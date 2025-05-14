@@ -1,0 +1,61 @@
+{% extends "gid\base.html" %}
+
+{% block conteudo %}
+        
+    <div class='divisoria' id='id_teste'>
+        <img src = "data:image/png;base64, {{ grafl1_1 }}" alt="" class='imagemsuperior'>
+        <img src = "data:image/png;base64, {{ grafl1_2 }}" alt="" class='imagemsuperior'>
+        <img src = "data:image/png;base64, {{ grafl1_3 }}" alt="" class='imagemsuperior'>  
+        
+    </div>
+
+    <div class='divisoria'>
+        <img src = "data:image/png;base64, {{ grafl2_1 }}" alt="" class='imagem'>  
+        <img src = "data:image/png;base64, {{ grafl2_2 }}" alt="" class='imagem'>  
+        <img src = "data:image/png;base64, {{ grafl2_3 }}" alt="" class='imagem'>  
+    </div>
+
+    <div class='divisoria'>
+        <div> {{ grafl3_1 | safe }}</div>  
+       
+    </div>
+
+
+    <select id="meu-combobox">
+        <option value="1">Opção 1</option>
+        <option value="2">Opção 2</option>
+      </select>
+      
+
+      <button onclick="carregarElemento()">Recarregar</button>
+      <div id="minha-div">
+        <!-- Conteúdo que será atualizado -->
+      </div>
+
+{% endblock %} 
+
+{% block style %}
+    <style>
+    .divisoria{
+        display:flex;
+        flex-wrap: wrap;
+        align-items: center; 
+        justify-content: center; 
+        margin:5; 
+        padding: 0
+    }
+    .imagem{
+        margin:5;
+        width:500;
+        height:400;
+        border-radius: 20px;
+    }
+    .imagemsuperior{
+        margin:5;
+        width:500;
+        height:200;
+        border-radius: 20px;
+    }
+    </style>
+
+{% endblock %}
