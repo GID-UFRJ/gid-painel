@@ -24,6 +24,11 @@ use o segundo no prompt do CMDOS
 * instale o django
 use o comando: py -m pip install django
 
+* crie a pasta /importar/programa na raiz do repositorio e salve os dados nela
+
+* popule o banco de dados com os dados
+use o comando: py manage.py importar_programas
+
 * prepare as migrações
 use o comando: py manage.py makemigrations
 
