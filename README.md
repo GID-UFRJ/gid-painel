@@ -40,4 +40,4 @@ Obs: se for windows use **py**, se for linux use **python**
   - use o comando: `py manage.py createsuperuser`
 
 * inicie o servidor
-  - use o comando: `py manage.py runserver
+  - use o comando: `py manage.py runserver`
