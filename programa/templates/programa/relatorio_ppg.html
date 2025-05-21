@@ -1,4 +1,4 @@
-{% extends "gid\base.html" %}
+{% extends "gid/base.html" %}
 
 {% block conteudo %}
         
@@ -6,17 +6,27 @@
         <img src = "data:image/png;base64, {{ grafl1_1 }}" alt="" class='imagemsuperior'>
         <img src = "data:image/png;base64, {{ grafl1_2 }}" alt="" class='imagemsuperior'>
         <img src = "data:image/png;base64, {{ grafl1_3 }}" alt="" class='imagemsuperior'>  
-        
     </div>
+
+    <div class='divisoria'>
+        <div class='grafico'> {{ grafl3_1 | safe }}</div>  
+        <div class='grafico'> {{ grafl3_2 | safe }}</div>  
+        <div class='grafico'> {{ grafl3_3 | safe }}</div>  
+        <div class='grafico'> {{ grafl3_4 | safe }}</div>  
+        <div class='grafico'> {{ grafl3_5 | safe }}</div>  
+    </div>
+    
+    <div class='divisoria'>
+        <div class='grafico'> {{ grafl3_6 | safe }}</div>  
+        <div class='grafico'> {{ grafl3_7 | safe }}</div>  
+    <div>
+
 
     <div class='divisoria'>
         <img src = "data:image/png;base64, {{ grafl2_1 }}" alt="" class='imagem'>  
         <img src = "data:image/png;base64, {{ grafl2_2 }}" alt="" class='imagem'>  
         <img src = "data:image/png;base64, {{ grafl2_3 }}" alt="" class='imagem'>  
-    </div>
-
-    <div class='divisoria'>
-        <div> {{ grafl3_1 | safe }}</div>  
+        
        
     </div>
 
@@ -36,6 +46,13 @@
 
 {% block style %}
     <style>
+    .grafico{
+        border: 2px solid blue;
+        padding:5px;
+        margin:5px;
+        background-color: white;
+        border-radius: 20px;
+    }
     .divisoria{
         display:flex;
         flex-wrap: wrap;
