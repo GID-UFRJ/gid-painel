@@ -24,17 +24,18 @@ class Ano(models.Model):
         return f"{self.ano}"
 
 class Resultado(models.Model):
-    rankingId = models.ForeignKey(Ranking, on_delete=models.CASCADE)
-    escopoId = models.ForeignKey(Escopo, on_delete=models.CASCADE)
-    anoId = models.ForeignKey(Ano, on_delete=models.CASCADE)
+    resultadoId = models.AutoField(primary_key=True)
+    ranking = models.ForeignKey(Ranking, on_delete=models.CASCADE)
+    escopo = models.ForeignKey(Escopo, on_delete=models.CASCADE)
+    ano = models.ForeignKey(Ano, on_delete=models.CASCADE)
     posicao = models.FloatField(null = False)
     pontuacaoGeral = models.FloatField(null = True, blank=True)
 
     class Meta:
         db_table_comment = "Resultados dos rankings em um dado escopo e ano"
         constraints = [
-        models.UniqueConstraint(fields=['rankingId', 'escopoId', 'anoId'], name='unique_resultados_tripla'), #Não achei como modelar chaves estrangeiras como chave primária composta, mas isso deve servir 
+        models.UniqueConstraint(fields=['ranking', 'escopo', 'ano'], name='unique_resultados_tripla'), #Não achei como modelar chaves estrangeiras como chave primária composta, mas isso deve servir 
         ] 
 
     def __str__(self):
-        return f"{self.rankingId.rankingNome} | {self.escopoId.escopoNome} | {self.anoId.ano}"
+        return f"{self.ranking.rankingNome} | {self.escopo.escopoNome} | {self.ano.ano}"

@@ -18,7 +18,7 @@ class Grafico_programa:
             values('modalidade__modalidadeNome').\
             annotate(contagem=Count('codigo', distinct=True))
         df = pd.DataFrame.from_records(queryset)
-        img = grafico_barra_plotly2(df, 'modalidade__modalidadeNome', 'contagem', 'Programas por modalidade', 'modalidade')
+        img = grafico_barra_plotly2(df, 'modalidade__modalidadeNome', 'contagem', 'Programas por modalidade', 'modalidade', 'nº programas')
         return(img)
     
     def programas_centro_plotly(self):
@@ -27,7 +27,7 @@ class Grafico_programa:
             annotate(contagem=Count('codigo', distinct=True)).\
             order_by('contagem')
         df = pd.DataFrame.from_records(queryset)
-        img = grafico_barra_plotly2(df, 'contagem', 'centro__centroNome','Programas por centro', 'centro', largura=1000, orientacao='h')
+        img = grafico_barra_plotly2(df, 'contagem', 'centro__centroNome','Programas por centro', 'nº programas','centro', largura=1000, orientacao='h')
         return(img)
 
     def programas_rede_plotly(self):
@@ -35,7 +35,7 @@ class Grafico_programa:
             values('rede__redeNome').\
             annotate(contagem=Count('codigo', distinct=True))
         df = pd.DataFrame.from_records(queryset)
-        img = grafico_barra_plotly2(df, 'rede__redeNome', 'contagem', 'Programas por rede', 'rede')
+        img = grafico_barra_plotly2(df, 'rede__redeNome', 'contagem', 'Programas por rede', 'rede', 'nº programas')
         return(img)
 
     def programasAcademicos_conceito_plotly(self):
@@ -43,7 +43,7 @@ class Grafico_programa:
             values('conceito').\
             annotate(contagem=Count('codigo', distinct=True))
         df = pd.DataFrame.from_records(queryset)
-        img = grafico_barra_plotly2(df, 'conceito', 'contagem', 'Programas acadêmico por conceito', 'conceito')
+        img = grafico_barra_plotly2(df, 'conceito', 'contagem', 'Programas acadêmico por conceito', 'conceito', 'nº de programas')
         return(img)
     
     def programasProfissionais_conceito_plotly(self):
@@ -51,7 +51,7 @@ class Grafico_programa:
             values('conceito').\
             annotate(contagem=Count('codigo', distinct=True))
         df = pd.DataFrame.from_records(queryset)
-        img = grafico_barra_plotly2(df, 'conceito', 'contagem', 'Programas acadêmico por conceito', 'conceito')
+        img = grafico_barra_plotly2(df, 'conceito', 'contagem', 'Programas acadêmico por conceito', 'conceito', 'nº programas')
         return(img)
     
     def programas_unidade_plotly(self):
@@ -60,7 +60,7 @@ class Grafico_programa:
             annotate(contagem=Count('codigo', distinct=True)).\
             order_by('contagem')
         df = pd.DataFrame.from_records(queryset)
-        img = grafico_barra_plotly2(df, 'contagem', 'unidade__unidadeNome','Programas por unidade', 'unidade', largura=750, altura = 1000,orientacao='h')
+        img = grafico_barra_plotly2(df, 'contagem', 'unidade__unidadeNome','Programas por unidade', 'nº programas','unidade', largura=750, altura = 1000,orientacao='h')
         return(img)
 
     def programas_areaAvaliacao_plotly(self):
@@ -70,7 +70,7 @@ class Grafico_programa:
             order_by('contagem')
         df = pd.DataFrame.from_records(queryset)
         df['areaAvaliacao__areaAvaliacaoNome'] = df['areaAvaliacao__areaAvaliacaoNome'].str.strip()
-        img = grafico_barra_plotly2(df, 'contagem', 'areaAvaliacao__areaAvaliacaoNome','Programas por Área de Avaliacao', 'areaAvaliacao', largura=750, altura = 1000,orientacao='h')
+        img = grafico_barra_plotly2(df, 'contagem', 'areaAvaliacao__areaAvaliacaoNome','Programas por Área de Avaliacao', 'nº programas','areaAvaliacao', largura=750, altura = 1000,orientacao='h')
         return(img)
 
 

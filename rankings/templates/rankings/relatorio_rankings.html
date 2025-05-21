@@ -1,0 +1,60 @@
+{% extends "gid/base.html" %}
+
+{% block conteudo %}
+        
+    <div class='divisoria' id='id_teste'>
+        <img src = "data:image/png;base64, {{ grafl1_1 }}" alt="" class='imagemsuperior'>
+        <img src = "data:image/png;base64, {{ grafl1_2 }}" alt="" class='imagemsuperior'>
+        <img src = "data:image/png;base64, {{ grafl1_3 }}" alt="" class='imagemsuperior'>  
+    </div>
+
+    <div class='divisoria'>
+        <div class='grafico'> {{ graf_01 | safe }}</div>  
+        <div class='grafico'> {{ graf_02 | safe }}</div>  
+        <div class='grafico'> {{ graf_03 | safe }}</div>  
+        <div class='grafico'> {{ graf_04 | safe }}</div>  
+        <div class='grafico'> {{ graf_05 | safe }}</div>  
+        <div class='grafico'> {{ graf_06 | safe }}</div>  
+    </div>
+    
+
+
+
+      
+
+
+
+{% endblock %} 
+
+{% block style %}
+    <style>
+    .grafico{
+        border: 2px solid blue;
+        padding:5px;
+        margin:5px;
+        background-color: white;
+        border-radius: 20px;
+    }
+    .divisoria{
+        display:flex;
+        flex-wrap: wrap;
+        align-items: center; 
+        justify-content: center; 
+        margin:5; 
+        padding: 0
+    }
+    .imagem{
+        margin:5;
+        width:500;
+        height:400;
+        border-radius: 20px;
+    }
+    .imagemsuperior{
+        margin:5;
+        width:500;
+        height:200;
+        border-radius: 20px;
+    }
+    </style>
+
+{% endblock %}
