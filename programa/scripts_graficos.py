@@ -90,17 +90,17 @@ class Grafico_programa:
  
     def graf_kpi_programa(self):
         resultado = self.queryset.aggregate(total=Count('codigo', distinct=True))
-        img = grafico_kpi(resultado['total'], 'Programas Stricto Sensu')
+        img = grafico_kpi(resultado['total'], 'Programas Stricto Sensu', cor='#4169E1')
         return(img)
     
     def graf_kpi_programa_academicos(self):
         resultado = self.queryset.filter(modalidade__modalidadeNome__in=['ACADÊMICO']).aggregate(total=Count('codigo', distinct=True))
-        img = grafico_kpi(resultado['total'], 'Programas Stricto Sensu')
+        img = grafico_kpi(resultado['total'], 'Programas Acadêmicos', cor='#4169E1')
         return(img)
     
     def graf_kpi_programa_profissionais(self):
         resultado = self.queryset.filter(modalidade__modalidadeNome__in=['PROFISSIONAL']).aggregate(total=Count('codigo', distinct=True))
-        img = grafico_kpi(resultado['total'], 'Programas Stricto Sensu')
+        img = grafico_kpi(resultado['total'], 'Programas Profissionais', cor='#4169E1')
         return(img)
 
     def graf_kpi_programa_rede(self):

@@ -42,6 +42,7 @@ def grafico_barra_plotly2(
     )
     fig.update_traces(
         textposition='outside',
+        textfont_weight='bold',
         textfont=dict(
             size=tamanho_rotulo_dados,
             color='blue'
