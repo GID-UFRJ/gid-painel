@@ -32,12 +32,12 @@ def grafico_barra_plotly2(
         yaxis=dict(
             showgrid=True if orientacao=='v' else False,
             gridcolor='lightgrey',
-            gridwidth=2            
+            gridwidth=0.001, griddash='dot'
         ),
         xaxis=dict(
             showgrid= True if orientacao!='v' else False,
             gridcolor='lightgrey',
-            gridwidth=2            
+            gridwidth=0.001, griddash='dot'            
         )
     )
     fig.update_traces(
@@ -59,34 +59,49 @@ def grafico_barra_plotly2(
     return(fig)
 
 def grafico_linha_plotly2(
-    x: str, 
-    y: str, 
+    x: list, 
+    y: list, 
     titulo:str | None='', 
     titulo_eixo_x: str | None='', 
     titulo_eixo_y:str | None='', 
     tamanho_rotulo_dados:str | None=20,
     largura:int | None = 500,
-    altura:int | None = 500):
-    
+    altura:int | None = 500,
+    inverter_eixo_y:bool | None = False,
+    y0:int | None = 0):
 
-    fig = go.Figure(layout=go.Layout(width=750,height=500))
+    if inverter_eixo_y:
+        y_inicial = y.max()*1.2
+        y_final = y0
+    else:
+        y_inicial = y0
+        y_final = y.max()*1.2
+
+    
+    fig = go.Figure(layout=go.Layout(width=largura,height=altura))
     fig.add_trace(
         go.Scatter(
             x=x, 
             y=y, 
             line=dict(color=None, width=6),
-            mode=None,
-            marker=dict(
-                symbol='circle',  # ou 'square', 'circle', etc.
-                size=20,
-                color=None
-            ),
+            marker=dict(symbol='circle', size=20, color=None),
+            mode='markers+text+lines',
+            text=y,
+            textposition='top center',
+            line_shape='spline'
         )
     )
     fig.update_layout(
-        yaxis=dict(autorange='reversed')
+        title=dict(text = titulo, x= 0.5, xanchor= 'center'), 
+        xaxis_title=titulo_eixo_x, 
+        yaxis_title=titulo_eixo_y,
+        plot_bgcolor='white',
+        yaxis=dict(showgrid=True, gridcolor='lightgrey', gridwidth=0.001, griddash='dot', range=[y_inicial, y_final]),
+        xaxis=dict(showgrid= False, gridcolor='lightgrey', gridwidth=2)
     )
-    
+    fig.update_traces(
+        textfont=dict(size=tamanho_rotulo_dados, color='blue', weight='bold')
+    )
     fig = to_html(fig, full_html=False)
     return(fig)
 

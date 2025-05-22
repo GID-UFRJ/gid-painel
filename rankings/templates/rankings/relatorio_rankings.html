@@ -3,9 +3,9 @@
 {% block conteudo %}
         
     <div class='divisoria' id='id_teste'>
-        <img src = "data:image/png;base64, {{ grafl1_1 }}" alt="" class='imagemsuperior'>
-        <img src = "data:image/png;base64, {{ grafl1_2 }}" alt="" class='imagemsuperior'>
-        <img src = "data:image/png;base64, {{ grafl1_3 }}" alt="" class='imagemsuperior'>  
+        <img src = "data:image/png;base64, {{ card_01 }}" alt="" class='imagemsuperior'>
+        <img src = "data:image/png;base64, {{ card_02 }}" alt="" class='imagemsuperior'>
+        <img src = "data:image/png;base64, {{ card_03 }}" alt="" class='imagemsuperior'>  
     </div>
 
     <div class='divisoria'>
@@ -17,13 +17,6 @@
         <div class='grafico'> {{ graf_06 | safe }}</div>  
     </div>
     
-
-
-
-      
-
-
-
 {% endblock %} 
 
 {% block style %}
@@ -50,6 +43,7 @@
         border-radius: 20px;
     }
     .imagemsuperior{
+        border: 2px solid blue;
         margin:5;
         width:500;
         height:200;
