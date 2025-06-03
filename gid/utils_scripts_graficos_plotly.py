@@ -64,6 +64,7 @@ def grafico_linha_plotly2(
     titulo:str | None='', 
     titulo_eixo_x: str | None='', 
     titulo_eixo_y:str | None='', 
+    adicionar_rotulo_dados:bool | None=True,
     tamanho_rotulo_dados:str | None=20,
     largura:int | None = 500,
     altura:int | None = 500,
@@ -77,6 +78,13 @@ def grafico_linha_plotly2(
         y_inicial = y0
         y_final = y.max()*1.2
 
+    # --- Configurando os rotulos baseados no parametro 'adicionar_rotulo_dados' ---
+    modo = 'markers+lines'
+    rotulo_dados = None # Se 'adicionar_rotulo_dados' for falso: sem rótulos
+
+    if adicionar_rotulo_dados:
+        modo = 'markers+text+lines'
+        rotulo_dados = y # Se 'adicionar_rotulo_dados' for verdadeiro: rotulo dos dados corresponde ao eixo y
     
     fig = go.Figure(layout=go.Layout(width=largura,height=altura))
     fig.add_trace(
@@ -85,8 +93,8 @@ def grafico_linha_plotly2(
             y=y, 
             line=dict(color=None, width=6),
             marker=dict(symbol='circle', size=20, color=None),
-            mode='markers+text+lines',
-            text=y,
+            mode=modo,
+            text=rotulo_dados,
             textposition='top center',
             line_shape='spline'
         )
