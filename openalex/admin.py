@@ -8,6 +8,7 @@ from .models import (
     PrimarySource,
     Work,
     Institution,
+    Author,
     Authorship,
     AuthorshipInstitution,
     CitedByYear,
@@ -21,6 +22,7 @@ admin.site.register(OAStatus)
 admin.site.register(PrimarySource)
 admin.site.register(Work)
 admin.site.register(Institution)
+admin.site.register(Author)
 admin.site.register(Authorship)
 admin.site.register(AuthorshipInstitution)
 admin.site.register(CitedByYear)
