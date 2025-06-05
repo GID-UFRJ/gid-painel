@@ -1,0 +1,64 @@
+{% extends "gid/base.html" %}
+
+{% block conteudo %}
+
+    <select 
+        name ='categoria'
+        id="select-categoria"
+        hx-get="{% url 'teste' %}" 
+        hx-target="#graf" 
+        hx-swap="innerHTML"
+        hx-trigger="change" >
+
+        <option value='QS'>QS</option >
+        <option value='THE'>THE</option>
+    </select>
+
+        
+    <div class='divisoria' id = 'graf'>
+        <div class='grafico'> {{ graf_01 | safe }}</div>
+        <div class='grafico'> {{ graf_02 | safe }}</div>
+    </div>
+
+
+    <br>------------------------------<br>
+
+
+
+
+    
+{% endblock %} 
+
+{% block style %}
+    <style>
+    .grafico{
+        border: 2px solid blue;
+        padding:5px;
+        margin:5px;
+        background-color: white;
+        border-radius: 20px;
+    }
+    .divisoria{
+        display:flex;
+        flex-wrap: wrap;
+        align-items: center; 
+        justify-content: center; 
+        margin:5; 
+        padding: 0
+    }
+    .imagem{
+        margin:5;
+        width:500;
+        height:400;
+        border-radius: 20px;
+    }
+    .imagemsuperior{
+        border: 2px solid blue;
+        margin:5;
+        width:500;
+        height:200;
+        border-radius: 20px;
+    }
+    </style>
+
+{% endblock %}

@@ -1,5 +1,7 @@
+{% load django_htmx %}
 <html lang="en">
 <head>
+    {% htmx_script %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
@@ -37,11 +39,13 @@
     
 
 </head>
-<body>
+
+<body hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
     <div>
         <ul>
             <li><a href={% url "ppgs" %}>Programas</a></li>
             <li><a href={% url "rankings" %}>Rankings</a></li>
+            <li><a href={% url "teste" %}>teste interatividade</a></li>
             <li style="float:right"><a class="active">PAINEL //// GID - PR2</a></li>
         </ul>
     </div>
