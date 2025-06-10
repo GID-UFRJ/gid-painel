@@ -1,5 +1,9 @@
 db.sqlite3
 __pycache__/
 venv/
-importar/
-dados/
+importar/*
+dados/*
+*.ipynb
+openalex
+.env
+*.pem

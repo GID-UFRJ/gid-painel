@@ -1,0 +1,16 @@
+yourdomain.com {
+    # Reverse proxy to Gunicorn (Django)
+    reverse_proxy gid-painel:8000  # "gid-painel" = service name in Compose
+
+    # Serve static files (optional, if not using WhiteNoise)
+    @static {
+        path /static/*
+    }
+    handle @static {
+        root * /app/staticfiles
+        file_server
+    }
+
+    # Automatic HTTPS
+    tls
+}
