@@ -5,3 +5,4 @@ importar/
 dados/
 openalex/database/
 docs/
+*.ipynb

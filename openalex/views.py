@@ -20,13 +20,32 @@ def producao(request):
         #'card_04':p.producao_total_citacoes(),
                  
         'graf_01':p.producao_por_ano(ano_inicial=1990, ano_final=2024),
-        #'graf_02':g.qs_americaLatina(),
-        #'graf_03':g.the_mundo(),
-        #'graf_04':g.the_americaLatina(),
+        'graf_02':p.producao_por_ano_worktype(ano_inicial=1990, ano_final=2024),
+        'graf_03':p.producao_por_ano_worktype(ano_inicial=1990, 
+                                              ano_final=2024,
+                                              tipo_plot='barra'),
+        'graf_04': p.distribuicao_tematica_artigos(),
+        'graf_04':p.metricas_por_topico_artigos_plot(),
         #'graf_05':g.shanghai_mundo(),
         #'graf_06':g.shanghai_nacional(),
     }
 )
  
 def visibilidade(request):
-    return render(request, r'openalex/visibilidade.html', {'placeholder': 'Página em construção'})
+    p = PlotsVisibilidade()
+
+    return render(request, r'openalex/visibilidade.html', {
+        'card_01':p.producao_total_citacoes(),
+        'card_02':p.producao_colaboracao_nacional(),
+        'card_03':p.producao_colaboracao_internacional(),
+
+        'graf_01':p.top_instituicoes_colaboradoras(internacional=False),
+        'graf_02':p.top_instituicoes_colaboradoras(internacional=True),
+        #'graf_02':p.top_instituicoes_colaboradoras(internacional=True),
+        #'graf_02':p.producao_por_ano_worktype(ano_inicial=1990, ano_final=2024),
+        #'graf_03':p.producao_por_ano_worktype(ano_inicial=1990, 
+        #                                      ano_final=2024,
+        #                                      tipo_plot='barra'),
+        #'graf_04': p.distribuicao_tematica_artigos(),
+    }
+)

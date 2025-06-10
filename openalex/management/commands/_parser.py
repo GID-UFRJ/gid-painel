@@ -115,7 +115,7 @@ class OpenAlexWorkParser:
                 topic_id=topic_id,
                 defaults={
                     "topic_name": t.get("display_name"),
-                    "subfield_name": t.get("subfield", {}).get("display_name", "")[:2],
+                    "subfield_name": t.get("subfield", {}).get("display_name", ""),
                     "field_name": t.get("field", {}).get("display_name", ""),
                     "domain_name": t.get("domain", {}).get("display_name", "")
                 }

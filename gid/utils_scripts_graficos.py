@@ -78,12 +78,25 @@ def grafico_pizza(titulo, **arg_pie):
     plt.close()
     return(img)
 
-def grafico_kpi(valor: int, rotulo: str, exibir_percentual:bool | None=False, cor: str | None=cores[0], exibir_posicao:bool | None = False):
-    valor = str(valor)
+def grafico_kpi(valor: int, 
+                rotulo: str, 
+                exibir_percentual:bool | None=False, 
+                cor: str | None=cores[0], 
+                exibir_posicao:bool | None = False,
+                exibir_magnitude:bool | None = False
+                ):
     if exibir_percentual:
         valor = f'{str(valor)} %'
     if exibir_posicao:
         valor = f'{str(valor)} º'
+    if exibir_magnitude:
+        valor = int(valor)
+        magnitude = 0
+        while abs(valor) >= 1000:
+            magnitude += 1
+            valor /= 1000.0
+        valor=f"{valor:.2f}{['', 'K', 'M', 'B', 'T'][magnitude]}"
+    
     fig = plt.figure(figsize=(4, 1.8))
     axs = fig.subplot_mosaic('A')
     axs['A'].text(0.5, 0.6, valor, ha='center', va='center', fontsize=60, color = cor, fontweight='semibold')
