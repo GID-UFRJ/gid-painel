@@ -7,10 +7,10 @@ services:
       - DJANGO_SECRET_KEY=sua_chave_secreta_aqui # python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
       - DJANGO_DEBUG=False
       - POSTGRES_USER=gid
+      - POSTGRES_NAME=gid_db # table name
       - POSTGRES_PASSWORD=gid_dashboard
-      - POSTGRES_DB=gid_db
-      - POSTGRES_HOST=postgres # databse service name
-      - POSTGRES_PORT=5432 #default port
+      - POSTGRES_HOST=postgres # database service name
+      - POSTGRES_PORT=5433 #default port
     volumes:
       - static_volume:/app/staticfiles  # Volume para arquivos estáticos
       - importar:/app/importar # Volume para arquivos usados para população inicial da db
@@ -23,6 +23,8 @@ services:
       - POSTGRES_USER=gid
       - POSTGRES_PASSWORD=gid_dashboard
       - POSTGRES_DB=gid_db
+    ports:
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

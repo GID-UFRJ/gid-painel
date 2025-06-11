@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-i6)ja+__8l9=1aj8_3s$!(p(1(0=f3z@tt$th62cnb71h9q3%q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['dashboard.labinfo.bioqmed.ufrj.br', 'localhost']
+ALLOWED_HOSTS = ['dashboard.labinfo.bioqmed.ufrj.br', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -74,13 +74,6 @@ WSGI_APPLICATION = 'gid.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': BASE_DIR / 'db.sqlite3',
-#    }
-#}
 
 DATABASES = {
     'default': {

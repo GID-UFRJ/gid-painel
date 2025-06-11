@@ -5,8 +5,7 @@ FROM python:3.13-slim AS builder
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     python3-dev \
-    libpq-dev \                   
-    postgresql-server-dev-all \    
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Ambiente virtual e instalação de dependências
@@ -24,6 +23,12 @@ FROM python:3.13-slim
 ENV PYTHONUNBUFFERED=1         
 # Evita lixo no container
 ENV PYTHONDONTWRITEBYTECODE=1  
+
+# Instalando dependências de runtime
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    && rm -rf /var/lib/apt/lists/*
+
 
 # Copia apenas o ambiente virtual (sem as dependências de compilação)
 COPY --from=builder /opt/venv /opt/venv
