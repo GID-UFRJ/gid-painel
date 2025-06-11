@@ -4,7 +4,6 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
       - DJANGO_SECRET_KEY=sua_chave_secreta_aqui # python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
       - DJANGO_DEBUG=False
       - POSTGRES_USER=gid
@@ -23,7 +22,7 @@ services:
     environment: #Change these
       - POSTGRES_USER=gid
       - POSTGRES_PASSWORD=gid_dashboard
-      - POSTGRES_DB=gid_dashboard
+      - POSTGRES_DB=gid_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
