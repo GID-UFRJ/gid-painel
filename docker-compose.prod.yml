@@ -24,24 +24,24 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  caddy:
-    image: caddy:latest
-    ports:
-      - "80:80"
-      - "443:443"  # Para HTTPS automático
-    volumes:
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data  # Para armazenar certificados SSL
-      - caddy_config:/config
-      - static_volume:/app/staticfiles
-      - media_volume:/app/media
-    depends_on:
-      - gid-painel
+  #caddy:
+  #  image: caddy:latest
+  #  ports:
+  #    - "80:80"
+  #    - "443:443"  # Para HTTPS automático
+  #  volumes:
+  #    - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+  #    - caddy_data:/data  # Para armazenar certificados SSL
+  #    - caddy_config:/config
+  #    - static_volume:/app/staticfiles
+  #    - media_volume:/app/media
+  #  depends_on:
+  #    - gid-painel
 
 volumes:
   postgres_data:
   static_volume:
   media_volume:
   importar:
-  caddy_data:
-  caddy_config: 
+  #caddy_data:
+  #caddy_config: 
