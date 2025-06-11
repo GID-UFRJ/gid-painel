@@ -12,5 +12,5 @@ yourdomain.com {
     }
 
     # Automatic HTTPS
-    tls
+    tls email@gmail.com
 }

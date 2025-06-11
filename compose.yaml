@@ -6,19 +6,24 @@ services:
     environment:
       - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
       - DJANGO_SECRET_KEY=sua_chave_secreta_aqui # python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-      - DJANGO_DEBUG=0
+      - DJANGO_DEBUG=False
+      - POSTGRES_USER=gid
+      - POSTGRES_PASSWORD=gid_dashboard
+      - POSTGRES_DB=gid_db
+      - POSTGRES_HOST=postgres # databse service name
+      - POSTGRES_PORT=5432 #default port
     volumes:
       - static_volume:/app/staticfiles  # Volume para arquivos estáticos
       - importar:/app/importar # Volume para arquivos usados para população inicial da db
     depends_on:
-      - db
+      - postgres
 
-  db:
+  postgres:
     image: postgres:13
     environment: #Change these
-      - POSTGRES_USER=postgres 
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=postgres
+      - POSTGRES_USER=gid
+      - POSTGRES_PASSWORD=gid_dashboard
+      - POSTGRES_DB=gid_dashboard
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

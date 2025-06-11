@@ -8,3 +8,4 @@ dados
 openalex/database
 docs
 *.ipynb
+.env
