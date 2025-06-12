@@ -7,15 +7,15 @@ services:
       - DJANGO_SECRET_KEY=sua_chave_secreta_aqui # python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
       - DJANGO_DEBUG=False
       - POSTGRES_USER=gid
-      - POSTGRES_NAME=gid_db # database name
+      - POSTGRES_NAME=gid_db # nome da database
       - POSTGRES_PASSWORD=gid_dashboard
-      - POSTGRES_HOST=postgres # database server service name
-      - POSTGRES_PORT=5432 #default port
+      - POSTGRES_HOST=postgres # nome do serviço do DB server
+      - POSTGRES_PORT=5432 # porta utilizada pelo DB server
     volumes:
       - static_volume:/app/staticfiles  # Volume para arquivos estáticos
-      - importar:/app/importar # Volume para arquivos usados para população inicial da db
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy # Garante que o aplicativo principal irá espera o DB estar saudável
 
   postgres:
     image: postgres:17.5
@@ -27,25 +27,31 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck: # Essencial para a condição 'service_healthy'
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  #caddy:
-  #  image: caddy:latest
-  #  ports:
-  #    - "80:80"
-  #    - "443:443"  # Para HTTPS automático
-  #  volumes:
-  #    - ./caddy/Caddyfile:/etc/caddy/Caddyfile
-  #    - caddy_data:/data  # Para armazenar certificados SSL
-  #    - caddy_config:/config
-  #    - static_volume:/app/staticfiles
-  #    - media_volume:/app/media
-  #  depends_on:
-  #    - gid-painel
+  init-db: # Este serviço executará seus comandos de configuração inicial
+    build: . # Usa o mesmo Dockerfile que o gid-painel
+    command: sh -c "python manage.py migrate --no-input \
+                    && python manage.py importar_programas \
+                    && python manage.py importar_rankings" # Use --no-input para migrations
+    volumes:
+      - ./importar:/app/importar # Monta o volume com os arquivos CSV para população inicial da DB
+    environment: # Precisa das credenciais do banco de dados
+      - POSTGRES_USER=gid
+      - POSTGRES_NAME=gid_db
+      - POSTGRES_PASSWORD=gid_dashboard
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+    depends_on:
+      postgres:
+        condition: service_healthy # Crucialmente, espera o banco de dados estar realmente pronto
+    profiles: ["setup"] # Isso o torna um serviço de configuração única - comando para popular a DB: $> docker compose --profile setup up --build -d
 
 volumes:
-  postgres_data:
   static_volume:
-  media_volume:
   importar:
-  #caddy_data:
-  #caddy_config: 
+  postgres_data:
