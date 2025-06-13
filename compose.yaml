@@ -30,8 +30,6 @@ services:
       - POSTGRES_USER=gid
       - POSTGRES_PASSWORD=gid_dashboard
       - POSTGRES_DB=gid_db
-    ports:
-      - "5433:5432" # Porta para acesso direto ao DB do host (opcional, pode remover se não precisar)
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -66,9 +64,9 @@ services:
   caddy:
     image: caddy:2.7.6-alpine 
     ports:
-      - "80:80"   # HTTP
-      - "443:443" # HTTPS
-      - "443:443/udp" # QUIC (opcional, mas recomendado)
+      - "8000:80"   # HTTP
+      - "8443:443" # HTTPS
+      - "8443:443/udp" # QUIC (opcional, mas recomendado)
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile # Mapeia Caddyfile do host
       - caddy_data:/data                     # Volume para dados persistentes do Caddy (certificados SSL)

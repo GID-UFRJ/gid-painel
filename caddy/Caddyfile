@@ -1,5 +1,5 @@
 # Use a variável de ambiente para o domínio
-{$CADDY_DOMAIN} {
+{$CADDY_DOMAIN}:80 { #Caddy escutando na porta 80 interna do contêiner, esperando o Host do domínio real
     # Configura o proxy reverso para o serviço Django
     reverse_proxy {$DJANGO_HOST}:{$DJANGO_PORT}
 
@@ -16,7 +16,7 @@
     # Se for localhost, um IP, ou não conseguir Let's Encrypt, Caddy usará tls internal automaticamente.
     #
     # É uma boa prática informar um e-mail para Let's Encrypt:
-    tls {$CADDY_EMAIL} # Caddy usará este email para notificações de Let's Encrypt
+    #tls {$CADDY_EMAIL} # Se quiser que a terminação SLL/TLS ocorra aqui, descomente essa linha 
 
     # Compressão
     encode gzip zstd
