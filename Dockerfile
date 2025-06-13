@@ -38,6 +38,13 @@ ENV PATH="/opt/venv/bin:$PATH"
 WORKDIR /app
 COPY . .
 
+# Definindo os valores padrão das variáveis da aplicação 
+ENV DJANGO_PORT 8000
+ENV GUNICORN_WORKERS 1
+
+#Expondo a porta do app
+EXPOSE ${DJANGO_PORT}
+
 # Copiando o script entrypoint para dentro do contêiner
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
