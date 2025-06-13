@@ -1,16 +1,28 @@
-yourdomain.com {
-    # Reverse proxy to Gunicorn (Django)
-    reverse_proxy gid-painel:8000  # "gid-painel" = service name in Compose
+# Use a variável de ambiente para o domínio
+{$CADDY_DOMAIN} {
+    # Configura o proxy reverso para o serviço Django
+    reverse_proxy {$DJANGO_HOST}:{$DJANGO_PORT}
 
-    # Serve static files (optional, if not using WhiteNoise)
-    @static {
-        path /static/*
-    }
-    handle @static {
+    # Serve arquivos estáticos diretamente do volume compartilhado
+    handle /static/* {
         root * /app/staticfiles
         file_server
     }
 
-    # Automatic HTTPS
-    tls email@gmail.com
+    # Gerenciamento de TLS (HTTPS)
+    # PARA DESENVOLVIMENTO LOCAL (com CADDY_DOMAIN=localhost ou 127.0.0.1):
+    tls internal
+
+    # PARA PRODUÇÃO (com CADDY_DOMAIN=seu_dominio.com e um email real):
+    # tls {$CADDY_EMAIL} # Caddy usará Let's Encrypt automaticamente
+    # Remova ou comente a linha 'tls internal' quando for para produção
+
+    # Compressão
+    encode gzip zstd
+
+    # Logs
+    log {
+        output stdout
+        format json
+    }
 }

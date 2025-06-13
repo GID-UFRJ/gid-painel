@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -129,7 +130,20 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Configurações para arquivos estáticos
+STATIC_URL = 'static/'
+# Onde o Django coletará os arquivos estáticos após `collectstatic`
+STATIC_ROOT = config('DJANGO_STATIC_ROOT', default=os.path.join(BASE_DIR, 'staticfiles'))
+# Certifique-se de que BASE_DIR esteja definido corretamente no seu settings.py
+
+# Configurações para arquivos de mídia (se você tiver uploads de usuário)
+# MEDIA_URL = 'media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles') # Crie este diretório
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+APP_PORT = config('DJANGO_PORT', default=8000, cast=int)

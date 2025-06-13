@@ -37,4 +37,15 @@ ENV PATH="/opt/venv/bin:$PATH"
 # Configuração da aplicação
 WORKDIR /app
 COPY . .
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "gid.wsgi:application"]
+
+# Copiando o script entrypoint para dentro do contêiner
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+
+# Tornando-o executável (prática defensiva)
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Definindo o ENTRYPOINT como o script copiado
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+#Entrypoint não espera argumentos padrão adicionais do CMD. Logo, CMD ficará vazio
+CMD []

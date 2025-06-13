@@ -1,58 +1,89 @@
 services:
   gid-painel:
     build: .
-    ports:
-      - "8000:8000"
     environment:
-      - DJANGO_SECRET_KEY=sua_chave_secreta_aqui # python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+      - DJANGO_SECRET_KEY=sua_chave_secreta_aqui
       - DJANGO_DEBUG=False
-      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,seuhost.com
-      - POSTGRES_USER=gid
-      - POSTGRES_NAME=gid_db # nome da database
-      - POSTGRES_PASSWORD=gid_dashboard
-      - POSTGRES_HOST=postgres # nome do serviço do DB server
-      - POSTGRES_PORT=5432 # porta utilizada pelo DB server
-    volumes:
-      - static_volume:/app/staticfiles  # Volume para arquivos estáticos
-    depends_on:
-      postgres:
-        condition: service_healthy # Garante que o aplicativo principal irá espera o DB estar saudável
-
-  postgres:
-    image: postgres:17.5
-    environment: 
-      - POSTGRES_USER=gid
-      - POSTGRES_PASSWORD=gid_dashboard
-      - POSTGRES_DB=gid_db
-    ports:
-      - "5433:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck: # Essencial para a condição 'service_healthy'
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  init-db: # Este serviço executará seus comandos de configuração inicial
-    build: . # Usa o mesmo Dockerfile que o gid-painel
-    command: sh -c "python manage.py migrate --no-input \
-                    && python manage.py importar_programas \
-                    && python manage.py importar_rankings" # Use --no-input para migrations
-    volumes:
-      - ./importar:/app/importar # Monta o volume com os arquivos CSV para população inicial da DB
-    environment: # Precisa das credenciais do banco de dados
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,seuhost.com #substituir 'seuhost.com' pelo domínio real
+      - DJANGO_PORT=8000 #8000 por padrão
+      - GUNICORN_WORKERS=1 #1 por padrão (recomendado usar mais em produção para multiplos usuários simultâneos)
       - POSTGRES_USER=gid
       - POSTGRES_NAME=gid_db
       - POSTGRES_PASSWORD=gid_dashboard
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
+      # Adicione esta variável para o Caddy saber onde encontrar os arquivos estáticos
+      - DJANGO_STATIC_ROOT=/app/staticfiles # Certifique-se que o Django coleta estáticos aqui
+    volumes:
+      # Certifique-se de que o diretório de arquivos estáticos esteja montado
+      # para o Caddy poder servi-los diretamente.
+      - static_volume:/app/staticfiles
+      - ./importar:/app/importar
     depends_on:
       postgres:
-        condition: service_healthy # Crucialmente, espera o banco de dados estar realmente pronto
-    profiles: ["setup"] # Isso o torna um serviço de configuração única - comando para popular a DB: $> docker compose --profile setup up --build -d
+        condition: service_healthy # Espera o DB estar saudável
+    restart: "on-failure" # Adicione para garantir que o serviço reinicie se cair
+
+  postgres:
+    image: postgres:17.5
+    environment:
+      - POSTGRES_USER=gid
+      - POSTGRES_PASSWORD=gid_dashboard
+      - POSTGRES_DB=gid_db
+    ports:
+      - "5433:5432" # Porta para acesso direto ao DB do host (opcional, pode remover se não precisar)
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: "on-failure"
+
+  init-db:
+    build: .
+    command: sh -c "python manage.py migrate --no-input \
+                     && python manage.py collectstatic --no-input \
+                     && python manage.py importar_programas \
+                     && python manage.py importar_rankings"
+    volumes:
+      - ./importar:/app/importar
+      # Se o collectstatic for executado, o volume static_volume precisa estar visível aqui também
+      - static_volume:/app/staticfiles
+    environment:
+      - POSTGRES_USER=gid
+      - POSTGRES_NAME=gid_db
+      - POSTGRES_PASSWORD=gid_dashboard
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - DJANGO_DEBUG=False # Defina o debug para falso para o collectstatic, se o settings usar
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles: ["setup"]
+
+  caddy:
+    image: caddy:2.7.6-alpine 
+    ports:
+      - "80:80"   # HTTP
+      - "443:443" # HTTPS
+      - "443:443/udp" # QUIC (opcional, mas recomendado)
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile # Mapeia Caddyfile do host
+      - caddy_data:/data                     # Volume para dados persistentes do Caddy (certificados SSL)
+      - static_volume:/app/staticfiles       # Monta o mesmo volume de arquivos estáticos
+    environment:
+      - CADDY_DOMAIN=localhost # Desenvolvimento: use localhost ou 127.0.0.1 - Produção: substitua por seu domínio real, ex: meuapp.com.br
+      - CADDY_EMAIL=dev@example.com # Email para Let's Encrypt (qualquer um para desenvolvimento, email válido para produção)
+      - DJANGO_HOST=gid-painel #Nome do serviço
+      - DJANGO_PORT=8000 #Porta do serviço 
+    depends_on:
+      gid-painel:
+        condition: service_started # Caddy precisa que o Django esteja rodando
+    restart: "unless-stopped" # Reinicia sempre, a menos que seja parado explicitamente
 
 volumes:
   static_volume:
-  importar:
   postgres_data:
+  caddy_data:
