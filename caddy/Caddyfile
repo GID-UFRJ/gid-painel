@@ -9,13 +9,14 @@
         file_server
     }
 
-    # Gerenciamento de TLS (HTTPS)
-    # PARA DESENVOLVIMENTO LOCAL (com CADDY_DOMAIN=localhost ou 127.0.0.1):
-    tls internal
-
-    # PARA PRODUÇÃO (com CADDY_DOMAIN=seu_dominio.com e um email real):
-    # tls {$CADDY_EMAIL} # Caddy usará Let's Encrypt automaticamente
-    # Remova ou comente a linha 'tls internal' quando for para produção
+    # GERENCIAMENTO DE TLS (HTTPS)
+    #
+    # Caddy irá tentar automaticamente Let's Encrypt se {$CADDY_DOMAIN} for um domínio público
+    # e acessível (portas 80/443 abertas).
+    # Se for localhost, um IP, ou não conseguir Let's Encrypt, Caddy usará tls internal automaticamente.
+    #
+    # É uma boa prática informar um e-mail para Let's Encrypt:
+    tls {$CADDY_EMAIL} # Caddy usará este email para notificações de Let's Encrypt
 
     # Compressão
     encode gzip zstd
