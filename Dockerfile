@@ -47,7 +47,6 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 # Definindo o ENTRYPOINT como o script copiado
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
-# Definindo o COMANDO PADRÃO para o contêiner (iniciar Gunicorn)
 # Este CMD será executado por padrão se nenhum 'command' for especificado no compose.yaml.
-# As variáveis ${DJANGO_PORT} e ${GUNICORN_WORKERS} serão expandidas pelo shell dentro do entrypoint.sh.
-CMD gunicorn --bind 0.0.0.0:${DJANGO_PORT} --workers ${GUNICORN_WORKERS} gid.wsgi:application
+# Entretanto, entrypoint.sh não precisa de nenhum argumento adicional, logo CMD será vazio aqui.
+CMD []

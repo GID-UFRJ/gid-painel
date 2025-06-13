@@ -1,21 +1,24 @@
 #!/bin/bash
 set -e # Sai imediatamente se um comando falhar
 
-# --- Lógica de setup de ambiente que SEMPRE deve rodar antes do comando principal ---
-# Ex: Definir variáveis de ambiente padrão, esperar pelo banco de dados (se não usar depends_on)
-DJANGO_PORT=${DJANGO_PORT:-8000}
-GUNICORN_WORKERS=${GUNICORN_WORKERS:-4}
+# Define GUNICORN_PORT com um valor padrão de 8000 se não estiver definido
+GUNICORN_PORT=${GUNICORN_PORT:-8000}
 
-# Exemplo de log para depuração:
-echo "--- Running Entrypoint Script ---"
-echo "DJANGO_PORT: ${DJANGO_PORT}"
-echo "GUNICORN_WORKERS: ${GUNICORN_WORKERS}"
-echo "Command to execute: $@" # Mostra o comando que será executado (CMD ou command do compose)
-echo "---------------------------------"
+# Define GUNICORN_WORKERS com um valor padrão de 2 se não estiver definido
+GUNICORN_WORKERS=${GUNICORN_WORKERS:-2}
 
-# --- EXECUTAR O COMANDO PASSADO COMO ARGUMENTO ---
-# Isso é CRUCIAL. "$@" expande para todos os argumentos passados para o script.
-# Se nenhum argumento for passado (como no init-db), ele não faz nada aqui, mas o CMD do compose.yaml
-# será o argumento.
-# Se o Dockerfile tiver um CMD, ele será o argumento.
-exec "$@"
+# Verificar se algum argumento foi passado para o entrypoint.sh
+# Se "$#" for maior que 0, significa que um comando (ou seus argumentos) foi fornecido
+if [ "$#" -gt 0 ]; then
+    echo "--- Executando comando customizado ---"
+    echo "Comando: '$@'"
+    # Executa o comando que foi passado para o entrypoint.sh
+    # Isso é o que init-db precisa para rodar seus comandos de migração
+    exec "$@"
+else
+    # Se nenhum argumento foi passado, executa o comando padrão (Gunicorn)
+    # Isso é o que gid-painel fará por padrão
+    echo "--- Iniciando Gunicorn (comando padrão) ---"
+    echo "Porta: ${GUNICORN_PORT}, Workers: ${GUNICORN_WORKERS}"
+    exec gunicorn --bind "0.0.0.0:${GUNICORN_PORT}" --workers "${GUNICORN_WORKERS}" gid.wsgi:application
+fi
