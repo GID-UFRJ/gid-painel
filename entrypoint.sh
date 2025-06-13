@@ -1,11 +1,21 @@
 #!/bin/bash
-# entrypoint.sh
+set -e # Sai imediatamente se um comando falhar
 
-# Definir um valor padrão para DJANGO_PORT e GUNICORN_WORKERS se não estiverem definidos
+# --- Lógica de setup de ambiente que SEMPRE deve rodar antes do comando principal ---
+# Ex: Definir variáveis de ambiente padrão, esperar pelo banco de dados (se não usar depends_on)
 DJANGO_PORT=${DJANGO_PORT:-8000}
-GUNICORN_WORKERS=${GUNICORN_WORKERS:-1} 
+GUNICORN_WORKERS=${GUNICORN_WORKERS:-4}
 
-echo "Iniciando Gunicorn na porta ${DJANGO_PORT} com ${GUNICORN_WORKERS} workers..."
+# Exemplo de log para depuração:
+echo "--- Running Entrypoint Script ---"
+echo "DJANGO_PORT: ${DJANGO_PORT}"
+echo "GUNICORN_WORKERS: ${GUNICORN_WORKERS}"
+echo "Command to execute: $@" # Mostra o comando que será executado (CMD ou command do compose)
+echo "---------------------------------"
 
-# Executar o Gunicorn.
-exec gunicorn --bind 0.0.0.0:${DJANGO_PORT} --workers ${GUNICORN_WORKERS} gid.wsgi:application
+# --- EXECUTAR O COMANDO PASSADO COMO ARGUMENTO ---
+# Isso é CRUCIAL. "$@" expande para todos os argumentos passados para o script.
+# Se nenhum argumento for passado (como no init-db), ele não faz nada aqui, mas o CMD do compose.yaml
+# será o argumento.
+# Se o Dockerfile tiver um CMD, ele será o argumento.
+exec "$@"

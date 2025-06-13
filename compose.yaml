@@ -48,9 +48,8 @@ services:
                      && python manage.py importar_programas \
                      && python manage.py importar_rankings"
     volumes:
-      - ./importar:/app/importar
-      # Se o collectstatic for executado, o volume static_volume precisa estar visível aqui também
-      - static_volume:/app/staticfiles
+      - ./importar:/app/importar # Montando dir do host com dados de população inicial da db
+      - static_volume:/app/staticfiles # Se o collectstatic for executado, o volume static_volume precisa estar visível aqui também
     environment:
       - POSTGRES_USER=gid
       - POSTGRES_NAME=gid_db
@@ -58,6 +57,7 @@ services:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - DJANGO_DEBUG=False # Defina o debug para falso para o collectstatic, se o settings usar
+      - DJANGO_STATIC_ROOT=/app/staticfiles # Certifique-se que DJANGO_STATIC_ROOT está aqui também
     depends_on:
       postgres:
         condition: service_healthy
