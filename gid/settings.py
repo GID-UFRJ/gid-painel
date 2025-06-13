@@ -26,8 +26,13 @@ SECRET_KEY = 'django-insecure-i6)ja+__8l9=1aj8_3s$!(p(1(0=f3z@tt$th62cnb71h9q3%q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['dashboard.labinfo.bioqmed.ufrj.br', 'localhost', '127.0.0.1']
+#Importando variavel de ambiente DJANGO_ALLOWED_HOSTS (string com hosts separados por virgula) usando decouple.config
+# config() tentará primeiro ler do ambiente (o que vem do Docker Compose),
+# depois de um arquivo .env, etc.
+ALLOWED_HOSTS_STR = config('DJANGO_ALLOWED_HOSTS', default='127.0.0.1,localhost')
 
+# Converte a string separada por vírgulas em uma lista
+ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',')]
 
 # Application definition
 

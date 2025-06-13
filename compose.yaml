@@ -6,6 +6,7 @@ services:
     environment:
       - DJANGO_SECRET_KEY=sua_chave_secreta_aqui # python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
       - DJANGO_DEBUG=False
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,seuhost.com
       - POSTGRES_USER=gid
       - POSTGRES_NAME=gid_db # nome da database
       - POSTGRES_PASSWORD=gid_dashboard
