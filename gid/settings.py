@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-i6)ja+__8l9=1aj8_3s$!(p(1(0=f3z@tt$th62cnb71h9q3%q'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DJANGO_DEBUG', cast=bool, default=False)
 
 #Importando variavel de ambiente DJANGO_ALLOWED_HOSTS (string com hosts separados por virgula) usando decouple.config
 # config() tentará primeiro ler do ambiente (o que vem do Docker Compose),

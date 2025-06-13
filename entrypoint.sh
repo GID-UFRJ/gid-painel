@@ -22,6 +22,6 @@ else
     # Se nenhum argumento foi passado (assume CMD vazio no Dockerfile), executa o comando padrão (Gunicorn)
     # Isso é o que gid-painel fará por padrão
     echo "--- Iniciando Gunicorn (comando padrão) ---"
-    echo "Porta: ${GUNICORN_PORT}, Workers: ${GUNICORN_WORKERS}"
-    exec gunicorn --bind "0.0.0.0:${GUNICORN_PORT}" --workers "${GUNICORN_WORKERS}" gid.wsgi:application
+    echo "Porta: ${DJANGO_PORT}, Workers: ${GUNICORN_WORKERS}"
+    exec gunicorn --bind "0.0.0.0:${DJANGO_PORT}" --workers "${GUNICORN_WORKERS}" gid.wsgi:application
 fi
