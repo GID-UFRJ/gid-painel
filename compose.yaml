@@ -1,6 +1,6 @@
 services:
   gid-painel:
-    build: .
+    image: gavieira/gid-painel:latest
     environment:
       # Variáveis da Aplicação Django (lidas do .env)
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
@@ -45,7 +45,8 @@ services:
     # Inicializa a db, criando tabelas e fazendo população inicial dos dados
     # Idealmente, deve ser executado usando 'docker compose run --rm init-db'
     # Executado assim, ele é removido assim que faz a população, evitando problemas com containers parados e volumes montados
-    build: .
+    # Comando para deploy e população: 'docker compose up -d && docker compose run --rm init-db'
+    image: gavieira/gid-painel:latest
     command: sh -c "set -e; python manage.py migrate --no-input \
                       && python manage.py collectstatic --no-input \
                       && python manage.py importar_programas \
