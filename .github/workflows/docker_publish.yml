@@ -1,30 +1,47 @@
-name: Build and Push Docker image
+name: Build and Push Docker Image
 
 on:
   push:
     branches:
-      - main  # ou qualquer branch que você queira usar para publicar
+      - main # Aciona o workflow em pushes para a branch 'main'
+      - develop # Opcional: Aciona também em pushes para a branch 'develop'
+
+env:
+  DOCKER_IMAGE_NAME: gavieira/gid-painel # Define o nome base da imagem Docker como uma variável de ambiente
 
 jobs:
   docker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # O runner que executará o workflow
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 # Clona o repositório para o runner
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v3 # Faz login no Docker Hub usando segredos
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v3 # Configura o Buildx para builds otimizados
+
+      - name: Extract Docker metadata (tags, labels)
+        id: meta # Atribui um ID para que possamos referenciar as saídas deste passo
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_IMAGE_NAME }} # Usa o nome base da imagem definido acima
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }} # Tag 'latest' apenas para pushes na 'main'
+            type=sha,prefix=,suffix=,enable=true # Tag com o hash do commit (SHA) para todas as execuções
+            type=ref,event=branch # Tag com o nome da branch (ex: 'develop')
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          push: true
-          tags: gavieira/gid-painel:latest
+          context: . # O contexto do build é o diretório raiz do repositório
+          push: true # Sempre envia a imagem se o build for bem-sucedido
+          tags: ${{ steps.meta.outputs.tags }} # Usa as tags geradas pelo docker/metadata-action
+          labels: ${{ steps.meta.outputs.labels }} # Usa os labels gerados pelo docker/metadata-action
+          cache-from: type=gha # Habilita o cache do build para acelerar futuras execuções
+          cache-to: type=gha,mode=max # Salva o cache do build
