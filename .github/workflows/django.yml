@@ -24,15 +24,14 @@ jobs:
     - name: Install System Dependencies 
       run: |
         sudo apt-get update
-        # Add your compilation dependencies here
         sudo apt-get install -y \
-          libpq-dev \             
-          libmysqlclient-dev \    
-          libjpeg-dev \           
-          zlib1g-dev \            
-          libfreetype6-dev \      
-          libxml2-dev \           
-          libxslt1-dev 
+          libpq-dev \
+          libmysqlclient-dev \
+          libjpeg-dev \
+          zlib1g-dev \
+          libfreetype6-dev \
+          libxml2-dev \
+          libxslt1-dev
           # Add any other dependencies your project might need for compilation
           # For example, if you use `pycurl`: libcurl4-openssl-dev
           # If you use `pylibmc`: libmemcached-dev
