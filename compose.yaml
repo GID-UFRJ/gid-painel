@@ -2,22 +2,23 @@ services:
   gid-painel:
     build: .
     environment:
-      - DJANGO_SECRET_KEY=sua_chave_secreta_aqui
-      - DJANGO_DEBUG=False
-      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,seuhost.com #substituir 'seuhost.com' pelo domínio real
-      - DJANGO_PORT=8000 #8000 por padrão
-      - GUNICORN_WORKERS=1 #1 por padrão (recomendado usar mais em produção para multiplos usuários simultâneos)
-      - POSTGRES_USER=gid
-      - POSTGRES_NAME=gid_db
-      - POSTGRES_PASSWORD=gid_dashboard
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      # Adicione esta variável para o Caddy saber onde encontrar os arquivos estáticos
-      - DJANGO_STATIC_ROOT=/app/staticfiles # Certifique-se que o Django coleta estáticos aqui
+      # Variáveis da Aplicação Django (lidas do .env)
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
+      - DJANGO_PORT=${DJANGO_PORT}
+      - GUNICORN_WORKERS=${GUNICORN_WORKERS}
+      - DJANGO_STATIC_ROOT=${DJANGO_STATIC_ROOT}
+      # Variáveis do Banco de Dados PostgreSQL (lidas do .env)
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
     volumes:
       # Certifique-se de que o diretório de arquivos estáticos esteja montado
       # para o Caddy poder servi-los diretamente.
-      - static_volume:/app/staticfiles
+      - static_volume:${DJANGO_STATIC_ROOT} # Agora usa a variável do .env
       - ./importar:/app/importar
     depends_on:
       postgres:
@@ -27,9 +28,10 @@ services:
   postgres:
     image: postgres:17.5
     environment:
-      - POSTGRES_USER=gid
-      - POSTGRES_PASSWORD=gid_dashboard
-      - POSTGRES_DB=gid_db
+      # Credenciais do PostgreSQL (lidas do .env)
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB} # A imagem Postgres usa POSTGRES_DB, que vem de POSTGRES_DB do .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -39,33 +41,36 @@ services:
       retries: 5
     restart: "on-failure"
 
-  init-db: 
+  init-db:
     # Inicializa a db, criando tabelas e fazendo população inicial dos dados
     # Idealmente, deve ser executado usando 'docker compose run --rm init-db'
     # Executado assim, ele é removido assim que faz a população, evitando problemas com containers parados e volumes montados
     build: .
     command: sh -c "set -e; python manage.py migrate --no-input \
-                     && python manage.py collectstatic --no-input \
-                     && python manage.py importar_programas \
-                     && python manage.py importar_rankings"
+                      && python manage.py collectstatic --no-input \
+                      && python manage.py importar_programas \
+                      && python manage.py importar_rankings"
     volumes:
       - ./importar:/app/importar # Montando dir do host com dados de população inicial da db
-      - static_volume:/app/staticfiles # Se o collectstatic for executado, o volume static_volume precisa estar visível aqui também
+      - static_volume:${DJANGO_STATIC_ROOT} # Se o collectstatic for executado, o volume static_volume precisa estar visível aqui também
     environment:
-      - POSTGRES_USER=gid
-      - POSTGRES_NAME=gid_db
-      - POSTGRES_PASSWORD=gid_dashboard
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - DJANGO_DEBUG=False # Defina o debug para falso para o collectstatic, se o settings usar
-      - DJANGO_STATIC_ROOT=/app/staticfiles # Certifique-se que DJANGO_STATIC_ROOT está aqui também
+      # Variáveis para o Django nas migrações/coleta estática (lidas do .env)
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - DJANGO_STATIC_ROOT=${DJANGO_STATIC_ROOT}
+      # Variáveis do Banco de Dados PostgreSQL (lidas do .env)
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
     depends_on:
       postgres:
         condition: service_healthy
     profiles: ["setup"]
 
   caddy:
-    image: caddy:2.7.6-alpine 
+    image: caddy:2.7.6-alpine
     ports:
       - "8000:80"   # HTTP
       - "8443:443" # HTTPS
@@ -73,12 +78,14 @@ services:
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile # Mapeia Caddyfile do host
       - caddy_data:/data                     # Volume para dados persistentes do Caddy (certificados SSL)
-      - static_volume:/app/staticfiles       # Monta o mesmo volume de arquivos estáticos
+      - static_volume:${DJANGO_STATIC_ROOT} # Monta o mesmo volume de arquivos estáticos
     environment:
-      - CADDY_DOMAIN=localhost # Desenvolvimento: use localhost ou 127.0.0.1 - Produção: substitua por seu domínio real, ex: meuapp.com.br
-      - CADDY_EMAIL=dev@example.com # Email para Let's Encrypt (qualquer um para desenvolvimento, email válido para produção)
-      - DJANGO_HOST=gid-painel #Nome do serviço
-      - DJANGO_PORT=8000 #Porta do serviço 
+      # Variáveis do Caddy (lidas do .env)
+      - CADDY_DOMAIN=${CADDY_DOMAIN}
+      - CADDY_EMAIL=${CADDY_EMAIL}
+      # Referência ao serviço Django (hardcoded, pois é um nome de serviço interno)
+      - DJANGO_HOST=gid-painel
+      - DJANGO_PORT=${DJANGO_PORT} # Porta que o Gunicorn está usando dentro do contêiner Django
     depends_on:
       gid-painel:
         condition: service_started # Caddy precisa que o Django esteja rodando
