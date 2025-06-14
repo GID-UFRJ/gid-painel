@@ -21,7 +21,23 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install Dependencies
+    - name: Install System Dependencies 
+      run: |
+        sudo apt-get update
+        # Add your compilation dependencies here
+        sudo apt-get install -y \
+          libpq-dev \             # For psycopg2 (PostgreSQL)
+          libmysqlclient-dev \    # For mysqlclient (MySQL)
+          libjpeg-dev \           # For Pillow
+          zlib1g-dev \            # For Pillow
+          libfreetype6-dev \      # For Pillow
+          libxml2-dev \           # For lxml
+          libxslt1-dev \          # For lxml
+          # Add any other dependencies your project might need for compilation
+          # For example, if you use `pycurl`: libcurl4-openssl-dev
+          # If you use `pylibmc`: libmemcached-dev
+          # Add more as per your `requirements.txt` and error logs
+    - name: Install Python Dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
