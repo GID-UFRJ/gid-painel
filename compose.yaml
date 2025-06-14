@@ -39,9 +39,12 @@ services:
       retries: 5
     restart: "on-failure"
 
-  init-db:
+  init-db: 
+    # Inicializa a db, criando tabelas e fazendo população inicial dos dados
+    # Idealmente, deve ser executado usando 'docker compose run --rm init-db'
+    # Executado assim, ele é removido assim que faz a população, evitando problemas com containers parados e volumes montados
     build: .
-    command: sh -c "python manage.py migrate --no-input \
+    command: sh -c "set -e; python manage.py migrate --no-input \
                      && python manage.py collectstatic --no-input \
                      && python manage.py importar_programas \
                      && python manage.py importar_rankings"
