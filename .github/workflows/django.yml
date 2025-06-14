@@ -26,13 +26,13 @@ jobs:
         sudo apt-get update
         # Add your compilation dependencies here
         sudo apt-get install -y \
-          libpq-dev \             # For psycopg2 (PostgreSQL)
-          libmysqlclient-dev \    # For mysqlclient (MySQL)
-          libjpeg-dev \           # For Pillow
-          zlib1g-dev \            # For Pillow
-          libfreetype6-dev \      # For Pillow
-          libxml2-dev \           # For lxml
-          libxslt1-dev \          # For lxml
+          libpq-dev \             
+          libmysqlclient-dev \    
+          libjpeg-dev \           
+          zlib1g-dev \            
+          libfreetype6-dev \      
+          libxml2-dev \           
+          libxslt1-dev 
           # Add any other dependencies your project might need for compilation
           # For example, if you use `pycurl`: libcurl4-openssl-dev
           # If you use `pylibmc`: libmemcached-dev
