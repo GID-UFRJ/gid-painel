@@ -1,15 +1,10 @@
 # GID Painel - Dockerized Django + PostgreSQL + Caddy
 
-<div style="text-align: justify;">
-O Escritório de Gestão de Indicadores da UFRJ ([GID](https://pr2.ufrj.br/gid)) 
-desenvolveu este painel com o intuito de promover acesso perene às mais diversas 
-métricas e dados institucionais. Sendo um órgão vinculado à Pró-Reitoria de Pesquisa e Pós-Graduação ([PR-2](https://pr2.ufrj.br/)), a ferramenta é especialmente focada em dados associados à produção científica e atuação dos PPGs (Programas de Pós-Graduação).
-<br><br>
-A aplicação, desenvolvida primariamente em Django, é dividida em vários subpainéis, que detalham vários aspectos da pesquisa e pós-graduação da UFRJ. Esperamos que estes proverão informações valiosas tanto para uso institucional interno (em auditoria e gerenciamento, por exemplo) quanto para o consumo pelo público geral.
-<br><br>
-O deploy da aplicação utiliza **Docker Compose** com serviços para o backend (Django + Gunicorn), banco de dados (PostgreSQL), servidor web (Caddy) e um serviço auxiliar para **inicialização da base de dados**.
-</div>
+O Escritório de Gestão de Indicadores da UFRJ ([GID](https://pr2.ufrj.br/gid)) desenvolveu este painel com o intuito de promover acesso perene às mais diversas métricas e dados institucionais. Sendo um órgão vinculado à Pró-Reitoria de Pesquisa e Pós-Graduação ([PR-2](https://pr2.ufrj.br/)), a ferramenta é especialmente focada em dados associados à produção científica e atuação dos PPGs (Programas de Pós-Graduação).
 
+A aplicação, desenvolvida primariamente em Django, é dividida em vários subpainéis, que detalham vários aspectos da pesquisa e pós-graduação da UFRJ. Esperamos que estes proverão informações valiosas tanto para uso institucional interno (em auditoria e gerenciamento, por exemplo) quanto para o consumo pelo público geral.
+
+O deploy da aplicação utiliza **Docker Compose** com serviços para o backend (Django + Gunicorn), banco de dados (PostgreSQL), servidor web (Caddy) e um serviço auxiliar para **inicialização da base de dados**.
 
 
 ---
