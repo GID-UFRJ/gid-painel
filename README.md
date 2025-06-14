@@ -1,43 +1,148 @@
-## requisitos
+# GID Painel - Dockerized Django + PostgreSQL + Caddy
 
-* python 3
-  - confira a versão usando o comando: `py --version`
+<div style="text-align: justify;">
+O Escritório de Gestão de Indicadores da UFRJ ([GID](https://pr2.ufrj.br/gid)) 
+desenvolveu este painel com o intuito de promover acesso perene às mais diversas 
+métricas e dados institucionais. Sendo um órgão vinculado à Pró-Reitoria de Pesquisa e Pós-Graduação ([PR-2](https://pr2.ufrj.br/)), a ferramenta é especialmente focada em dados associados à produção científica e atuação dos PPGs (Programas de Pós-Graduação).
+<br><br>
+A aplicação, desenvolvida primariamente em Django, é dividida em vários subpainéis, que detalham vários aspectos da pesquisa e pós-graduação da UFRJ. Esperamos que estes proverão informações valiosas tanto para uso institucional interno (em auditoria e gerenciamento, por exemplo) quanto para o consumo pelo público geral.
+<br><br>
+O deploy da aplicação utiliza **Docker Compose** com serviços para o backend (Django + Gunicorn), banco de dados (PostgreSQL), servidor web (Caddy) e um serviço auxiliar para **inicialização da base de dados**.
+</div>
 
-* django 5
-  - confira a versão usando o comando: `django-admin --version`
 
-* git
-  - confira a versão usando o comando: `git -v`
 
-## como executar
+---
 
-Obs: se for windows use **py**, se for linux use **python**
+## 🔧 Requisitos
 
-* crie o ambiente virtual
+- Docker
+- Docker Compose
 
-  - use o comando: `py -m venv venv`
+---
 
-* ative o ambiente virtual
-  - use um dos seguintes comandos: `venv\Scripts\Activate.ps1` ou `venv\Scripts\activate.bat`
-  - use o primeiro comando no power shell
-  - use o segundo no prompt do CMDOS
+## 🚀 Subindo a Aplicação
 
-* instale o django
-  - use o comando: `py -m pip install django`
+1. Copie o `.env.example` para `.env` e configure as variáveis de ambiente:
 
-* crie a pasta /importar/programa na raiz do repositorio e salve os dados nela
+```bash
+cp .env.example .env
+```
 
-* popule o banco de dados com os dados
-  - use o comando: `py manage.py importar_programas`
+2. Construa e inicie os serviços principais:
 
-* prepare as migrações
-  - use o comando: `py manage.py makemigrations`
+```bash
+docker compose up -d
+```
 
-* faça a migração
-  - use o comando: `py manage.py migrate`
+3. Execute o script de inicialização da base de dados (migrações, coleta de estáticos e importação inicial):
 
-* crie o administrador
-  - use o comando: `py manage.py createsuperuser`
+```bash
+docker compose run --rm init-db
+```
+**Nota:** A importação inicial depende de arquivos csvs previamente adicionados à pasta `importar`, que deve estar na raiz do projeto.
 
-* inicie o servidor
-  - use o comando: `py manage.py runserver`
+---
+
+## 🛠 Serviços
+
+### `gid-painel`
+
+- Serviço principal Django (usando Gunicorn).
+- Lê as configurações do arquivo `.env`.
+- Expõe a aplicação internamente na porta definida por `DJANGO_PORT`.
+- Serve arquivos estáticos no volume `static_volume`.
+
+### `postgres`
+
+- Banco de dados PostgreSQL.
+- Inicializado com as credenciais definidas no `.env`.
+- Utiliza volume persistente `postgres_data`.
+
+### `init-db`
+
+- Serviço opcional para **migração e importação inicial**.
+- Executa os seguintes comandos:
+  - `python manage.py migrate`
+  - `python manage.py collectstatic`
+  - `python manage.py importar_programas`
+  - `python manage.py importar_rankings`
+- Deve ser executado manualmente com `--rm` para auto remoção.
+
+### `caddy`
+
+- Servidor HTTP/HTTPS reverso para servir o Django com TLS automático via Let's Encrypt.
+- Usa as variáveis `CADDY_DOMAIN` e `CADDY_EMAIL` para configuração de domínio e certificado.
+- Serve os arquivos estáticos a partir do volume compartilhado `static_volume`.
+- Único serviço que mapeará portas do sistema operacional hospedeiro, definindo a porta em que a aplicação será disponibilizada.
+- Pode ser usado com outro proxy reverso externo.
+- Para HTTPS (terminação SSL/TLS) diretamente no Caddy, a linha referente à configuração tls deve ser descomentada em `caddy/Caddyfile`.
+
+---
+
+## 📁 Estrutura de Volumes
+
+- `static_volume`: arquivos estáticos coletados pelo Django.
+- `postgres_data`: dados persistentes do banco de dados PostgreSQL.
+- `caddy_data`: certificados SSL e cache usados pelo Caddy.
+
+---
+
+## 📄 Variáveis de Ambiente (.env)
+
+```env
+# Django
+DJANGO_SECRET_KEY=sua_chave_secreta_aqui
+DJANGO_DEBUG=False
+DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+DJANGO_PORT=8000
+GUNICORN_WORKERS=1
+DJANGO_STATIC_ROOT=/app/staticfiles
+
+# Banco de Dados PostgreSQL
+POSTGRES_USER=gid
+POSTGRES_DB=gid_db
+POSTGRES_PASSWORD=gid_dashboard
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+
+# Caddy
+CADDY_DOMAIN=localhost
+CADDY_EMAIL=dev@example.com
+```
+
+> **Nota:** Para gerar uma chave segura do Django, use:
+> ```bash
+> python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+> ```
+
+---
+
+## 🌐 Acesso à Aplicação
+
+Após subir os serviços:
+
+- Acesse via navegador: [http://localhost:8000](http://localhost:8000)
+- Em produção, substitua `localhost` por seu domínio real.
+
+---
+
+## 🗑️ Parar e Limpar
+
+Parar todos os serviços:
+
+```bash
+docker compose down
+```
+
+Parar e remover volumes persistentes:
+
+```bash
+docker compose down -v
+```
+
+---
+
+## 📝 Licença
+
+Este projeto é mantido pelo Escritório de Gestão de Indicadores Institucionais da UFRJ ([GID](https://pr2.ufrj.br/gid)). Licenciamento e termos de uso podem ser definidos conforme sua organização.
