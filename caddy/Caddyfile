@@ -4,7 +4,9 @@
     reverse_proxy {$DJANGO_HOST}:{$DJANGO_PORT}
 
     # Serve arquivos estáticos diretamente do volume compartilhado
-    handle /static/* {
+    # handle_path remove o prefixo pareado (/static) do caminho do request, logo: /static/css/styles.css → /app/staticfiles/css/styles.css
+    # handle normal não remove /static, logo não funcionaria: /static/css/styles.css → /app/staticfiles/static/css/styles.css
+    handle_path /static/* {
         root * /app/staticfiles
         file_server
     }
