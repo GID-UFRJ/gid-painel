@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'programa',
     'rankings',
+    'baseGraficos',
 ]
 
 MIDDLEWARE = [
