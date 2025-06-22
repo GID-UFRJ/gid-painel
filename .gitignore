@@ -1,4 +1,5 @@
 db.sqlite3
+backlog.txt
 __pycache__/
 venv/
 importar/*
