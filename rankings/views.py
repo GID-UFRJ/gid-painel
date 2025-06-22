@@ -15,5 +15,6 @@ def rankings(request):
         'graf_03':g.the_mundo(),
         'graf_04':g.the_americaLatina(),
         'graf_05':g.shanghai_mundo(),
-        'graf_06':g.shanghai_nacional(),
+        'graf_06':g.shanghai_nacional_novo(),
+
     })

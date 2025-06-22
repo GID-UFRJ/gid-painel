@@ -4,10 +4,13 @@ from . import models
 from django.db.models import Q, Count
 from gid.utils_scripts_graficos import cores, grafico_barra, grafico_kpi
 from gid.utils_scripts_graficos_plotly import grafico_barra_plotly2, grafico_linha_plotly2
+from baseGraficos import utils_plotly
+from baseGraficos import models as m
 
 class Grafico_ranking:
     def __init__(self):
         self.queryset = models.Resultado.objects
+        self.queryset_graf = m.Grafico.objects
 
     def kpi_qs_americaLatina(self):
         queryset = self.queryset.\
@@ -81,3 +84,24 @@ class Grafico_ranking:
         df = pd.DataFrame.from_records(queryset)
         img = grafico_linha_plotly2(df['ano__ano'], df['posicao'], 'Shanghai Nacional', 'ano', 'posição', largura=750, inverter_eixo_y=True)
         return(img)
+    
+    def shanghai_nacional_novo(self):
+        q = self.queryset_graf.first()
+        graf = utils_plotly.Grafico(q.tamanhoGrafico.tamanhoHorizontal, q.tamanhoGrafico.tamanhoVertical)
+        g = graf.grafico_linha_com_marcador_grande_para_rankings_teste(q.tituloGrafico, q.tituloEixoGrafico, list(q.series.keys())[0], q.series)
+        return(g)
+    '''
+    def shanghai_nacional_novo(self):
+        q = self.queryset_graf.first()
+        
+        series = list(q.series.keys())
+        dados = list(q.series.values())
+
+        dados_x = list(dados[0].keys())
+        dados_y = list(dados[0].values())
+
+        graf = utils_plotly.Grafico(750, 500)
+        g = graf.grafico_linha_com_marcador_grande_para_rankings(q.tituloGrafico, q.tituloEixoGrafico, list(q.series.keys())[0], dados_x, dados_y)
+        g.
+        return(g)
+    '''

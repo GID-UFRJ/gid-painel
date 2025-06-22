@@ -16,6 +16,14 @@
         <div class='grafico'> {{ graf_05 | safe }}</div>  
         <div class='grafico'> {{ graf_06 | safe }}</div>  
     </div>
+
+    -----------------------------
+
+    <div class='divisoria'>
+        {% for o in some_list %}
+            <div class='grafico'> {{ graf_01 | safe }}</div>
+        {% endfor %}
+    </div>
     
 {% endblock %} 
 
