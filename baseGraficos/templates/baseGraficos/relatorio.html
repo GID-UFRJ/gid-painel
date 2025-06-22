@@ -2,12 +2,6 @@
 
 {% block conteudo %}
         
-    <div class='divisoria' id='id_teste'>
-        <img src = "data:image/png;base64, {{ card_01 }}" alt="" class='imagemsuperior'>
-        <img src = "data:image/png;base64, {{ card_02 }}" alt="" class='imagemsuperior'>
-        <img src = "data:image/png;base64, {{ card_03 }}" alt="" class='imagemsuperior'>  
-    </div>
-
     <div class='divisoria'>
         {% for grafico in graficos %}
             <div class='grafico'> {{ grafico | safe }}</div>

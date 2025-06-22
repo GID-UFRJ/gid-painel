@@ -36,72 +36,15 @@ class Grafico_ranking:
         img = grafico_kpi(int(df[df['ano__ano']==df['ano__ano'].max()]['posicao'].values[0]), f'Shanghai - Nacional (ano: {df["ano__ano"].max()})', cor='#4169E1', exibir_posicao=True)
         return(img)
 
-
-    def qs_mundo(self):
-        queryset = self.queryset.\
-            filter(ranking__rankingNome='QS', escopo__escopoNome='Mundo').\
-            values('ano__ano', 'posicao')
-        df = pd.DataFrame.from_records(queryset)
-        img = grafico_linha_plotly2(df['ano__ano'], df['posicao'], 'QS mundo', 'ano', 'posição', largura=750, inverter_eixo_y=True)
-        return(img)
+class Grafico_ranking2:
+    def __init__(self):
+        self.queryset_graf = m.Grafico.objects
     
-    def qs_americaLatina(self):
-        queryset = self.queryset.\
-            filter(ranking__rankingNome='QS', escopo__escopoNome='Am. Latina').\
-            values('ano__ano', 'posicao')
-        df = pd.DataFrame.from_records(queryset)
-        img = grafico_linha_plotly2(df['ano__ano'], df['posicao'], 'QS América Latina', 'ano', 'posição', largura=750, inverter_eixo_y=True)
-        return(img)
-
-    def the_mundo(self):
-        queryset = self.queryset.\
-            filter(ranking__rankingNome='THE', escopo__escopoNome='Mundo').\
-            values('ano__ano', 'posicao')
-        df = pd.DataFrame.from_records(queryset)
-        img = grafico_linha_plotly2(df['ano__ano'], df['posicao'], 'THE mundo', 'ano', 'posição', tamanho_rotulo_dados=15, largura=750, inverter_eixo_y=True)
-        return(img)
+    def listaGraficos(self):
+        lista = []
+        registros = self.queryset_graf.all()
+        for r in registros:
+            graf = utils_plotly.Grafico(r.tamanhoGrafico.tamanhoHorizontal, r.tamanhoGrafico.tamanhoVertical)
+            lista.append(graf.grafico_linha_com_marcador_grande_para_rankings(r.tituloGrafico, r.tituloEixoGrafico, list(r.series.keys())[0], r.series))
+        return(lista)
     
-    def the_americaLatina(self):
-        queryset = self.queryset.\
-            filter(ranking__rankingNome='THE', escopo__escopoNome='Am. Latina').\
-            values('ano__ano', 'posicao')
-        df = pd.DataFrame.from_records(queryset)
-        img = grafico_linha_plotly2(df['ano__ano'], df['posicao'], 'THE América Latina', 'ano', 'posição', largura=750, inverter_eixo_y=True)
-        return(img)
-    
-    def shanghai_mundo(self):
-        queryset = self.queryset.\
-            filter(ranking__rankingNome='Shanghai', escopo__escopoNome='Mundo').\
-            values('ano__ano', 'posicao')
-        df = pd.DataFrame.from_records(queryset)
-        img = grafico_linha_plotly2(df['ano__ano'], df['posicao'], 'Shanghai mundo', 'ano', 'posição', largura=750, tamanho_rotulo_dados=15, inverter_eixo_y=True)
-        return(img)
-    
-    def shanghai_nacional(self):
-        queryset = self.queryset.\
-            filter(ranking__rankingNome='Shanghai', escopo__escopoNome='Nacional').\
-            values('ano__ano', 'posicao')
-        df = pd.DataFrame.from_records(queryset)
-        img = grafico_linha_plotly2(df['ano__ano'], df['posicao'], 'Shanghai Nacional', 'ano', 'posição', largura=750, inverter_eixo_y=True)
-        return(img)
-    
-    def shanghai_nacional_novo(self):
-        q = self.queryset_graf.first()
-        graf = utils_plotly.Grafico(q.tamanhoGrafico.tamanhoHorizontal, q.tamanhoGrafico.tamanhoVertical)
-        g = graf.grafico_linha_com_marcador_grande_para_rankings_teste(q.tituloGrafico, q.tituloEixoGrafico, list(q.series.keys())[0], q.series)
-        return(g)
-    '''
-    def shanghai_nacional_novo(self):
-        q = self.queryset_graf.first()
-        
-        series = list(q.series.keys())
-        dados = list(q.series.values())
-
-        dados_x = list(dados[0].keys())
-        dados_y = list(dados[0].values())
-
-        graf = utils_plotly.Grafico(750, 500)
-        g = graf.grafico_linha_com_marcador_grande_para_rankings(q.tituloGrafico, q.tituloEixoGrafico, list(q.series.keys())[0], dados_x, dados_y)
-        g.
-        return(g)
-    '''

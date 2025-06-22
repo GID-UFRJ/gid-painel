@@ -17,15 +17,6 @@ class TamanhoGrafico(models.Model):
     tamanhoHorizontal = models.IntegerField()
     def __str__(self):
         return f'{self.tamanhoVertical} x {self.tamanhoHorizontal}'
-'''    
-class Serie(models.Model):
-    nomeSerie = models.CharField(max_length=30)
-    dadosSerie = models.JSONField()
-    class Meta:
-        ordering = ["nomeSerie"]
-    def __str__(self):
-        return self.nomeSerie
-'''
 
 class Grafico(models.Model):
     #dados da exibição
@@ -37,7 +28,7 @@ class Grafico(models.Model):
     tituloGrafico = models.CharField(max_length=100)
     tituloEixoGrafico = models.CharField(max_length=100)
     #serie
-    series = models.JSONField(default=dict, help_text='use formato de dicionário   --->   {"serie1": {"2010": 25, "2011": 50}}')
+    series = models.JSONField(default=dict, help_text='use formato de dicionário   --->   {"serie1": {"2010": 25, "2011": 50}}.   Para passar um elemento None pode usar null')
     def __str__(self):
         return f'{self.painel} -- {self.posicaoNoPainel} -- {self.tituloGrafico}'
     class Meta:

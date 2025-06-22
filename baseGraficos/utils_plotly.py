@@ -72,7 +72,7 @@ class Grafico:
         fig = to_html(self.fig, full_html=False)
         return(fig)
     
-    def grafico_linha_com_marcador_grande_para_rankings_teste(self, titulo:str, titulo_eixo_x:str, titulo_eixo_y:str, dicionario:dict):
+    def grafico_linha_com_marcador_grande_para_rankings(self, titulo:str, titulo_eixo_x:str, titulo_eixo_y:str, dicionario:dict):
         '''
         exemplo de dicionário
         
@@ -96,18 +96,6 @@ class Grafico:
         self.__hover_template()
         return(self.__exportar_html())
     
-    def grafico_linha_com_marcador_grande_para_rankings(self, titulo:str, titulo_eixo_x:str, titulo_eixo_y:str, x:list, y:list):
-        self.__config_titulo(titulo)
-        self.__config_titulo_eixo_x(titulo_eixo_x)
-        self.__config_titulo_eixo_y(titulo_eixo_y)
-        self.__config_cor_fundo()
-        self.__config_grid_x()
-        self.__config_grid_y()
-        self.__config_linha_com_marcador(x, y, tamanho_marcador=50)
-        self.__config_eixo_y_0_inverso()        
-        self.__hover_template()
-        return(self.__exportar_html())
-
     def grafico_linha_com_marcador_grande(self, titulo:str, titulo_eixo_x:str, titulo_eixo_y:str, x:list, y:list):
         self.__config_titulo(titulo)
         self.__config_titulo_eixo_x(titulo_eixo_x)
