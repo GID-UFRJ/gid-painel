@@ -20,6 +20,7 @@ services:
       # para o Caddy poder servi-los diretamente.
       - static_volume:${DJANGO_STATIC_ROOT} # Agora usa a variável do .env
       - ./importar:/app/importar
+      - .:/app
     depends_on:
       postgres:
         condition: service_healthy # Espera o DB estar saudável
