@@ -7,10 +7,12 @@ class Painel(models.Model):
         return self.nome
     
 class EstiloGrafico(models.Model):
-    nomeEstilo = models.CharField(max_length=30)
-    detalheEstilo  = models.CharField(max_length=200)
+    nomeEstilo = models.CharField(max_length=100)
+    numeroIdentificador = models.IntegerField(default=1)
     def __str__(self):
-        return self.nomeEstilo
+        return f'{self.numeroIdentificador} - {self.nomeEstilo}'
+    class Meta:
+        ordering = ["numeroIdentificador", "nomeEstilo"]
 
 class TamanhoGrafico(models.Model):
     tamanhoVertical = models.IntegerField()
@@ -30,6 +32,6 @@ class Grafico(models.Model):
     #serie
     series = models.JSONField(default=dict, help_text='use formato de dicionário   --->   {"serie1": {"2010": 25, "2011": 50}}.   Para passar um elemento None pode usar null')
     def __str__(self):
-        return f'{self.painel} -- {self.posicaoNoPainel} -- {self.tituloGrafico}'
+        return f'{self.painel} -- {self.posicaoNoPainel} -- {self.tituloGrafico} -- {self.estiloGrafico.nomeEstilo}'
     class Meta:
         ordering = ["painel", "posicaoNoPainel"]

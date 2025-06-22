@@ -6,6 +6,17 @@ class Grafico:
     def __init__(self, largura: int | None=750, altura: int | None=500):
         self.fig = go.Figure(layout=go.Layout(width=largura,height=altura))
 
+    def escolher_grafico(self, tipo_grafico:int, titulo:str, titulo_eixo_x:str, titulo_eixo_y:str, dicionario:dict):
+        match tipo_grafico:
+            case 1:
+                return self.__grafico_linha_com_marcador_grande_para_rankings(titulo, titulo_eixo_x, titulo_eixo_y, dicionario)
+            case 2:
+                return self.__grafico_linha_com_marcador_grande(titulo, titulo_eixo_x, titulo_eixo_y, dicionario)
+            case 3:
+                return self.__grafico_linha_com_marcador_pequeno(titulo, titulo_eixo_x, titulo_eixo_y, dicionario)
+            case 4:
+                return self.__grafico_barra(titulo, titulo_eixo_x, titulo_eixo_y, dicionario)
+
     def __config_titulo(self, titulo:str | None =''):
         self.fig.update_layout(title=dict(text = titulo, x= 0.5, xanchor= 'center'))
         return(self)
@@ -42,8 +53,10 @@ class Grafico:
                                       ))
         return(self)
     
-    def __config_bar(self, x: list, y: list):        
-        self.fig.add_trace(go.Bar(x=x, y=y))
+    def __config_bar(self, x: list, y: list, posicao_texto:str | None='auto', cor_fonte:int | None='black'):        
+        self.fig.add_trace(go.Bar(x=x, y=y, 
+                                textfont=dict(color=cor_fonte, size=18, family='Arial Black', weight='bold'),
+                                text=y, textposition=posicao_texto))
         return(self)
     
     def __hover_template(self):
@@ -72,7 +85,7 @@ class Grafico:
         fig = to_html(self.fig, full_html=False)
         return(fig)
     
-    def grafico_linha_com_marcador_grande_para_rankings(self, titulo:str, titulo_eixo_x:str, titulo_eixo_y:str, dicionario:dict):
+    def __grafico_linha_com_marcador_grande_para_rankings(self, titulo:str, titulo_eixo_x:str, titulo_eixo_y:str, dicionario:dict):
         '''
         exemplo de dicionário
         
@@ -96,40 +109,76 @@ class Grafico:
         self.__hover_template()
         return(self.__exportar_html())
     
-    def grafico_linha_com_marcador_grande(self, titulo:str, titulo_eixo_x:str, titulo_eixo_y:str, x:list, y:list):
+    def __grafico_linha_com_marcador_grande(self, titulo:str, titulo_eixo_x:str, titulo_eixo_y:str, dicionario:dict):
+        '''
+        exemplo de dicionário
+        
+            {"serie":{"2020":130,"2021":132, "2022":140}}
+            
+            {"serie1":{"2020":130,"2021":132, "2022":140}, "serie2":{"2020":230,"2021":134, "2022":160}}
+
+        '''
         self.__config_titulo(titulo)
         self.__config_titulo_eixo_x(titulo_eixo_x)
         self.__config_titulo_eixo_y(titulo_eixo_y)
         self.__config_cor_fundo()
         self.__config_grid_x()
         self.__config_grid_y()
-        self.__config_linha_com_marcador(x, y, tamanho_marcador=50)
-        self.__config_eixo_y_0_inverso()        
+        for serie in dicionario:
+            dados = dicionario[serie]
+            dados_x = list(dados.keys())
+            dados_y = list(dados.values())
+            self.__config_linha_com_marcador(dados_x, dados_y, serie, tamanho_marcador=50)
+        self.__config_eixo_y_0()     
         self.__hover_template()
         return(self.__exportar_html())
 
-    def grafico_linha_com_marcador_pequeno(self, titulo:str, titulo_eixo_x:str, titulo_eixo_y:str, x:list, y:list):
+    def __grafico_linha_com_marcador_pequeno(self, titulo:str, titulo_eixo_x:str, titulo_eixo_y:str, dicionario:dict):
+        '''
+        exemplo de dicionário
+        
+            {"serie":{"2020":130,"2021":132, "2022":140}}
+            
+            {"serie1":{"2020":130,"2021":132, "2022":140}, "serie2":{"2020":230,"2021":134, "2022":160}}
+
+        '''
         self.__config_titulo(titulo)
         self.__config_titulo_eixo_x(titulo_eixo_x)
         self.__config_titulo_eixo_y(titulo_eixo_y)
         self.__config_cor_fundo()
         self.__config_grid_x()
         self.__config_grid_y()
-        self.__config_linha_com_marcador(x, y, tamanho_marcador=20, posicao_texto='top center', cor_fonte='blue')
-        self.__config_eixo_y_0()     
-        self.__hover_template()   
+        for serie in dicionario:
+            dados = dicionario[serie]
+            dados_x = list(dados.keys())
+            dados_y = list(dados.values())
+            self.__config_linha_com_marcador(dados_x, dados_y, serie, tamanho_marcador=20, posicao_texto='top center', cor_fonte='blue')
+        self.__config_eixo_y_0()        
+        self.__hover_template()
         return(self.__exportar_html())
 
-    def grafico_bar(self):
-        self.__config_titulo()
-        self.__config_titulo_eixo_x()
-        self.__config_titulo_eixo_y()
+    def __grafico_barra(self, titulo:str, titulo_eixo_x:str, titulo_eixo_y:str, dicionario:dict):
+        '''
+        exemplo de dicionário
+        
+            {"serie":{"2020":130,"2021":132, "2022":140}}
+            
+            {"serie1":{"2020":130,"2021":132, "2022":140}, "serie2":{"2020":230,"2021":134, "2022":160}}
+
+        '''
+        self.__config_titulo(titulo)
+        self.__config_titulo_eixo_x(titulo_eixo_x)
+        self.__config_titulo_eixo_y(titulo_eixo_y)
         self.__config_cor_fundo()
         self.__config_grid_x()
         self.__config_grid_y()
-        self.__config_bar()
-        self.__config_marcador()
-        self.__config_texto()
+        for serie in dicionario:
+            dados = dicionario[serie]
+            dados_x = list(dados.keys())
+            dados_y = list(dados.values())
+            self.__config_bar(dados_x, dados_y)
+        self.__config_eixo_y_0()        
+        self.__hover_template()
         return(self.__exportar_html())
 
 
