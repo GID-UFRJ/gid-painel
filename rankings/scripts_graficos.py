@@ -45,6 +45,7 @@ class Grafico_ranking2:
         registros = self.queryset_graf.all()
         for r in registros:
             graf = utils_plotly.Grafico(r.tamanhoGrafico.tamanhoHorizontal, r.tamanhoGrafico.tamanhoVertical)
-            lista.append(graf.grafico_linha_com_marcador_grande_para_rankings(r.tituloGrafico, r.tituloEixoGrafico, list(r.series.keys())[0], r.series))
+            lista.append(graf.escolher_grafico(r.estiloGrafico.numeroIdentificador, r.tituloGrafico, r.tituloEixoX, r.tituloEixoX, r.series))
         return(lista)
     
+ 
