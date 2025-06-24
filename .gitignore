@@ -9,3 +9,4 @@ dados/
 openalex/database/
 docs/
 *.ipynb
+*.swp
