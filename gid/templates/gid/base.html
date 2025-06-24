@@ -41,7 +41,6 @@
     <div>
         <ul>
             <li><a href={% url "ppgs" %}>Programas</a></li>
-            <li><a href={% url "rankings" %}>Rankings</a></li>
             {% for item in menu_items %}
               <li><a href="../graficos/{{ item.nome }}">{{ item.nome }}</a></li>
             {% endfor %}

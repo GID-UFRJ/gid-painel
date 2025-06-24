@@ -9,3 +9,4 @@ openalex
 .env
 *.pem
 .env
+dump/
