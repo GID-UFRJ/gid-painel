@@ -31,7 +31,6 @@ DEBUG = config('DJANGO_DEBUG', cast=bool, default=False)
 # config() tentará primeiro ler do ambiente (o que vem do Docker Compose),
 # depois de um arquivo .env, etc.
 ALLOWED_HOSTS_STR = config('DJANGO_ALLOWED_HOSTS', default='127.0.0.1,localhost')
-ALLOWED_HOSTS = ['127.0.0.1']
 
 # Converte a string separada por vírgulas em uma lista
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',')]
