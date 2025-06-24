@@ -2,19 +2,10 @@
 
 {% block conteudo %}
         
-    <div class='divisoria' id='id_teste'>
-        <img src = "data:image/png;base64, {{ card_01 }}" alt="" class='imagemsuperior'>
-        <img src = "data:image/png;base64, {{ card_02 }}" alt="" class='imagemsuperior'>
-        <img src = "data:image/png;base64, {{ card_03 }}" alt="" class='imagemsuperior'>  
-    </div>
-
     <div class='divisoria'>
-        <div class='grafico'> {{ graf_01 | safe }}</div>  
-        <div class='grafico'> {{ graf_02 | safe }}</div>  
-        <div class='grafico'> {{ graf_03 | safe }}</div>  
-        <div class='grafico'> {{ graf_04 | safe }}</div>  
-        <div class='grafico'> {{ graf_05 | safe }}</div>  
-        <div class='grafico'> {{ graf_06 | safe }}</div>  
+        {% for grafico in graficos %}
+            <div class='grafico'> {{ grafico | safe }}</div>
+        {% endfor %}
     </div>
     
 {% endblock %} 

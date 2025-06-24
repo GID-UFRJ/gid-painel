@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('DJANGO_SECRET_KEY', default='chave_super_secreta')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DJANGO_DEBUG', cast=bool, default=False)
+DEBUG = True #config('DJANGO_DEBUG', cast=bool, default=False)
 
 #Importando variavel de ambiente DJANGO_ALLOWED_HOSTS (string com hosts separados por virgula) usando decouple.config
 # config() tentará primeiro ler do ambiente (o que vem do Docker Compose),
@@ -39,7 +39,8 @@ ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',')]
 
 INSTALLED_APPS = [
     'programa',
-    'rankings',
+    'baseGraficos',
+#    'rankings',
 #    'openalex',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -71,6 +72,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'baseGraficos.context_processors.menu_items',
             ],
         },
     },
