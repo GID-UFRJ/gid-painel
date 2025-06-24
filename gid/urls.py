@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('programa.urls')),
     path('rankings/', include('rankings.urls')),
+    path('openalex/', include('openalex.urls')),
 ]

@@ -31,6 +31,7 @@ DEBUG = config('DJANGO_DEBUG', cast=bool, default=False)
 # config() tentará primeiro ler do ambiente (o que vem do Docker Compose),
 # depois de um arquivo .env, etc.
 ALLOWED_HOSTS_STR = config('DJANGO_ALLOWED_HOSTS', default='127.0.0.1,localhost')
+ALLOWED_HOSTS = ['127.0.0.1']
 
 # Converte a string separada por vírgulas em uma lista
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',')]
@@ -38,14 +39,15 @@ ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',')]
 # Application definition
 
 INSTALLED_APPS = [
+    'programa',
+    'rankings',
+    'openalex',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'programa',
-    'rankings',
 ]
 
 MIDDLEWARE = [
@@ -145,3 +147,7 @@ STATIC_ROOT = config('DJANGO_STATIC_ROOT', default=os.path.join(BASE_DIR, 'stati
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 APP_PORT = config('DJANGO_PORT', default=8000, cast=int)
+
+INSTALLED_APPS += [
+    "django_extensions",
+]
