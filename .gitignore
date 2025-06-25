@@ -11,3 +11,4 @@ openalex/database/
 docs/
 *.swp
 dump/
+dump/*
