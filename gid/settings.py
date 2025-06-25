@@ -148,7 +148,8 @@ STATIC_ROOT = config('DJANGO_STATIC_ROOT', default=os.path.join(BASE_DIR, 'stati
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 APP_PORT = config('DJANGO_PORT', default=8000, cast=int)
-
+'''
 INSTALLED_APPS += [
     "django_extensions",
 ]
+'''
