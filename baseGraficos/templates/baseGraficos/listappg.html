@@ -1,0 +1,26 @@
+{% extends "gid/base.html" %}
+
+{% block conteudo %}
+        
+    <div class='divisoria'>
+        <ul class='lista_vertical'>
+        {% for item in lista %}
+            <li><a href="../graficos/ppg/{{ item }}">{{ item }}</a></li>
+        {% endfor %}
+        </ul>
+    </div>
+
+{% endblock %} 
+
+
+{% block style %}
+    <style>
+    .lista_vertical{
+        display: flex; 
+        flex-direction: column; 
+        list-style: none; 
+        padding: 0;
+    }
+    </style>
+
+{% endblock %}

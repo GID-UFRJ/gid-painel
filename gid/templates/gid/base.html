@@ -44,8 +44,9 @@
             <li><a href={% url "producao" %}>Produção</a></li>
             <li><a href={% url "visibilidade" %}>Visibilidade</a></li>
             {% for item in menu_items %}
-              <li><a href="../graficos/{{ item.nome }}">{{ item.nome }}</a></li>
+              <li><a href={% url "url_grafico_painel" item %}>{{ item.nome }}</a></li>
             {% endfor %}
+            <li><a href={% url "url_lista_ppg" %}>Producao_sucupira</a></li>
 
             <li style="float:right"><a class="active">PAINEL //// GID - PR2</a></li>
         </ul>

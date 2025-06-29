@@ -14,3 +14,25 @@ def view_graficos(request, nome_painel):
     return render(request, r'baseGraficos/relatorio.html', {
         'graficos':lista
     })
+
+
+def view_graficos_producao(request, cod_ppg):
+
+    lista = []
+    registros = models.GraficoSucupira.objects.filter(painel = cod_ppg)
+    for r in registros:
+        graf = utils_plotly.Grafico(r.tamanhoGrafico.tamanhoHorizontal, r.tamanhoGrafico.tamanhoVertical)
+        lista.append(graf.escolher_grafico(r.estiloGrafico.numeroIdentificador, r.tituloGrafico, r.tituloEixoX, r.tituloEixoY, r.series))
+
+    return render(request, r'baseGraficos/relatorio.html', {
+        'graficos':lista
+    })
+
+def view_lista_ppg(request):
+
+    codigos = models.GraficoSucupira.objects.values_list('painel', flat=True).distinct()
+    lista_codigos = list(set(codigos))
+
+    return render(request, r'baseGraficos/listappg.html', {
+        'lista':lista_codigos
+    })
