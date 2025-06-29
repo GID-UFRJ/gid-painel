@@ -37,9 +37,16 @@ class Grafico(models.Model):
     class Meta:
         ordering = ["painel", "posicaoNoPainel"]
 
+
+class ListaSucupira(models.Model):
+    codPrograma = models.CharField(max_length=13)
+    nomePrograma = models.CharField(max_length=300)
+    class Meta:
+        ordering = ["nomePrograma", "codPrograma"]
+
 class GraficoSucupira(models.Model):
     #dados da exibição
-    painel = models.CharField(max_length=13)
+    painel = models.CharField(max_length=13) #o painel no caso é por ppg
     posicaoNoPainel = models.IntegerField()
     tamanhoGrafico = models.ForeignKey(TamanhoGrafico, on_delete=models.CASCADE)
     estiloGrafico = models.ForeignKey(EstiloGrafico, on_delete=models.CASCADE)
@@ -53,3 +60,6 @@ class GraficoSucupira(models.Model):
         return f'{self.painel} -- {self.posicaoNoPainel} -- {self.tituloGrafico} -- {self.estiloGrafico.nomeEstilo}'
     class Meta:
         ordering = ["painel", "posicaoNoPainel"]
+
+
+

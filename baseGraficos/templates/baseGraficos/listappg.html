@@ -4,8 +4,8 @@
         
     <div class='divisoria'>
         <ul class='lista_vertical'>
-        {% for item in lista %}
-            <li><a href="../graficos/ppg/{{ item }}">{{ item }}</a></li>
+        {% for ppg in ppgs %}
+            <li><a class='elemento_lista' href="../graficos/ppg/{{ ppg.codPrograma }}">{{ ppg.codPrograma }} - {{ ppg.nomePrograma }}</a></li>
         {% endfor %}
         </ul>
     </div>
@@ -20,6 +20,9 @@
         flex-direction: column; 
         list-style: none; 
         padding: 0;
+    }
+    .elemento_lista{
+        text-align: left;
     }
     </style>
 

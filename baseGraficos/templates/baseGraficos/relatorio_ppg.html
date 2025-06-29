@@ -1,0 +1,49 @@
+{% extends "gid/base.html" %}
+
+{% block conteudo %}
+    <div>
+        <h1>{{ppg.nomePrograma}}</h1>
+        <h4>{{ppg.codPrograma}}</h4>
+    </div>        
+
+    <div class='divisoria'>
+        {% for grafico in graficos %}
+            <div class='grafico'> {{ grafico | safe }}</div>
+        {% endfor %}
+    </div>
+    
+{% endblock %} 
+
+{% block style %}
+    <style>
+    .grafico{
+        border: 2px solid blue;
+        padding:5px;
+        margin:5px;
+        background-color: white;
+        border-radius: 20px;
+    }
+    .divisoria{
+        display:flex;
+        flex-wrap: wrap;
+        align-items: center; 
+        justify-content: center; 
+        margin:5; 
+        padding: 0
+    }
+    .imagem{
+        margin:5;
+        width:500;
+        height:400;
+        border-radius: 20px;
+    }
+    .imagemsuperior{
+        border: 2px solid blue;
+        margin:5;
+        width:500;
+        height:200;
+        border-radius: 20px;
+    }
+    </style>
+
+{% endblock %}
