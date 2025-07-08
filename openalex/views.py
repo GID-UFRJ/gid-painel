@@ -13,7 +13,7 @@ def index(request):
 def producao(request):
     p = PlotsProducao()
 
-    return render(request, r'rankings/relatorio_rankings.html', {
+    return render(request, r'openalex/producao.html', {
         'card_01':p.producao_total(),
         'card_02':p.producao_total_artigos(),
         'card_03':p.producao_artigos_acesso_aberto(),

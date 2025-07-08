@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class RankingsConfig(AppConfig):
+class BasegraficosConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'rankings'
+    name = 'baseGraficos'

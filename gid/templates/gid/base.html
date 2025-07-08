@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-        ul {
+        .menu_ul {
           list-style-type: none;
           margin: 0;
           padding: 0;
@@ -12,11 +12,11 @@
           background-color: #333;
         }
         
-        li {
+        .menu_li {
           float: left;
         }
         
-        li a {
+        .menu_li a {
           display: block;
           color: white;
           text-align: center;
@@ -39,12 +39,16 @@
 </head>
 <body>
     <div>
-        <ul>
-            <li><a href={% url "ppgs" %}>Programas</a></li>
-            <li><a href={% url "rankings" %}>Rankings</a></li>
-            <li><a href={% url "producao" %}>Produção</a></li>
-            <li><a href={% url "visibilidade" %}>Visibilidade</a></li>
-            <li style="float:right"><a class="active">PAINEL //// GID - PR2</a></li>
+        <ul class='menu_ul'>
+            <li class='menu_li'><a href={% url "ppgs" %}>Programas</a></li>
+            <li class='menu_li'><a href={% url "producao" %}>Produção</a></li>
+            <li class='menu_li'><a href={% url "visibilidade" %}>Visibilidade</a></li>
+            {% for item in menu_items %}
+              <li class='menu_li'><a href={% url "url_grafico_painel" item %}>{{ item.nome }}</a></li>
+            {% endfor %}
+            <li class='menu_li'><a href={% url "url_lista_ppg" %}>Producao_sucupira</a></li>
+
+            <li class='menu_li' style="float:right"><a class="active">PAINEL //// GID - PR2</a></li>
         </ul>
     </div>
 

@@ -1,0 +1,29 @@
+{% extends "gid/base.html" %}
+
+{% block conteudo %}
+        
+    <div class='divisoria'>
+        <ul class='lista_vertical'>
+        {% for ppg in ppgs %}
+            <li><a class='elemento_lista' href="../graficos/ppg/{{ ppg.codPrograma }}">{{ ppg.codPrograma }} - {{ ppg.nomePrograma }}</a></li>
+        {% endfor %}
+        </ul>
+    </div>
+
+{% endblock %} 
+
+
+{% block style %}
+    <style>
+    .lista_vertical{
+        display: flex; 
+        flex-direction: column; 
+        list-style: none; 
+        padding: 0;
+    }
+    .elemento_lista{
+        text-align: left;
+    }
+    </style>
+
+{% endblock %}
