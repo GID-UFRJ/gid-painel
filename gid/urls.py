@@ -19,7 +19,8 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('programa.urls')),
+    path('', include('homepage.urls', namespace='homepage')),
+    path('sucupira/', include('sucupira.urls', namespace='sucupira')),
     path('graficos/', include('baseGraficos.urls')),
-    path('openalex/', include('openalex.urls')),
+    path('openalex/', include('openalex.urls', namespace='openalex')),
 ]

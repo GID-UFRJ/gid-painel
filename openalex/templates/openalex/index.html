@@ -1,0 +1,75 @@
+{% extends "gid/base.html" %}
+
+{% block conteudo %}
+        
+<div class="container p-4">
+    <br>
+    <div class="row justify-content-center">
+        <div class="col-8">
+            <h2 class="text-center text-black">Painel de Produção Científica da UFRJ</h2>
+            <br>
+            <div class="text-black">
+                <p>
+                    Este painel visa detalhar a produção científica da UFRJ. Ele pode ser dividido em dois subpainéis: 
+                </p>
+                <ul> 
+                    <li>
+                        <p>
+                            <a href="{% url 'openalex:producao' %}"><strong>Produção</strong></a>: apresenta informações sobre o conjunto de documentos publicados pela UFRJ
+                            e analisa características como a divisão dos documentos por disciplina e análise de citação.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <a href="{% url 'openalex:colaboracao' %}"><strong>Colaboracao</strong></a>: apresenta informações sobre a colaboração da UFRJ em publicações, tanto
+                            a nível nacional quanto internacional.
+                        </p>
+                    </li>
+                </ul>    
+                <p>
+                    Os dados utlizados em ambos os painéis advém da <a href="https://openalex.org/">OpenAlex</a>,
+                    uma base bibliográfica aberta que conta com um grande número de publicações indexadas. Os registros 
+                    analisados aqui correspondem aos documentos encontrados na base onde pelo menos um autor é afiliado
+                    à UFRJ, os quais são recuperados e atualizados automaticamente através de sua 
+                    <a href="https://docs.openalex.org/how-to-use-the-api/api-overview">API gratuita</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} 
+
+{% block style %}
+    <style>
+    .grafico{
+        border: 2px solid blue;
+        padding:5px;
+        margin:5px;
+        background-color: white;
+        border-radius: 20px;
+    }
+    .divisoria{
+        display:flex;
+        flex-wrap: wrap;
+        align-items: center; 
+        justify-content: center; 
+        margin:5; 
+        padding: 0
+    }
+    .imagem{
+        margin:5;
+        width:500;
+        height:400;
+        border-radius: 20px;
+    }
+    .imagemsuperior{
+        border: 2px solid blue;
+        margin:5;
+        width:500;
+        height:200;
+        border-radius: 20px;
+    }
+    </style>
+
+{% endblock %}

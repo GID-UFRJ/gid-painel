@@ -1,0 +1,41 @@
+{% extends "gid/base.html" %}
+
+{% block conteudo %}
+        
+<div class="container p-4">
+    <br>
+    <div class="row justify-content-center">
+        <div class="col-8">
+            <h2 class="text-center text-black">Painel de Pós-Graduação</h2>
+            <br>
+            <div class="text-black">
+                <p>
+                    Este painel visa prover informações detalhadas sobre os programas de pós graduação (PPGs) da UFRJ. Ele pode ser dividido em dois subpainéis: 
+                </p>
+                <ul> 
+                    <li>
+                        <p>
+                            <a href="{% url 'sucupira:posgrad_ufrj' %}"><strong>Pós-Graduação na UFRJ</strong></a>: apresenta informações (e.g. total de discentes e docentes) 
+                            sobre a Pós-Graduação na UFRJ como um todo.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <a href="{% url 'sucupira:ppgs' %}"><strong>PPGs</strong></a>: apresenta informações detalhadas sobre cada um dos PPGs da UFRJ. 
+                        </p>
+                    </li>
+                </ul>    
+                <p>
+                    Os dados utlizados em ambos os painéis advém dos <a href="https://dadosabertos.capes.gov.br/">Dados Abertos da CAPES</a>,
+                    uma base de dados oficial que disponibiliza informações detalhadas sobre todos os programas de Pós-Graduação do Brasil. 
+                    Foram analisados aqui registros a partir de 2013, ano no qual a coleta dos dados pela CAPES passou a se dar através da plataforma 
+                    <a href="'https://sucupira.capes.gov.br/">Sucupira</a>. É válido ressaltar que os dados abertos da CAPES são atualizados com um certo
+                    atraso (e.g. em Agosto de 2025, os dados de 2024 ainda não estavam disponíveis). Logo, as informações presentes aqui podem estar 
+                    ligeiramente desatualizadas.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} 
