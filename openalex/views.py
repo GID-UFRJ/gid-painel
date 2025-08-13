@@ -34,7 +34,7 @@ def producao(request):
 def colaboracao(request):
     p = PlotsVisibilidade()
 
-    return render(request, r'openalex/visibilidade.html', {
+    return render(request, r'openalex/colaboracao.html', {
         'card_01':p.producao_total_citacoes(),
         'card_02':p.producao_colaboracao_nacional(),
         'card_03':p.producao_colaboracao_internacional(),

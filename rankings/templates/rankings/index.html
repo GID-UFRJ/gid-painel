@@ -1,0 +1,95 @@
+{% extends "gid/base.html" %}
+
+{% block conteudo %}
+        
+<div class="container p-4">
+    <br>
+    <div class="row justify-content-center">
+        <div class="col-8">
+            <h2 class="text-center text-black">Painel de Rankings da UFRJ</h2>
+            <br>
+            <div class="text-black">
+                <p>
+                    Este painel (que pode ser acessado <a href={% url "rankings:classificacao" %}><strong>AQUI</strong></a>) visa detalhar o desempenho da UFRJ nos mais diversos rankings, dentre os quais temos:
+                </p>
+                <ul> 
+                    <li>
+                        <p>
+                            <a href="{https://www.timeshighereducation.com/world-university-rankings}"><strong>Times Higher Education World University Rankings (THE Rankings)</strong></a>: Considerado 
+                            um dos rankings acadêmicos mais tradicionais, o THE Rankings foi criado em 2004 no Reino Unido, surgindo de uma parceria entre a revista Times Higher Education e 
+                            a empresa de dados Quacquarelli Symonds (QS), ambas especializadas em ensino superior. Ele combina medidas quantitativas de pesquisa e ensino com dados
+                            de reputação acadêmica, obtidos através de uma pesquisa global com milhares de docentes.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <a href="{https://www.topuniversities.com/university-rankings}"><strong>Quacquarelli Symonds World University Rankings (QS)</strong></a>: Embora tenha começado em parceria com o THE, o QS 
+                            se tornou um ranking independente em 2010, com base em Londres. Após a separação, a Quacquarelli Symonds reformulou a metodologia de seu 
+                            ranking, atribuindo um peso consideravelmente maior à reputação. Ele também se destaca por incluir a reputação entre empregadores.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <a href="{https://www.shanghairanking.com}"><strong>Academic Ranking of World Universities (AWRU ou Shangai Ranking) </strong></a>: Popularmente conhecido como Shangai Ranking, o AWRU foi criado
+                            em 2003, na Universidade Jiao Tong de Xangai, na China. O objetivo original não era criar um ranking global para o público, mas sim uma ferramenta interna para 
+                            o governo chinês. Por meio da comparação do desempenho das universidades chinesas com as melhores do mundo, seria possível identificar aspectos onde as 
+                            instituições chinesas poderiam melhorar e, assim, acelerar seu desenvolvimento. Graças a isso, o ranking é muito focado pesquisa de alto impacto, 
+                            como o número de prêmios Nobel e publicações em revistas científicas de elite.
+                        </p>
+                    </li>
+                </ul>    
+                <p>
+                    Os dados utlizados neste painel são coletados anualmente pelo <a href="https://pr2.ufrj.br/gid/">GID</a>. A metodologia consiste em recuperar manualmente
+                    a classificação da UFRJ nos sites dos rankings. Esses dados são apresentados na forma de séries temporais, permitindo observar o desempenho da UFRJ ao longo dos 
+                    anos para cada ranking. 
+                </p>    
+                <p>
+                    Cada ranking pode também apresentar múltiplos escopos, que permite avaliar a posição da UFRJ contra subconjuntos específicos de instituições. 
+                    Por exemplo, o Shangai Ranking possui tanto uma classificação global, onde todas as instituições são ranqueadas, quanto nacional, onde apenas 
+                    instituições brasileiras são consideradas. De acordo com o contexto, isso pode permitir análises mais normalizadas e versáteis.
+                </p>
+                <p>
+                    Alguns rankings não apresentam a posição da instituição, mas sim uma faixa de posições na qual 
+                    ela se enquadra (e.g. 100-150). Nesse caso, os gráficos apresentam duas linhas: uma para a posição máxima e outra para a mínima, representando assim o intervalo
+                    de posições que a insituição pode estar ocupando.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} 
+
+{% block style %}
+    <style>
+    .grafico{
+        border: 2px solid blue;
+        padding:5px;
+        margin:5px;
+        background-color: white;
+        border-radius: 20px;
+    }
+    .divisoria{
+        display:flex;
+        flex-wrap: wrap;
+        align-items: center; 
+        justify-content: center; 
+        margin:5; 
+        padding: 0
+    }
+    .imagem{
+        margin:5;
+        width:500;
+        height:400;
+        border-radius: 20px;
+    }
+    .imagemsuperior{
+        border: 2px solid blue;
+        margin:5;
+        width:500;
+        height:200;
+        border-radius: 20px;
+    }
+    </style>
+
+{% endblock %}

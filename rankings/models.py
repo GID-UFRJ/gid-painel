@@ -32,7 +32,7 @@ class Resultado(models.Model):
     pontuacaoGeral = models.FloatField(null = True, blank=True)
 
     class Meta:
-        #db_table_comment = "Resultados dos rankings em um dado escopo e ano"
+        db_table_comment = "Resultados dos rankings em um dado escopo e ano"
         constraints = [
         models.UniqueConstraint(fields=['ranking', 'escopo', 'ano'], name='unique_resultados_tripla'), #Não achei como modelar chaves estrangeiras como chave primária composta, mas isso deve servir 
         ] 

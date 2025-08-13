@@ -42,7 +42,7 @@
     
     <div class="row justify-content-center p-4">
         <div class="col-2">
-            <a href="/producao" class="text-decoration-none">
+            <a href="{% url 'openalex:index' %}" class="text-decoration-none">
                 <div class="card d-flex flex-column h-100 shadow rounded border-info card-hover" style="border: 3px solid; overflow: hidden;">
                     <div class="card-body bg-white text-center">
                         <i class="fa fa-file fa-3x text-info"></i>
@@ -54,7 +54,7 @@
             </a>
         </div>
         <div class="col-2">
-            <a href="/posgrad" class="text-decoration-none">
+            <a href="{% url 'sucupira:index' %}" class="text-decoration-none">
                 <div class="card d-flex flex-column h-100 shadow rounded border-info card-hover" style="border: 3px solid; overflow: hidden;">
                     <div class="card-body bg-white text-center">
                         <i class="fa fa-graduation-cap fa-3x text-info"></i>
