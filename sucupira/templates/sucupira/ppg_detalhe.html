@@ -1,0 +1,41 @@
+{% extends 'gid/base.html' %} 
+
+{% block conteudo %}
+    <div class="container mt-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'sucupira:index' %}">Início</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'sucupira:ppgs' %}">Programas de Pós-Graduação</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ programa.nm_programa_ies }}</li>
+            </ol>
+        </nav>
+
+        <h1 class="mb-4">Detalhes do Programa: {{ programa.nm_programa_ies }}</h1>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Informações Gerais</h5>
+                <ul>
+                    <li><strong>Grande Área:</strong> {{ programa.grande_area.nm_grande_area_conhecimento }}</li>
+                    <li><strong>Área de Avaliação:</strong> {{ programa.area_avaliacao.nm_area_avaliacao }} ({{ programa.area_avaliacao.cd_area_avaliacao }})</li>
+                    <li><strong>Ano de Início:</strong> {{ programa.an_inicio_programa|default:"Não informado" }}</li>
+                </ul>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h2>Gráfico de Docentes</h2>
+                <div id="grafico-docentes">
+                    </div>
+            </div>
+            <div class="col-md-6">
+                <h2>Gráfico de Discentes</h2>
+                <div id="grafico-discentes">
+                    </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

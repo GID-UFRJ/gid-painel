@@ -1,0 +1,27 @@
+{% extends 'gid/base.html' %}
+
+
+{% block conteudo %}
+    <div class="container mt-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'sucupira:index' %}">Início</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Programas de Pós-Graduação</li>
+            </ol>
+        </nav>
+        
+        <h1 class="mb-4">Programas de Pós-Graduação (PPGs)</h1>
+
+        {% if programas %}
+            <div class="list-group">
+                {% for programa in programas %}
+                    <a href="{% url 'sucupira:ppg_detalhe' programa.id %}" class="list-group-item list-group-item-action">
+                        {{ programa.nm_programa_ies }}
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Nenhum programa de pós-graduação encontrado.</p>
+        {% endif %}
+    </div>
+{% endblock %}
