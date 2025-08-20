@@ -8,10 +8,10 @@ def breadcrumbs(context):
     request = context['request']
     path = request.path
 
-    print(f"DEBUG: request.path = {path}")  # <---- DEBUG
+    #print(f"DEBUG: request.path = {path}")  # <---- DEBUG
 
     parts = [unquote(p) for p in path.strip('/').split('/') if p]
-    print(f"DEBUG: parts = {parts}")  # <---- DEBUG
+    #print(f"DEBUG: parts = {parts}")  # <---- DEBUG
 
     breadcrumbs = []
     url = '/'

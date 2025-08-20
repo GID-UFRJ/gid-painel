@@ -1,27 +1,44 @@
 {% extends 'homepage/base.html' %}
 
-
 {% block conteudo %}
-    <div class="container mt-4">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'sucupira:index' %}">Início</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Programas de Pós-Graduação</li>
-            </ol>
-        </nav>
-        
-        <h1 class="mb-4">Programas de Pós-Graduação (PPGs)</h1>
+<h1 class="mb-4">Programas de Pós-Graduação (PPGs)</h1>
 
-        {% if programas %}
-            <div class="list-group">
-                {% for programa in programas %}
-                    <a href="{% url 'sucupira:ppg_detalhe' programa.id %}" class="list-group-item list-group-item-action">
-                        {{ programa.nm_programa_ies }}
-                    </a>
-                {% endfor %}
+{% if programas_agrupados %}
+<div class="container-fluid mt-3" style="background-color:Gainsboro; padding: 15px;">
+    <div class="accordion" id="ppgAccordion">
+        {% for grande_area, programas in programas_agrupados.items %}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading-ppg{{ forloop.counter }}">
+                <button class="accordion-button collapsed" 
+                        type="button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#collapse-ppg{{ forloop.counter }}" 
+                        aria-expanded="false" 
+                        aria-controls="collapse-ppg{{ forloop.counter }}">
+                    {{ grande_area }}
+                </button>
+            </h2>
+            <div id="collapse-ppg{{ forloop.counter }}" 
+                 class="accordion-collapse collapse" 
+                 aria-labelledby="heading-ppg{{ forloop.counter }}" 
+                 data-bs-parent="#ppgAccordion">
+                <div class="accordion-body p-0">
+                    <ul class="list-group list-group-flush">
+                        {% for programa in programas %}
+                        <li class="list-group-item ps-5">
+                            <a href="{% url 'sucupira:ppg_detalhe' programa.id %}">
+                                {{ programa.nm_programa_ies }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
-        {% else %}
-            <p>Nenhum programa de pós-graduação encontrado.</p>
-        {% endif %}
+        </div>
+        {% endfor %}
     </div>
+</div>
+{% else %}
+<p>Nenhum programa de pós-graduação encontrado.</p>
+{% endif %}
 {% endblock %}

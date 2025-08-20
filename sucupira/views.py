@@ -1,3 +1,4 @@
+from collections import defaultdict
 from django.shortcuts import render, get_object_or_404
 from django.shortcuts import HttpResponse
 from .models import Programa
@@ -14,16 +15,27 @@ def posgrad_ufrj(request):
 
 def ppgs(request):
     """
-    Lista todos os programas de pós-graduação em ordem alfabética.
+    Lista todos os programas de pós-graduação por grande area em ordem alfabética.
     """
-    # Busca todos os objetos Programa e ordena pelo nome
-    programas = Programa.objects.all().order_by('nm_programa_ies')
-    
+    # Buscar todos os programas com a grande_area já carregada
+    programas = Programa.objects.select_related('grande_area').order_by(
+        'grande_area__nm_grande_area_conhecimento', 'nm_programa_ies'
+    )
+
+    # Agrupar por Grande Área
+    agrupados = defaultdict(list)
+    for programa in programas:
+        chave = programa.grande_area.nm_grande_area_conhecimento
+        agrupados[chave].append(programa)
+
+    # Transformar em dict ordenado por chave (Grande Área)
+    programas_agrupados = dict(sorted(agrupados.items()))
+
     context = {
-        'programas': programas,
+        'programas_agrupados': programas_agrupados
     }
-    
     return render(request, 'sucupira/ppgs.html', context)
+
 
 def ppg_detalhe(request, programa_id):
     """
