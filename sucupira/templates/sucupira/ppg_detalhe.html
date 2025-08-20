@@ -1,16 +1,7 @@
-{% extends 'gid/base.html' %} 
+{% extends 'homepage/base.html' %} 
 
 {% block conteudo %}
-    <div class="container mt-4">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'sucupira:index' %}">Início</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'sucupira:ppgs' %}">Programas de Pós-Graduação</a></li>
-                <li class="breadcrumb-item active" aria-current="page">{{ programa.nm_programa_ies }}</li>
-            </ol>
-        </nav>
-
-        <h1 class="mb-4">Detalhes do Programa: {{ programa.nm_programa_ies }}</h1>
+    <h1 class="mb-4">Detalhes do Programa: {{ programa.nm_programa_ies }}</h1>
 
         <div class="card">
             <div class="card-body">

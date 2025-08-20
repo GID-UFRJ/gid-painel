@@ -1,3 +1,5 @@
+{% load breadcrumbs %}
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -57,7 +59,23 @@
         </ul>
     </div>
 
+
+
     <div style="background-color:Gainsboro">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Início</a></li>
+            {% breadcrumbs as breadcrumb_list %}
+            {% for name, url in breadcrumb_list %}
+              {% if forloop.last %}
+                <li class="breadcrumb-item active" aria-current="page">{{ name|capfirst }}</li>
+              {% else %}
+                <li class="breadcrumb-item"><a href="{{ url }}">{{ name|capfirst }}</a></li>
+              {% endif %}
+            {% endfor %}
+          </ol>
+        </nav>
+
         {% block conteudo %}{% endblock  %}
     </div>
 </body>
