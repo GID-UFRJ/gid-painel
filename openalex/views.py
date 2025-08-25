@@ -30,6 +30,10 @@ def producao(request):
         #'graf_06':g.shanghai_nacional(),
     }
 )
+
+def impacto(request):
+    return(HttpResponse('Página em construção'))
+
  
 def colaboracao(request):
     p = PlotsVisibilidade()
