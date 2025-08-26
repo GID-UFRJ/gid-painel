@@ -2,8 +2,8 @@ import pandas as pd
 import plotly.express as px
 from plotly.io import to_html
 import numpy as np
-from .models import Work, Year, WorkTopic, Institution, Authorship
-from .utils import calculate_h_index
+from ..models import Work, Year, WorkTopic, Institution, Authorship
+from .misc import calculate_h_index
 from django.db.models import F, Q, Count, Sum, Min, Max, Subquery, OuterRef, Case, When, Value
 from gid.utils_scripts_graficos import cores, grafico_barra, grafico_kpi
 from gid.utils_scripts_graficos_plotly import grafico_linha_plotly, grafico_barra_plotly, grafico_barra_plotly2
@@ -48,66 +48,70 @@ class PlotsProducao:
     
 
     def producao_por_ano(self, 
-                         ano_inicial:int | None = None, 
-                         ano_final:int | None = None):
-        ano_inicial, ano_final = self._inferir_intervalo_anos(ano_inicial, ano_final)
-        docs_por_ano = Work.objects.filter(
-                pubyear__year__gte=str(ano_inicial), # Converte para string pois Year.year é CharField
-                pubyear__year__lte=str(ano_final)
-        ).values('pubyear__year').annotate(
-            document_count=Count('id') # Or Count('work_id') or Count('*')
-            ).order_by('pubyear__year') # Optional: order the results by year
-        df = pd.DataFrame.from_records(docs_por_ano)
-        img = grafico_linha_plotly(df,
-                                    x='pubyear__year', 
-                                    y='document_count',
-                                    titulo='Total de publicações por ano',
-                                    titulo_eixo_x='Ano',
-                                    titulo_eixo_y='Número de publicações',
-                                    #adicionar_rotulo_dados=False,
-                                    tamanho_rotulo_dados=15,
-                                    largura=1900,
-        )
-        return img
- 
-    def producao_por_ano_worktype(self, 
-                        ano_inicial:int | None = None, 
-                        ano_final:int | None = None, 
-                        tipo_plot: str | None = 'linha'):
-        ano_inicial, ano_final = self._inferir_intervalo_anos(ano_inicial, ano_final)
-        docs_por_ano_worktype = Work.objects.filter(
-                pubyear__year__gte=str(ano_inicial), # Converte para string pois Year.year é CharField
-                pubyear__year__lte=str(ano_final)
-        ).values('pubyear__year', 'worktype__worktype').annotate(
-            document_count=Count('id') # Or Count('work_id') or Count('*')
-            ).order_by('pubyear__year') # Optional: order the results by year
-        df = pd.DataFrame.from_records(docs_por_ano_worktype)
-        if tipo_plot == 'linha':
-            img = grafico_linha_plotly(df,
-                                        x='pubyear__year', 
-                                        y='document_count',
-                                        grupo='worktype__worktype',
-                                        titulo='Total de publicações por ano (tipo de documento)',
-                                        titulo_eixo_x='Ano',
-                                        titulo_eixo_y='Número de publicações',
-                                        adicionar_rotulo_dados=False,
-                                        #tamanho_rotulo_dados=15,
-                                        largura=1900,
-            )
-        elif tipo_plot == 'barra':
-            img = grafico_barra_plotly(df, 
-                                       x='pubyear__year', 
-                                       y='document_count',
-                                       grupo='worktype__worktype',
-                                       titulo='Total de publicações por ano (tipo de documento)',
-                                       titulo_eixo_x='Ano',
-                                       titulo_eixo_y='Número de publicações',
-                                       adicionar_rotulo_dados=False,
-                                       #tamanho_rotulo_dados=15,
-                                       largura=1900,
-            )
-        return img
+                         ano_inicial: int | None = None, 
+                         ano_final: int | None = None, 
+                         filtro: str | None = 'total'):
 
+        ano_inicial, ano_final = self._inferir_intervalo_anos(ano_inicial, ano_final)
+
+        # Define a dictionary for common plotting parameters
+        plot_params = {
+            'x': 'pubyear__year', 
+            'y': 'document_count',
+            'titulo_eixo_x': 'Ano',
+            'titulo_eixo_y': 'Número de publicações',
+            'largura': 1900,
+        }
+
+        # Base query
+        base_query = Work.objects.filter(
+            pubyear__year__gte=str(ano_inicial),
+            pubyear__year__lte=str(ano_final)
+        )
+
+        if filtro == 'acesso_aberto':
+            docs_por_ano = base_query.values('pubyear__year', 'is_oa').annotate(
+                document_count=Count('id')
+            ).order_by('pubyear__year', 'is_oa')
+
+            df = pd.DataFrame.from_records(docs_por_ano)
+            df['is_oa'] = df['is_oa'].map({True: 'Acesso Aberto', False: 'Acesso Fechado'})
+
+            # Add filter-specific parameters to the dictionary
+            plot_params.update({
+                'grupo': 'is_oa',
+                'titulo': 'Produção por ano e Acesso Aberto',
+            })
+
+        elif filtro == 'tipo_documento':
+            docs_por_ano = base_query.values('pubyear__year', 'worktype__worktype').annotate(
+                document_count=Count('id')
+            ).order_by('pubyear__year', 'worktype__worktype')
+
+            df = pd.DataFrame.from_records(docs_por_ano)
+
+            # Add filter-specific parameters
+            plot_params.update({
+                'grupo': 'worktype__worktype',
+                'titulo': 'Produção por ano e Tipo de Documento',
+            })
+
+        else:  # Default filter: 'total'
+            docs_por_ano = base_query.values('pubyear__year').annotate(
+                document_count=Count('id')
+            ).order_by('pubyear__year')
+
+            df = pd.DataFrame.from_records(docs_por_ano)
+
+            # Add filter-specific parameters
+            plot_params.update({
+                'titulo': 'Total de publicações por ano',
+            })
+
+        # Call the plotting function with the dynamically generated parameters
+        img = grafico_linha_plotly(df, **plot_params)
+    
+        return img
 
     def distribuicao_tematica_artigos(self):
         contagem_temas_principais = WorkTopic.objects.filter(
