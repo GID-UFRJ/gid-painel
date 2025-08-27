@@ -50,18 +50,10 @@ class PlotsProducao:
     def producao_por_ano(self, 
                          ano_inicial: int | None = None, 
                          ano_final: int | None = None, 
-                         filtro: str | None = 'total'):
+                         tipo_producao: str | None = 'total',
+                         tipo_grafico: str | None = 'barra'):
 
         ano_inicial, ano_final = self._inferir_intervalo_anos(ano_inicial, ano_final)
-
-        # Define a dictionary for common plotting parameters
-        plot_params = {
-            'x': 'pubyear__year', 
-            'y': 'document_count',
-            'titulo_eixo_x': 'Ano',
-            'titulo_eixo_y': 'Número de publicações',
-            'largura': 1900,
-        }
 
         # Base query
         base_query = Work.objects.filter(
@@ -69,7 +61,13 @@ class PlotsProducao:
             pubyear__year__lte=str(ano_final)
         )
 
-        if filtro == 'acesso_aberto':
+        # Definições comuns
+        eixo_x = "pubyear__year"
+        eixo_y = "document_count"
+        grupo = None
+        titulo = "Total de publicações por ano"
+
+        if tipo_producao == 'acesso_aberto':
             docs_por_ano = base_query.values('pubyear__year', 'is_oa').annotate(
                 document_count=Count('id')
             ).order_by('pubyear__year', 'is_oa')
@@ -77,41 +75,100 @@ class PlotsProducao:
             df = pd.DataFrame.from_records(docs_por_ano)
             df['is_oa'] = df['is_oa'].map({True: 'Acesso Aberto', False: 'Acesso Fechado'})
 
-            # Add filter-specific parameters to the dictionary
-            plot_params.update({
-                'grupo': 'is_oa',
-                'titulo': 'Produção por ano e Acesso Aberto',
-            })
+            grupo = "is_oa"
+            titulo = "Produção por ano e Acesso Aberto"
 
-        elif filtro == 'tipo_documento':
+        elif tipo_producao == 'tipo_documento':
             docs_por_ano = base_query.values('pubyear__year', 'worktype__worktype').annotate(
                 document_count=Count('id')
             ).order_by('pubyear__year', 'worktype__worktype')
 
             df = pd.DataFrame.from_records(docs_por_ano)
+            grupo = "worktype__worktype"
+            titulo = "Produção por ano e Tipo de Documento"
+        
+        elif tipo_producao == 'dominio':
+            docs_por_dominio = WorkTopic.objects.filter(
+                work__pubyear__year__gte=str(ano_inicial),
+                work__pubyear__year__lte=str(ano_final)
+            ).values(
+                'work__pubyear__year',
+                'topic__domain_name'
+            ).annotate(
+                document_count=Count('work', distinct=True)
+            ).order_by('work__pubyear__year', 'topic__domain_name')
 
-            # Add filter-specific parameters
-            plot_params.update({
-                'grupo': 'worktype__worktype',
-                'titulo': 'Produção por ano e Tipo de Documento',
-            })
+            df = pd.DataFrame.from_records(docs_por_dominio)
+            eixo_x = "work__pubyear__year"
+            eixo_y = "document_count"
+            grupo = "topic__domain_name"
+            titulo = "Produção por ano e Domínio"
 
-        else:  # Default filter: 'total'
+        elif tipo_producao == 'correspondente_ufrj':
+
+            # Subquery com todos os authorships da UFRJ correspondentes
+            ufrj_authorships = Authorship.objects.filter(
+                is_corresponding=True,
+                authorshipinstitution__institution__institution_name="Universidade Federal do Rio de Janeiro"
+            ).values('work_id')
+
+            # Filtrando só os Works nesses authorships
+            docs_ufrj = Work.objects.filter(
+                pubyear__year__gte=str(ano_inicial),
+                pubyear__year__lte=str(ano_final),
+                id__in=Subquery(ufrj_authorships)
+            ).values('pubyear__year').annotate(
+                document_count=Count('id')
+            ).order_by('pubyear__year')
+
+            df = pd.DataFrame.from_records(docs_ufrj)
+            eixo_x = "pubyear__year"
+            eixo_y = "document_count"
+            grupo = None
+            titulo = "Produção por ano (Autor correspondente da UFRJ)"
+
+        else:  # total
             docs_por_ano = base_query.values('pubyear__year').annotate(
                 document_count=Count('id')
             ).order_by('pubyear__year')
 
             df = pd.DataFrame.from_records(docs_por_ano)
+        
 
-            # Add filter-specific parameters
-            plot_params.update({
-                'titulo': 'Total de publicações por ano',
-            })
 
-        # Call the plotting function with the dynamically generated parameters
-        img = grafico_linha_plotly(df, **plot_params)
-    
-        return img
+        # Construção do gráfico com plotly express
+        if tipo_grafico == "barra":
+            fig = px.bar(
+                df,
+                x=eixo_x,
+                y=eixo_y,
+                color=grupo,
+                text=eixo_y,
+                title=titulo,
+            )
+
+            fig.update_traces(texttemplate='%{text:.0f}', textfont_size=12, textposition='inside')
+        else:  # linha
+            fig = px.line(
+                df,
+                x=eixo_x,
+                y=eixo_y,
+                color=grupo,
+                markers=True,
+                title=titulo,
+            )
+
+        # Layout: sem largura fixa, apenas responsivo
+        fig.update_layout(
+            autosize=True,
+            margin=dict(l=40, r=40, t=60, b=40),
+            xaxis_title="Ano",
+            yaxis_title="Número de publicações",
+        )
+
+        # Retorna o HTML responsivo
+        return fig.to_html(full_html=False, include_plotlyjs='cdn', config={"responsive": True})
+
 
     def distribuicao_tematica_artigos(self):
         contagem_temas_principais = WorkTopic.objects.filter(

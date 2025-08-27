@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 #Também foi preferir usar chaves substitutas/artificiais (surrogate) em vez de naturais, para fins de eficiência e tbm pq elas substituem chaves compostas, para as quais o django não tem um suporte muito desenvolvido
 
 class Year(models.Model):
-    year = models.CharField(max_length=10, unique=True)
+    year = models.IntegerField(max_length=10, unique=True)
 
     def __str__(self):
         return self.year
@@ -64,7 +64,7 @@ class Work(models.Model):
 
 class Institution(models.Model):
     institution_id = models.CharField(max_length=100, unique=True)
-    institution_name = models.CharField(max_length=255)
+    institution_name = models.CharField(max_length=255, db_index=True)
     country_code = models.CharField(max_length=10)
 
     def __str__(self):

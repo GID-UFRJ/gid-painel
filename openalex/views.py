@@ -19,7 +19,7 @@ def producao(request):
         'card_03':p.producao_artigos_acesso_aberto(),
         #'card_04':p.producao_total_citacoes(),
                  
-        'graf_01':p.producao_por_ano(ano_inicial=1990, ano_final=2024, filtro='Total'),
+        'graf_01':p.producao_por_ano(ano_inicial=1990, ano_final=2024, tipo_producao='Total'),
         #'graf_02':p.producao_por_ano_worktype(ano_inicial=1990, ano_final=2024),
         #'graf_03':p.producao_por_ano_worktype(ano_inicial=1990, 
         #                                      ano_final=2024,
@@ -34,10 +34,12 @@ def producao(request):
 def grafico_producao_por_ano(request):
     ano_inicial = int(request.GET.get("ano_inicial", 1990))
     ano_final = int(request.GET.get("ano_final", 2024))
-    filtro = request.GET.get("filtro", "total")
+    tipo_producao = request.GET.get("tipo_producao", "total")
+    tipo_grafico = request.GET.get("tipo_grafico", "barra")
+
 
     p = PlotsProducao()
-    graf = p.producao_por_ano(ano_inicial=ano_inicial, ano_final=ano_final, filtro=filtro)
+    graf = p.producao_por_ano(ano_inicial=ano_inicial, ano_final=ano_final, tipo_producao=tipo_producao, tipo_grafico=tipo_grafico)
 
     return render(request, "openalex/partials/producao_por_ano.html", {"graf": graf})
 
