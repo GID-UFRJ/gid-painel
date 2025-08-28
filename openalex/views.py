@@ -19,15 +19,8 @@ def producao(request):
         'card_03':p.producao_artigos_acesso_aberto(),
         #'card_04':p.producao_total_citacoes(),
                  
-        'graf_01':p.producao_por_ano(ano_inicial=1990, ano_final=2024, tipo_producao='Total'),
-        #'graf_02':p.producao_por_ano_worktype(ano_inicial=1990, ano_final=2024),
-        #'graf_03':p.producao_por_ano_worktype(ano_inicial=1990, 
-        #                                      ano_final=2024,
-        #                                      tipo_plot='barra'),
-        #'graf_04': p.distribuicao_tematica_artigos(),
-        #'graf_04':p.metricas_por_topico_artigos_plot(),
-        #'graf_05':g.shanghai_mundo(),
-        #'graf_06':g.shanghai_nacional(),
+        'graf_01':p.producao_por_ano(ano_inicial=1990, ano_final=2024),
+        'graf_02': p.distribuicao_tematica_artigos(),
     }
 )
 
@@ -41,7 +34,7 @@ def grafico_producao_por_ano(request):
     p = PlotsProducao()
     graf = p.producao_por_ano(ano_inicial=ano_inicial, ano_final=ano_final, tipo_producao=tipo_producao, tipo_grafico=tipo_grafico)
 
-    return render(request, "openalex/partials/producao_por_ano.html", {"graf": graf})
+    return render(request, "openalex/partials/_producao_por_ano.html", {"graf": graf})
 
 
 def impacto(request):

@@ -4,7 +4,7 @@ from plotly.io import to_html
 import numpy as np
 from ..models import Work, Year, WorkTopic, Institution, Authorship
 from .misc import calculate_h_index
-from django.db.models import F, Q, Count, Sum, Min, Max, Subquery, OuterRef, Case, When, Value
+from django.db.models import F, Q, Count, Sum, Min, Max, Subquery, OuterRef, Case, When, Value, CharField, Exists
 from gid.utils_scripts_graficos import cores, grafico_barra, grafico_kpi
 from gid.utils_scripts_graficos_plotly import grafico_linha_plotly, grafico_barra_plotly, grafico_barra_plotly2
 
@@ -66,6 +66,7 @@ class PlotsProducao:
         eixo_y = "document_count"
         grupo = None
         titulo = "Total de publicações por ano"
+        category_orders = {} #Usado para ordenar categorias na legenda dos plots
 
         if tipo_producao == 'acesso_aberto':
             docs_por_ano = base_query.values('pubyear__year', 'is_oa').annotate(
@@ -77,6 +78,8 @@ class PlotsProducao:
 
             grupo = "is_oa"
             titulo = "Produção por ano e Acesso Aberto"
+            category_orders = {grupo: ["Acesso Aberto", "Acesso Fechado"]}
+
 
         elif tipo_producao == 'tipo_documento':
             docs_por_ano = base_query.values('pubyear__year', 'worktype__worktype').annotate(
@@ -104,28 +107,52 @@ class PlotsProducao:
             grupo = "topic__domain_name"
             titulo = "Produção por ano e Domínio"
 
-        elif tipo_producao == 'correspondente_ufrj':
-
-            # Subquery com todos os authorships da UFRJ correspondentes
-            ufrj_authorships = Authorship.objects.filter(
+        elif tipo_producao == 'autor_correspondente':
+            # Subquery: existe correspondente da UFRJ?
+            corresp_ufrj = Authorship.objects.filter(
+                work=OuterRef('pk'),
                 is_corresponding=True,
                 authorshipinstitution__institution__institution_name="Universidade Federal do Rio de Janeiro"
-            ).values('work_id')
+            )
 
-            # Filtrando só os Works nesses authorships
-            docs_ufrj = Work.objects.filter(
+            # Subquery: existe correspondente em outra instituição (não UFRJ)?
+            corresp_outro = Authorship.objects.filter(
+                work=OuterRef('pk'),
+                is_corresponding=True
+            ).exclude(
+                authorshipinstitution__institution__institution_name="Universidade Federal do Rio de Janeiro"
+            )
+
+            # Base: todos os trabalhos no intervalo
+            works_qs = Work.objects.filter(
                 pubyear__year__gte=str(ano_inicial),
                 pubyear__year__lte=str(ano_final),
-                id__in=Subquery(ufrj_authorships)
-            ).values('pubyear__year').annotate(
-                document_count=Count('id')
-            ).order_by('pubyear__year')
+                worktype__worktype="article",
+            ).annotate(
+                has_corresp_ufrj=Exists(corresp_ufrj),
+                has_corresp_outro=Exists(corresp_outro),
+            ).annotate(
+                categoria=Case(
+                    When(has_corresp_ufrj=True, then=Value("UFRJ")),
+                    When(has_corresp_outro=True, then=Value("Outro")),
+                    default=Value("Não especificado"),
+                    output_field=CharField()
+                )
+            )
 
-            df = pd.DataFrame.from_records(docs_ufrj)
+            # Agregar por ano e categoria
+            docs_corresp = works_qs.values('pubyear__year', 'categoria').annotate(
+                document_count=Count('id')
+            ).order_by('pubyear__year', 'categoria')
+
+            # Converter para DataFrame
+            df = pd.DataFrame.from_records(docs_corresp)
+
             eixo_x = "pubyear__year"
             eixo_y = "document_count"
-            grupo = None
-            titulo = "Produção por ano (Autor correspondente da UFRJ)"
+            grupo = "categoria"
+            titulo = "Produção por ano (Artigos - Autor correspondente UFRJ / Outro / Não especificado)"
+            category_orders = {grupo: ["UFRJ", "Outro", "Não especificado"]}
 
         else:  # total
             docs_por_ano = base_query.values('pubyear__year').annotate(
@@ -133,7 +160,6 @@ class PlotsProducao:
             ).order_by('pubyear__year')
 
             df = pd.DataFrame.from_records(docs_por_ano)
-        
 
 
         # Construção do gráfico com plotly express
@@ -145,9 +171,11 @@ class PlotsProducao:
                 color=grupo,
                 text=eixo_y,
                 title=titulo,
+                category_orders=category_orders,
             )
 
             fig.update_traces(texttemplate='%{text:.0f}', textfont_size=12, textposition='inside')
+
         else:  # linha
             fig = px.line(
                 df,
@@ -156,6 +184,7 @@ class PlotsProducao:
                 color=grupo,
                 markers=True,
                 title=titulo,
+                category_orders=category_orders,
             )
 
         # Layout: sem largura fixa, apenas responsivo
@@ -169,35 +198,72 @@ class PlotsProducao:
         # Retorna o HTML responsivo
         return fig.to_html(full_html=False, include_plotlyjs='cdn', config={"responsive": True})
 
-
     def distribuicao_tematica_artigos(self):
-        contagem_temas_principais = WorkTopic.objects.filter(
-            pk__in=Subquery(
-                WorkTopic.objects.filter(
-                    work=OuterRef('work')
-                ).order_by('-score').values('pk')[:1]
-            ),
-            work__worktype__worktype='article'  # Filter for articles only
-        ).select_related(
-            'topic',
-            'work',
-            'work__worktype',  # Optimizes the worktype join
-        ).values(
+        # Query base: pegar todos os WorkTopics de artigos
+        qs = WorkTopic.objects.filter(
+            work__worktype__worktype='article'
+        ).select_related('topic', 'work')
+
+        df = pd.DataFrame.from_records(qs.values(
+            'work_id',
             'topic__domain_name',
             'topic__field_name',
-            'topic__subfield_name',
-        ).annotate(
-            article_count=Count('work')  # Count of works where this topic is top
-        ).order_by('-article_count')
-        df = pd.DataFrame.from_records(contagem_temas_principais)
-        img = px.sunburst(df.sort_values(by='topic__domain_name'),
-                          path=[
-                            'topic__domain_name',
-                            'topic__field_name',
-                            'topic__subfield_name',
-                          ], values = 'article_count').update_layout(height=800)
-        img = to_html(img, full_html=False)
-        return img
+            'topic__subfield_name'
+        ))
+
+        # Remover duplicados para subfield
+        df_subfield = df.drop_duplicates(subset=['work_id', 'topic__subfield_name'])
+        # Contagem por subfield
+        df_subfield['article_count'] = 1
+
+        # Remover duplicados para field
+        df_field = df.drop_duplicates(subset=['work_id', 'topic__field_name'])
+        df_field['article_count'] = 1
+
+        # Remover duplicados para domain
+        df_domain = df.drop_duplicates(subset=['work_id', 'topic__domain_name'])
+        df_domain['article_count'] = 1
+
+        # Concatenar e agregar por nível para sunburst
+        df_all = pd.concat([df_domain, df_field, df_subfield], ignore_index=True)
+        df_agg = df_all.groupby(
+            ['topic__domain_name', 'topic__field_name', 'topic__subfield_name'],
+            as_index=False
+        ).sum()
+
+        # Criar gráfico sunburst
+        fig = px.sunburst(
+            df_agg.sort_values(by='topic__domain_name'),
+            path=['topic__domain_name', 'topic__field_name', 'topic__subfield_name'],
+            values='article_count'
+        )
+
+        # Layout responsivo, título e nota
+        fig.update_layout(
+            autosize=True,
+            margin=dict(l=20, r=20, t=80, b=60),  # espaço extra embaixo para a nota
+            title=dict(
+                text="Distribuição Temática de Artigos",
+                x=0.5,
+                xanchor='center',
+                font=dict(size=20)
+            ),
+            annotations=[
+                dict(
+                    text="Nota: cada artigo pode ser classificado em mais de uma área",
+                    x=0.5,
+                    y=-0.05,           # posição abaixo do gráfico
+                    xref="paper",
+                    yref="paper",
+                    showarrow=False,
+                    font=dict(size=12, color="gray"),
+                    align="center"
+                )
+            ]
+        )   
+
+        # Retornar HTML
+        return to_html(fig, full_html=False, include_plotlyjs='cdn', config={"responsive": True})
 
 
     def metricas_por_topico_artigos(self):

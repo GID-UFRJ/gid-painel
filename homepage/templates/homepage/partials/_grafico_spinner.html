@@ -1,0 +1,21 @@
+<div class="grafico position-relative">
+
+    <!-- Spinner overlay -->
+    <div class="htmx-indicator position-absolute top-50 start-50 translate-middle
+                d-flex justify-content-center align-items-center"
+         style="z-index: 10; width: 100%; height: 100%; background: rgba(255,255,255,0.6); pointer-events: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+    </div>
+
+    <!-- Container do gráfico -->
+    <div id="{{ grafico_id }}">
+        {% if grafico_html %}
+            <div>
+                {{ grafico_html|safe }}
+            </div>
+        {% endif %}
+    </div>
+
+</div>

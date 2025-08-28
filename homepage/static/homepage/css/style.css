@@ -1,0 +1,72 @@
+/* Styles dos breadcrumbs */
+
+.menu_ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+.menu_li {
+  float: left;
+}
+
+.menu_li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a:hover:not(.active) {
+  background-color: #111;
+}
+
+.active {
+  background-color: #04AA6D;
+}
+
+
+/* Styles dos elementos do painel */ 
+
+.grafico {
+    border: 2px solid blue;
+    padding: 10px;
+    margin: 5px;
+    background-color: white;
+    border-radius: 20px;
+    max-width: 100%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.grafico > div {
+    width: 100% !important;
+    height: 100% !important;
+}
+.divisoria {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    margin: 5px;
+    padding: 0;
+}
+.imagem {
+    margin: 5px;
+    width: 500px;
+    height: 400px;
+    border-radius: 20px;
+}
+.imagemsuperior {
+    border: 2px solid blue;
+    margin: 5px;
+    width: 500px;
+    height: 200px;
+    border-radius: 20px;
+}
+
+

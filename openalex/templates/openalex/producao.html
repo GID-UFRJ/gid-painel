@@ -2,19 +2,21 @@
 
 {% block conteudo %}
         
-    <div class='divisoria' id='id_teste'>
-        <img src = "data:image/png;base64, {{ card_01 }}" alt="" class='imagemsuperior'>
-        <img src = "data:image/png;base64, {{ card_02 }}" alt="" class='imagemsuperior'>
-        <img src = "data:image/png;base64, {{ card_03 }}" alt="" class='imagemsuperior'>  
-    </div>
+<div class='divisoria' id='id_teste'>
+    <img src = "data:image/png;base64, {{ card_01 }}" alt="" class='imagemsuperior'>
+    <img src = "data:image/png;base64, {{ card_02 }}" alt="" class='imagemsuperior'>
+    <img src = "data:image/png;base64, {{ card_03 }}" alt="" class='imagemsuperior'>  
+</div>
 
-    <div class="container mt-4">
+<div class="container mt-4">
 
   <!-- Filtros em um único form -->
-  <form hx-get="{% url 'openalex:grafico_producao_por_ano' %}"
+  <form x-data="{}" 
+        x-init="$el.reset()"
+        hx-get="{% url 'openalex:grafico_producao_por_ano' %}"
         hx-target="#graf-container"
         hx-trigger="change delay:300ms"
-        hx-indicator="#loading-spinner"> 
+        hx-indicator=".htmx-indicator">
 
     <div class="row mb-3">
 
@@ -41,7 +43,7 @@
           <option value="tipo_documento">Tipo de Documento</option>
           <option value="acesso_aberto">Acesso Aberto</option>
           <option value="dominio">Domínio</option>
-          <option value="correspondente_ufrj">Autor correspondente</option>
+          <option value="autor_correspondente">Autor correspondente</option>
         </select>
       </div>
 
@@ -59,65 +61,15 @@
   </form>
 
   <!-- Gráfico com spinner overlay -->
-<div class="position-relative">
-
-  <div id="loading-spinner" class="htmx-indicator position-absolute top-50 start-50 translate-middle d-flex justify-content-center align-items-center" style="z-index: 10; width: 100%; height: 100%; background: rgba(255,255,255,0.6);">
-      <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Carregando...</span>
-      </div>
-  </div>
-
-  <div id="graf-container">
-      <div class="grafico">
-          {{ graf_01|safe }}
-      </div>
-  </div>
+  {% include 'homepage/partials/_grafico_spinner.html' with grafico_html=graf_01 grafico_id='graf-container' %}
 
 </div>
 
+<!-- Gráfico - Distribuição temática de documentos UFRJ -->
+<div class="container mt-4">
+  <div class="grafico" style="height: 90vh;">
+      {{ graf_02 | safe }}
+  </div>
+</div>
+
 {% endblock %} 
-
-{% block style %}
-    <style>
-    .grafico {
-        border: 2px solid blue;
-        padding: 10px;
-        margin: 5px;
-        background-color: white;
-        border-radius: 20px;
-        max-width: 100%;
-        aspect-ratio: 16 / 9;   /* altura proporcional à largura */
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    .grafico > div {
-        width: 100% !important;
-        height: 100% !important;
-    }
-    .divisoria{
-        display:flex;
-        flex-wrap: wrap;
-        align-items: center; 
-        justify-content: center; 
-        margin:5; 
-        padding: 0
-    }
-    .imagem{
-        margin:5;
-        width:500;
-        height:400;
-        border-radius: 20px;
-    }
-    .imagemsuperior{
-        border: 2px solid blue;
-        margin:5;
-        width:500;
-        height:200;
-        border-radius: 20px;
-    }
-
-    </style>
-
-{% endblock %}
