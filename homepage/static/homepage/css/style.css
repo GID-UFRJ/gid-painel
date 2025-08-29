@@ -1,5 +1,17 @@
-/* Styles dos breadcrumbs */
+/* ===========================
+   Estilos globais
+=========================== */
+body {
+  background-color: #f5f5f5; /* Gainsboro */
+  min-height: 100vh; /* garante que ocupe a tela inteira */
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif; /* opcional */
+}
 
+/* ===========================
+   Breadcrumbs e Menu
+=========================== */
 .menu_ul {
   list-style-type: none;
   margin: 0;
@@ -29,44 +41,92 @@ li a:hover:not(.active) {
 }
 
 
-/* Styles dos elementos do painel */ 
+/* =======================================
+   Estilos das páginas iniciais (index)
+======================================= */
 
+
+/* ------ Estilos para a página inteira: ------- */
+
+/* Parágrafos justificados */
+.index p {
+  text-align: justify;
+}
+
+/* Classe para controlar a altura e a rolagem das colunas */
+.conteudo-principal.conteudo-rolavel,
+.conteudo-secundario.conteudo-rolavel {
+  max-height: 70vh; /* 70% da altura da janela de visualização */
+  overflow-y: auto; /* Adiciona barra de rolagem vertical quando necessário */
+  width: 100%;      /* Garante que o conteúdo ocupe toda a largura da coluna */
+}
+
+/* ------ Estilos para o conteúdo principal: ------- */
+
+/* Lidando com título principal */
+.conteudo-principal :is(h1, h2, h3, h4, h5, h6) {
+  text-align: center;
+  margin-bottom: 1.5rem; /* espaço extra abaixo */
+}
+
+/* ------ Estilos para o conteúdo secundário: ------- */
+
+.conteudo-secundario {
+  max-height: 100%;   /* limita à altura da coluna */
+  overflow-y: auto;   /* ativa scroll apenas quando ultrapassar */
+}
+
+/* Espaçamento entre títulos e os parágrafos subsequentes */
+.conteudo-secundario :is(h1, h2, h3, h4, h5, h6) {
+  margin-bottom: 1rem; /* aumenta espaço abaixo do título */
+}
+
+/* Reduz espaço quando houver dois <p> seguidos */
+.conteudo-secundario p + p {
+  margin-top: -0.6em;
+}
+
+/* ===========================
+   Elementos gráficos do Painel
+=========================== */
 .grafico {
-    border: 2px solid blue;
-    padding: 10px;
-    margin: 5px;
-    background-color: white;
-    border-radius: 20px;
-    max-width: 100%;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  border: 2px solid blue;
+  padding: 10px;
+  margin: 5px;
+  background-color: white;
+  border-radius: 20px;
+  max-width: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
+
 .grafico > div {
-    width: 100% !important;
-    height: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
 }
+
 .divisoria {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    margin: 5px;
-    padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  margin: 5px;
+  padding: 0;
 }
+
 .imagem {
-    margin: 5px;
-    width: 500px;
-    height: 400px;
-    border-radius: 20px;
+  margin: 5px;
+  width: 500px;
+  height: 400px;
+  border-radius: 20px;
 }
+
 .imagemsuperior {
-    border: 2px solid blue;
-    margin: 5px;
-    width: 500px;
-    height: 200px;
-    border-radius: 20px;
+  border: 2px solid blue;
+  margin: 5px;
+  width: 500px;
+  height: 200px;
+  border-radius: 20px;
 }
-
-

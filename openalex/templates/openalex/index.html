@@ -1,80 +1,86 @@
-{% extends "homepage/base.html" %}
+{% extends "homepage/base_index.html" %}
 
-{% block conteudo %}
-        
-<div class="container p-4">
-    <br>
-    <div class="row justify-content-center">
-        <div class="col-8">
-            <h2 class="text-center text-black">Painel de Produção Científica da UFRJ</h2>
-            <br>
-            <div class="text-black">
-                <p>
-                    Este painel visa detalhar a produção científica da UFRJ. Ele pode ser dividido em dois subpainéis: 
-                </p>
-                <ul> 
-                    <li>
-                        <p>
-                            <a href="{% url 'openalex:producao' %}"><strong>Produção</strong></a>: apresenta informações sobre o conjunto de documentos publicados pela UFRJ
-                            e analisa características como a divisão dos documentos por disciplina e análise de citação.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <a href="{% url 'openalex:impacto' %}"><strong>Impacto</strong></a>: apresenta análises de citação para o conjunto de publicações da UFRJ.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <a href="{% url 'openalex:colaboracao' %}"><strong>Colaboracao</strong></a>: apresenta informações sobre a colaboração da UFRJ em publicações, tanto
-                            a nível nacional quanto internacional.
-                        </p>
-                    </li>
-                </ul>    
-                <p>
-                    Os dados utlizados em ambos os painéis advém da <a href="https://openalex.org/">OpenAlex</a>,
-                    uma base bibliográfica aberta que conta com um grande número de publicações indexadas. Os registros 
-                    analisados aqui correspondem aos documentos encontrados na base onde pelo menos um autor é afiliado
-                    à UFRJ, os quais são recuperados e atualizados automaticamente através de sua 
-                    <a href="https://docs.openalex.org/how-to-use-the-api/api-overview">API gratuita</a>.
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
+{% block conteudo_principal %}
+
+<h4>Painel de dados sobre a PESQUISA da UFRJ</h4>
+
+<p>
+    Os dados disponíveis neste painel foram coletados do <a href='https://openalex.org/'>OpenAlex</a>, 
+    uma base de dados de produção científica que organiza e disponibiliza 
+    centenas de milhões de  documentos científicos em diferentes formatos.
+</p>
+
+<p>
+    Para recuperar os dados da UFRJ, foi utilizado o critério endereço 
+    de filiação dos autores. Assim, os dados desta seção incluem documentos 
+    com pelo menos um/a autor/a filiado/a à UFRJ. Os dados foram obtidos programaticamente
+    a partir da <a href="https://docs.openalex.org/how-to-use-the-api/api-overview">API da OpenAlex</a>
+    e <a href="https://github.com/GID-UFRJ/gid-painel/blob/main/openalex/models.py">modelados</a> para 
+    amarzenamento em um banco de dados relacional. A equipe do <a href="https://pr2.ufrj.br/gid/">GID</a> 
+    atualiza esses dados a cada seis meses.
+</p>
+
+<p>
+    Para este painel, os dados estão apresentados em três blocos, Produção, Impacto e Colaboração. 
+    Para cada um deles selecionamos algumas variáveis que descrevem aspectos relevantes da pesquisa 
+    realizada na e pela UFRJ.
+</p>
+
+<!--
+<p>
+    Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, quis gravida magna mi a libero. Fusce vulputate eleifend sapien. Vestibulum purus quam, scelerisque ut, mollis sed, nonummy id, metus. Nullam accumsan lorem in dui. Cras ultricies mi eu turpis hendrerit fringilla. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; In ac dui quis mi consectetuer lacinia. Nam pretium turpis et arcu. Duis arcu tortor, suscipit eget, imperdiet nec, imperdiet iaculis, ipsum. Sed aliquam ultrices mauris. Integer ante arcu, accumsan a, consectetuer eget, posuere ut, mauris. Praesent adipiscing. Phasellus ullamcorper ipsum rutrum nunc. Nunc nonummy metus. Vestibulum volutpat pretium libero. Cras id dui. Aenean ut eros et nisl sagittis vestibulum. Nullam nulla eros, ultricies sit amet, nonummy id, imperdiet feugiat, pede. Sed lectus. Donec mollis hendrerit risus. Phasellus nec sem in justo pellentesque facilisis. Etiam imperdiet imperdiet orci. Nunc nec neque. Phasellus leo dolor, tempus non, auctor et, hendrerit quis, nisi. Curabitur ligula sapien, tincidunt non, euismod vitae, posuere imperdiet, leo. Maecenas malesuada. Praesent congue erat at massa. Sed cursus turpis vitae tortor. Donec posuere vulputate arcu. Phasellus accumsan cursus velit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed aliquam, nisi quis porttitor congue, elit erat euismod orci, ac placerat dolor lectus quis orci. Phasellus consectetuer vestibulum elit. Aenean tellus metus, bibendum sed, posuere ac, mattis non, nunc. Vestibulum fringilla pede sit amet augue. In turpis. Pellentesque posuere. Praesent turpis. Aenean posuere, tortor sed cursus feugiat, nunc augue blandit nunc, eu sollicitudin urna dolor sagittis lacus. Donec elit libero, sodales nec, volutpat a, suscipit non, turpis. Nullam sagittis. Suspendisse pulvinar, augue ac venenatis condimentum, sem libero volutpat nibh, nec pellentesque velit pede quis nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Fusce id purus. Ut varius tincidunt libero. Phasellus dolor. Maecenas vestibulum mollis 
+</p>
+-->
 
 {% endblock %} 
 
-{% block style %}
-    <style>
-    .grafico{
-        border: 2px solid blue;
-        padding:5px;
-        margin:5px;
-        background-color: white;
-        border-radius: 20px;
-    }
-    .divisoria{
-        display:flex;
-        flex-wrap: wrap;
-        align-items: center; 
-        justify-content: center; 
-        margin:5; 
-        padding: 0
-    }
-    .imagem{
-        margin:5;
-        width:500;
-        height:400;
-        border-radius: 20px;
-    }
-    .imagemsuperior{
-        border: 2px solid blue;
-        margin:5;
-        width:500;
-        height:200;
-        border-radius: 20px;
-    }
-    </style>
+{% block conteudo_secundario %}
+    <h5># Produção</h5>
 
+    <p>
+        Inclui os totais por ano de publicação, por tipo de documento, por área, por tipo de 
+        acesso e por autoria correspondente. Vale ressaltar que as áreas de conhecimento apresentadas
+        nesta seção foram atribuídas pela OpenAlex, não sendo possível a comparação entre as áreas, 
+        pois os totais são impactados pelo número de periódicos que varia entre as áreas.  
+    </p>    
+    <p>
+        Já os dados de tipo de acesso do periódico foram reagrupados em duas categorias (restrito e aberto) 
+        e, assim, é possível observar a adesão da UFRJ ao movimento de acesso aberto (explicar? Ou indicar fonte?). 
+        Por fim, a autoria correspondente foi incluída nesta seção pois ela revela a real liderança da UFRJ 
+        na pesquisa publicada.
+    </p>
+
+    <h5 class="mt-4"># Impacto</h5>
+
+    <p>
+        Inclui os totais por ano de citação segundo a área do periódico, o tipo de acesso e a autoria correspondente. 
+        Inclui também o Índice H da UFRJ segundo estas mesmas variáveis.<br>
+    </p>
+
+    <p>
+        Importante destacar que a citação não é sinônimo de qualidade da pesquisa publicada, mas é sim do impacto 
+        ou da visibilidade dela (ref). 
+        Há inúmeros fatores que contribuem para o aumento de citação de uma pesquisa publicada (ref). 
+        Já o Índice H, originalmente de um/a determinado/a autor/a (ref), leva em conta duas variáveis, 
+        a produção e a citação, e permite observar a produção-impacto sem a contribuição dos outliers (melhorar).
+    </p>
+
+    <h5 class="mt-4"># Colaboração</h5>
+
+    <p>
+        Inclui os totais por ano da produção com pelo menos um/a autor/a filiado/a a uma instituição estrangeira e com pelo 
+        menos um/a autor/a filiado/a a uma instituição brasileira; além das 10 instituições estrangeiras 
+        e as 10 instituições brasileiras que mais assinaram pesquisa da UFRJ. 
+    </p>
+
+    <p>
+        Ressalta-se que estas análises permitem visualizar não apenas as parcerias da UFRJ, mas também eventual dependência 
+        seja de colaboradores estrangeiros seja de colaboradores brasileiros. 
+    </p>
+
+<!--
+    <p>
+    Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, quis gravida magna mi a libero. Fusce vulputate eleifend sapien. Vestibulum purus quam, scelerisque ut, mollis sed, nonummy id, metus. Nullam accumsan lorem in dui. Cras ultricies mi eu turpis hendrerit fringilla. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; In ac dui quis mi consectetuer lacinia. Nam pretium turpis et arcu. Duis arcu tortor, suscipit eget, imperdiet nec, imperdiet iaculis, ipsum. Sed aliquam ultrices mauris. Integer ante arcu, accumsan a, consectetuer eget, posuere ut, mauris. Praesent adipiscing. Phasellus ullamcorper ipsum rutrum nunc. Nunc nonummy metus. Vestibulum volutpat pretium libero. Cras id dui. Aenean ut eros et nisl sagittis vestibulum. Nullam nulla eros, ultricies sit amet, nonummy id, imperdiet feugiat, pede. Sed lectus. Donec mollis hendrerit risus. Phasellus nec sem in justo pellentesque facilisis. Etiam imperdiet imperdiet orci. Nunc nec neque. Phasellus leo dolor, tempus non, auctor et, hendrerit quis, nisi. Curabitur ligula sapien, tincidunt non, euismod vitae, posuere imperdiet, leo. Maecenas malesuada. Praesent congue erat at massa. Sed cursus turpis vitae tortor. Donec posuere vulputate arcu. Phasellus accumsan cursus velit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed aliquam, nisi quis porttitor congue, elit erat euismod orci, ac placerat dolor lectus quis orci. Phasellus consectetuer vestibulum elit. Aenean tellus metus, bibendum sed, posuere ac, mattis non, nunc. Vestibulum fringilla pede sit amet augue. In turpis. Pellentesque posuere. Praesent turpis. Aenean posuere, tortor sed cursus feugiat, nunc augue blandit nunc, eu sollicitudin urna dolor sagittis lacus. Donec elit libero, sodales nec, volutpat a, suscipit non, turpis. Nullam sagittis. Suspendisse pulvinar, augue ac venenatis condimentum, sem libero volutpat nibh, nec pellentesque velit pede quis nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Fusce id purus. Ut varius tincidunt libero. Phasellus dolor. Maecenas vestibulum mollis 
+    </p>
+-->
 {% endblock %}

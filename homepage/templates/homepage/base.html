@@ -1,72 +1,22 @@
-{% load breadcrumbs %}
-{% load static %}
-
-<html lang="en">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-
-    <!-- Adicionando bootstrap (CSS)-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-
-    <!-- Adicionando custom css -->
-    <link rel="stylesheet" href="{% static 'homepage/css/style.css' %}">
-
-    <!-- Adicionando font-awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-    <!-- Adicionando htmx -->
-    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
-
-    <!-- Adicionando alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.10.3/dist/cdn.min.js"></script>
-
-    <title>Document</title>
-
+  {% include 'homepage/partials/_head.html' %}
 </head>
 <body>
-    <div>
-        <ul class='menu_ul'>
-            <li class='menu_li'><a href={% url "homepage:index" %}>Homepage</a></li>
-            <li class='menu_li'><a href={% url "openalex:index" %}>Produção</a></li>
-            <li class='menu_li'><a href={% url "rankings:index" %}>Rankings</a></li>
-            <li class='menu_li'><a href={% url "sucupira:index" %}>Pós-Graduação</a></li>
+
+  <!-- Navbar -->
+  {% include 'homepage/partials/_navbar.html' %}
 
 
-            {% for item in menu_items %}
-              <li class='menu_li'><a href={% url "url_grafico_painel" item %}>{{ item.nome }}</a></li>
-            {% endfor %}
+  <!-- Breadcrumbs -->
+  {% include 'homepage/partials/_breadcrumbs.html' %}
 
+  <!-- Conteúdo principal -->
+  {% block conteudo %}{% endblock  %}
 
-            <li class='menu_li' style="float:right"><a class="active">PAINEL //// GID - PR2</a></li>
-        </ul>
-    </div>
-
-
-
-    <div style="background-color:Gainsboro">
-
-        <!-- Breadcrumbs -->
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Início</a></li>
-            {% breadcrumbs as breadcrumb_list %}
-            {% for name, url in breadcrumb_list %}
-              {% if forloop.last %}
-                <li class="breadcrumb-item active" aria-current="page">{{ name|capfirst }}</li>
-              {% else %}
-                <li class="breadcrumb-item"><a href="{{ url }}">{{ name|capfirst }}</a></li>
-              {% endif %}
-            {% endfor %}
-          </ol>
-        </nav>
-
-        <!-- Conteúdo principal -->
-        {% block conteudo %}{% endblock  %}
-    </div>
     
-    <!-- Bootstrap JS (inclui Popper) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <!-- Bootstrap JS (inclui Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 </body>
 </html>

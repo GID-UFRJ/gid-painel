@@ -14,6 +14,10 @@ def breadcrumbs(context):
     #print(f"DEBUG: parts = {parts}")  # <---- DEBUG
 
     breadcrumbs = []
+
+    # Adiciona "Início" sempre como primeiro item
+    breadcrumbs.append(("Início", "/"))
+
     url = '/'
 
     for part in parts:
