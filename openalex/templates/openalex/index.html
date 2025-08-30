@@ -35,7 +35,7 @@
 {% endblock %} 
 
 {% block conteudo_secundario %}
-    <h5># Produção</h5>
+    <h5># <a href="{% url 'openalex:producao' %}">Produção</a></h5>
 
     <p>
         Inclui os totais por ano de publicação, por tipo de documento, por área, por tipo de 
@@ -50,7 +50,7 @@
         na pesquisa publicada.
     </p>
 
-    <h5 class="mt-4"># Impacto</h5>
+    <h5 class="mt-4"># <a href="{% url 'openalex:impacto' %}">Impacto</a></h5>
 
     <p>
         Inclui os totais por ano de citação segundo a área do periódico, o tipo de acesso e a autoria correspondente. 
@@ -65,7 +65,7 @@
         a produção e a citação, e permite observar a produção-impacto sem a contribuição dos outliers (melhorar).
     </p>
 
-    <h5 class="mt-4"># Colaboração</h5>
+    <h5 class="mt-4"># <a href="{% url 'openalex:impacto' %}">Colaboração</a></h5>
 
     <p>
         Inclui os totais por ano da produção com pelo menos um/a autor/a filiado/a a uma instituição estrangeira e com pelo 

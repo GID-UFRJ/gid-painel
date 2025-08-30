@@ -43,7 +43,7 @@ class Work(models.Model):
     work_title = models.TextField(null=True, blank=True) #Surprisingly, some records can have missing work_titles
     pubyear = models.ForeignKey(Year, on_delete=models.CASCADE)
     worktype = models.ForeignKey(WorkType, on_delete=models.CASCADE)
-    cited_by_count = models.IntegerField()
+    cited_by_count = models.IntegerField(db_index=True)
     primary_source = models.ForeignKey(PrimarySource, on_delete=models.CASCADE, null=True, blank=True)
     is_oa = models.BooleanField()
     oa_status = models.ForeignKey(OAStatus, on_delete=models.CASCADE)

@@ -22,6 +22,6 @@ urlpatterns = [
     path('', include('homepage.urls', namespace='homepage')),
     path('sucupira/', include('sucupira.urls', namespace='sucupira')),
     path('graficos/', include('baseGraficos.urls')),
-    path('openalex/', include('openalex.urls', namespace='openalex')),
+    path('pesquisa/', include('openalex.urls', namespace='openalex')),
     path('rankings/', include('rankings.urls', namespace='rankings')),
 ]

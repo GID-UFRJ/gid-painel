@@ -4,7 +4,7 @@ from plotly.io import to_html
 import numpy as np
 from ..models import Work, Year, WorkTopic, Institution, Authorship
 from .misc import calculate_h_index
-from django.db.models import F, Q, Count, Sum, Min, Max, Subquery, OuterRef, Case, When, Value, CharField, Exists
+from django.db.models import F, Q, Count, Sum, Min, Avg, Max, Subquery, OuterRef, Case, When, Value, CharField, Exists
 from gid.utils_scripts_graficos import cores, grafico_barra, grafico_kpi
 from gid.utils_scripts_graficos_plotly import grafico_linha_plotly, grafico_barra_plotly, grafico_barra_plotly2
 
@@ -38,7 +38,7 @@ class PlotsProducao:
                           exibir_magnitude=True)
         return(img)
 
-    
+    # NO MOMENTO, ESSE MÉTODO É INUTIL - REMOVER OU REFATORAR COMO FUNCAO FORA DA CLASSE
     def _inferir_intervalo_anos(self, ano_inicial=None, ano_final=None):
         if not ano_inicial:
             ano_inicial = Year.objects.aggregate(min=Min('year'))['min']
@@ -336,7 +336,8 @@ class PlotsProducao:
         return fig
 
 
-class PlotsVisibilidade:
+
+class PlotsImpacto:
     '''Gráficos sobre citações, colaborações e outros aspectos relacionados 
     à visibilidade da produção academica recuperada na OpenAlex'''
 
@@ -347,6 +348,158 @@ class PlotsVisibilidade:
                           cor='#4169E1',
                           exibir_magnitude=True)
         return(img)
+
+    def producao_total_hindex(self):
+        citacoes = list(
+            Work.objects.order_by('-cited_by_count')
+            .values_list('cited_by_count', flat=True)
+        )
+
+        h = calculate_h_index(citacoes, pre_reverse_sorted=True)
+
+        img = grafico_kpi(
+            h,
+            f'Índice H institucional',
+            cor='#4169E1'
+        )
+        return img
+
+    def citacoes_por_ano(self,
+                         ano_inicial: int | None = None,
+                         ano_final: int | None = None,
+                         tipo_producao: str | None = 'total',
+                         metrica: str | None = 'total_citacoes',
+                         tipo_grafico: str | None = 'barra'):
+        """
+        Gera gráficos de métricas de citação (Total, Acumulada, Média, Índice H)
+        ao longo dos anos, com opção de agrupamento por Domínio ou Acesso Aberto.
+        """
+
+        print(f"ano_inicial={ano_inicial}, ano_final={ano_final}, tipo_producao={tipo_producao}, metrica={metrica}, tipo_grafico={tipo_grafico}")
+
+        # --- 1. Coleta de Dados Brutos ---
+        dados_brutos = []
+        grupo = None
+        
+        if tipo_producao == 'dominio':
+            query = WorkTopic.objects.filter(
+                work__pubyear__year__gte=str(ano_inicial),
+                work__pubyear__year__lte=str(ano_final)
+            ).values(
+                'work__pubyear__year', 
+                'topic__domain_name', 
+                'work__cited_by_count'  # <-- CORREÇÃO 1
+            )
+            dados_brutos = list(query)
+            grupo = 'topic__domain_name'
+            
+        elif tipo_producao == 'acesso_aberto':
+            query = Work.objects.filter(
+                pubyear__year__gte=str(ano_inicial),
+                pubyear__year__lte=str(ano_final)
+            ).values(
+                'pubyear__year', 
+                'is_oa', 
+                'cited_by_count'  
+            )
+            dados_brutos = list(query)
+            grupo = 'is_oa'
+
+        else: # 'total'
+            query = Work.objects.filter(
+                pubyear__year__gte=str(ano_inicial),
+                pubyear__year__lte=str(ano_final)
+            ).values(
+                'pubyear__year', 
+                'cited_by_count'  
+            )
+            dados_brutos = list(query)
+        
+        df = pd.DataFrame.from_records(dados_brutos)
+        
+        df.rename(columns={
+            'work__pubyear__year': 'ano', 'pubyear__year': 'ano',
+            'work__cited_by_count': 'citacoes', 
+            'cited_by_count': 'citacoes',       
+            'topic__domain_name': 'dominio',
+        }, inplace=True)
+
+        category_orders = {}
+
+        if grupo == 'is_oa':
+            df['is_oa'] = df['is_oa'].map({True: 'Acesso Aberto', False: 'Acesso Fechado'})
+            category_orders = {grupo: ["Acesso Aberto", "Acesso Fechado"]}
+            grupo_cols = ['ano', 'is_oa']
+
+        elif grupo == 'topic__domain_name':
+            grupo_cols = ['ano', 'dominio']
+            grupo = 'dominio'
+        else:
+            grupo_cols = ['ano']
+
+        # --- 2. Cálculo da Métrica ---
+        eixo_x = "ano"
+        eixo_y, titulo, yaxis_title = "", "", ""
+        
+        grouped = df.groupby(grupo_cols)
+
+        if metrica == 'total_citacoes':
+            df_final = grouped['citacoes'].sum().reset_index()
+            eixo_y, titulo, yaxis_title = "citacoes", "Total de Citações por Ano", "Total de Citações"
+
+        elif metrica == 'media':
+            df_final = grouped['citacoes'].mean().reset_index()
+            df_final['citacoes'] = df_final['citacoes'].round(2)
+            eixo_y, titulo, yaxis_title = "citacoes", "Média de Citações por Ano", "Citações por Publicação (Média)"
+
+        elif metrica == 'total_citacoes_acumuladas':
+            soma_anual = df.groupby(grupo_cols)['citacoes'].sum().reset_index()
+            if grupo:
+                soma_anual['citacoes_acumuladas'] = soma_anual.groupby(grupo)['citacoes'].cumsum()
+            else:
+                soma_anual['citacoes_acumuladas'] = soma_anual['citacoes'].cumsum()
+            df_final = soma_anual
+            eixo_y, titulo, yaxis_title = "citacoes_acumuladas", "Total de Citações Acumuladas por Ano", "Total de Citações (Acumulado)"
+
+        elif metrica == 'hindex':
+            # Garanta que a função 'calculate_h_index' esteja importada.
+            df_final = df.groupby(grupo_cols)['citacoes'].apply(calculate_h_index).reset_index(name='h_index')
+            eixo_y, titulo, yaxis_title = "h_index", "Índice H por Ano de Publicação", "Índice H"
+        
+        else:
+            raise ValueError(f"Métrica desconhecida: {metrica}")
+
+        if grupo:
+            titulo += f" (por { 'Domínio' if grupo == 'dominio' else 'Tipo de Acesso' })"
+
+        # --- 3. Construção do Gráfico ---
+        if tipo_grafico == "barra":
+            fig = px.bar(
+                df_final, x=eixo_x, y=eixo_y, color=grupo, text=eixo_y,
+                title=titulo, category_orders=category_orders,
+            )
+            fig.update_traces(texttemplate='%{text:.2s}', textfont_size=12, textposition='inside')
+        else:
+            fig = px.line(
+                df_final, x=eixo_x, y=eixo_y, color=grupo, markers=True,
+                title=titulo, category_orders=category_orders,
+            )
+
+        fig.update_layout(
+            autosize=True, margin=dict(l=40, r=40, t=60, b=40),
+            xaxis_title="Ano de Publicação", yaxis_title=yaxis_title,
+            legend_title_text='Grupo' if grupo else '',
+        )
+        
+        if tipo_grafico == 'barra':
+            fig.update_xaxes(type='category')
+
+        return fig.to_html(full_html=False, include_plotlyjs='cdn', config={"responsive": True})
+
+class PlotsColaboracao:
+    '''Gráficos sobre colaboração institucional com base na 
+    produção academica recuperada na OpenAlex'''
+
 
     def producao_colaboracao_nacional(self):
         id_ufrj = 'I122140584'

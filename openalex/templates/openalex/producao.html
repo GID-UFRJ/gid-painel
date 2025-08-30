@@ -2,10 +2,9 @@
 
 {% block conteudo %}
         
-<div class='divisoria' id='id_teste'>
+<div class='divisoria'>
     <img src = "data:image/png;base64, {{ card_01 }}" alt="" class='imagemsuperior'>
     <img src = "data:image/png;base64, {{ card_02 }}" alt="" class='imagemsuperior'>
-    <img src = "data:image/png;base64, {{ card_03 }}" alt="" class='imagemsuperior'>  
 </div>
 
 <div class="container mt-4">
@@ -14,7 +13,7 @@
   <form x-data="{}" 
         x-init="$el.reset()"
         hx-get="{% url 'openalex:grafico_producao_por_ano' %}"
-        hx-target="#graf-container"
+        hx-target="#producao-ano"
         hx-trigger="change delay:300ms"
         hx-indicator=".htmx-indicator">
 
@@ -61,7 +60,7 @@
   </form>
 
   <!-- Gráfico com spinner overlay -->
-  {% include 'homepage/partials/_grafico_spinner.html' with grafico_html=graf_01 grafico_id='graf-container' %}
+  {% include 'homepage/partials/_grafico_spinner.html' with grafico_html=graf_01 grafico_id='producao-ano' %}
 
 </div>
 
