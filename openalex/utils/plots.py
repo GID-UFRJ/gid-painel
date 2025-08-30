@@ -378,6 +378,7 @@ class PlotsImpacto:
         print(f"ano_inicial={ano_inicial}, ano_final={ano_final}, tipo_producao={tipo_producao}, metrica={metrica}, tipo_grafico={tipo_grafico}")
 
         # --- 1. Coleta de Dados Brutos ---
+        texttemplate = '%{text:.2s}' #template dos valores colocados sobre as barras
         dados_brutos = []
         grupo = None
         
@@ -389,7 +390,9 @@ class PlotsImpacto:
                 'work__pubyear__year', 
                 'topic__domain_name', 
                 'work__cited_by_count'  # <-- CORREÇÃO 1
-            )
+            ).distinct(
+                'work_id', 'topic__domain_name'
+            ) # garante um work por domínio
             dados_brutos = list(query)
             grupo = 'topic__domain_name'
             
@@ -465,6 +468,7 @@ class PlotsImpacto:
             # Garanta que a função 'calculate_h_index' esteja importada.
             df_final = df.groupby(grupo_cols)['citacoes'].apply(calculate_h_index).reset_index(name='h_index')
             eixo_y, titulo, yaxis_title = "h_index", "Índice H por Ano de Publicação", "Índice H"
+            texttemplate= '%{text}' #texttemplate customizado (sem arredondar) para o hindex
         
         else:
             raise ValueError(f"Métrica desconhecida: {metrica}")
@@ -478,7 +482,7 @@ class PlotsImpacto:
                 df_final, x=eixo_x, y=eixo_y, color=grupo, text=eixo_y,
                 title=titulo, category_orders=category_orders,
             )
-            fig.update_traces(texttemplate='%{text:.2s}', textfont_size=12, textposition='inside')
+            fig.update_traces(texttemplate=texttemplate, textfont_size=12, textposition='inside')
         else:
             fig = px.line(
                 df_final, x=eixo_x, y=eixo_y, color=grupo, markers=True,
