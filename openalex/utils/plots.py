@@ -2,8 +2,8 @@ import pandas as pd
 import plotly.express as px
 from plotly.io import to_html
 import numpy as np
-from ..models import Work, Year, WorkTopic, Institution, Authorship
-from .misc import calculate_h_index
+from ..models import Work, Year, WorkTopic, Institution, Authorship, AuthorshipInstitution
+from .misc import calculate_h_index, gerar_sigla, renomear_siglas_duplicadas
 from django.db.models import F, Q, Count, Sum, Min, Avg, Max, Subquery, OuterRef, Case, When, Value, CharField, Exists
 from gid.utils_scripts_graficos import cores, grafico_barra, grafico_kpi
 from gid.utils_scripts_graficos_plotly import grafico_linha_plotly, grafico_barra_plotly, grafico_barra_plotly2
@@ -503,10 +503,13 @@ class PlotsImpacto:
 class PlotsColaboracao:
     '''Gráficos sobre colaboração institucional com base na 
     produção academica recuperada na OpenAlex'''
+    ufrj_id = 'I122140584'
+
+    def __init__(self, instituicao_id=ufrj_id):
+        self.instituicao_id = instituicao_id
 
 
     def producao_colaboracao_nacional(self):
-        id_ufrj = 'I122140584'
         total_colaboracao_nacional = Work.objects.annotate(
             br_inst_count=Count(
                 'authorship__authorshipinstitution__institution', #Conta num de instituiçẽs distintas
@@ -514,7 +517,7 @@ class PlotsColaboracao:
                 distinct=True
             )
         ).filter(
-            br_inst_count__gte=2
+            br_inst_count__gte=2 #apenas linhas com duas ou mais ocorrências BR são contadas
         ).count()
 
         img = grafico_kpi(total_colaboracao_nacional, 
@@ -541,14 +544,150 @@ class PlotsColaboracao:
         return img    
         
 
+    def colaboracoes_por_ano(
+        self, 
+        ano_inicial: int | None = 1990, 
+        ano_final: int | None = 2024, 
+        tipo_colaboracao: str | None = 'nacional', 
+        tipo_producao: str | None = 'total', 
+        tipo_grafico: str | None = 'barra',
+    ):
+        """
+        Gera o HTML de um gráfico da produção científica da UFRJ 
+        em colaboração com outras instituições (nacionais ou internacionais) 
+        ao longo do tempo.
+        """
 
-    def top_instituicoes_colaboradoras(self, internacional: bool | None = False):
-        ufrj_id = 'I122140584'
+        base_query = Work.objects.annotate(
+                    br_inst_count=Count(
+                        'authorship__authorshipinstitution__institution',
+                        filter=Q(authorship__authorshipinstitution__institution__country_code='BR') &
+                               ~Q(authorship__authorshipinstitution__institution__institution_id=self.instituicao_id),
+                        distinct=True
+                    ),
+                    foreign_inst_count=Count(
+                        'authorship__authorshipinstitution__institution',
+                        filter=~Q(authorship__authorshipinstitution__institution__country_code='BR'),
+                        distinct=True
+                    )).filter(
+                        pubyear__year__gte=ano_inicial,
+                        pubyear__year__lte=ano_final,
+                        )
 
-        filtro_pais = Q(country_code='BR') if not internacional else ~Q(country_code='BR')
+        #Definições comuns
+        eixo_x = "pubyear__year"
+        eixo_y = "document_count"
+        grupo = None
+        titulo = "Total de colaborações por ano"
+        category_orders = {} #Usado para ordenar categorias na legenda dos plots
+
+
+        # Aplicar filtro condicional baseado em tipo_colaboracao
+        if tipo_colaboracao == 'nacional':
+            colaboracoes_filtro = base_query.filter(br_inst_count__gt=0)  # Maior que 0 para colaboração nacional
+        elif tipo_colaboracao == 'internacional':
+            colaboracoes_filtro = base_query.filter(foreign_inst_count__gt=0)  # Maior que 0 para colaboração internacional
+
+        colaboracoes_ids = Work.objects.filter(id__in=colaboracoes_filtro.values("id"))
+
+        # Aplicar filtro condicional baseado em tipo_publicação
+        if tipo_producao == 'acesso_aberto':
+            colaboracoes_por_ano = colaboracoes_ids.values('pubyear__year', 'is_oa').annotate(
+                document_count=Count('id')
+            ).order_by('pubyear__year', 'is_oa')
+
+            df = pd.DataFrame.from_records(colaboracoes_por_ano)
+            df['is_oa'] = df['is_oa'].map({True: 'Acesso Aberto', False: 'Acesso Fechado'})
+
+            grupo = "is_oa"
+            titulo = "Produção por ano e Acesso Aberto"
+            category_orders = {grupo: ["Acesso Aberto", "Acesso Fechado"]}
+
+
+        elif tipo_producao == 'tipo_documento':
+            colaboracoes_por_ano = colaboracoes_ids.values('pubyear__year', 'worktype__worktype').annotate(
+                document_count=Count('id')
+            ).order_by('pubyear__year', 'worktype__worktype')
+
+            df = pd.DataFrame.from_records(colaboracoes_por_ano)
+            grupo = "worktype__worktype"
+            titulo = "Produção por ano e Tipo de Documento"
+
+        elif tipo_producao == 'dominio':
+            docs_por_dominio = WorkTopic.objects.filter(
+                work__pubyear__year__gte=str(ano_inicial),
+                work__pubyear__year__lte=str(ano_final)
+            ).values(
+                'work__pubyear__year',
+                'topic__domain_name'
+            ).annotate(
+                document_count=Count('work', distinct=True)
+            ).order_by('work__pubyear__year', 'topic__domain_name')
+
+            df = pd.DataFrame.from_records(docs_por_dominio)
+            eixo_x = "work__pubyear__year"
+            eixo_y = "document_count"
+            grupo = "topic__domain_name"
+            titulo = "Produção por ano e Domínio"
+
+        else:  # total
+            colaboracoes_por_ano = colaboracoes_ids.values('pubyear__year').annotate(
+                document_count=Count('id')
+            ).order_by('pubyear__year')
+
+            df = pd.DataFrame.from_records(colaboracoes_por_ano)
+
+        # Construção do gráfico com plotly express
+        if tipo_grafico == "barra":
+            fig = px.bar(
+                df,
+                x=eixo_x,
+                y=eixo_y,
+                color=grupo,
+                text=eixo_y,
+                title=titulo,
+                category_orders=category_orders,
+            )
+
+            fig.update_traces(texttemplate='%{text:.0f}', textfont_size=12, textposition='inside')
+
+        else:  # linha
+            fig = px.line(
+                df,
+                x=eixo_x,
+                y=eixo_y,
+                color=grupo,
+                markers=True,
+                title=titulo,
+                category_orders=category_orders,
+            )
+
+        # Layout: sem largura fixa, apenas responsivo
+        fig.update_layout(
+            autosize=True,
+            margin=dict(l=40, r=40, t=60, b=40),
+            xaxis_title="Ano",
+            yaxis_title="Número de publicações",
+        )
+
+        # Retorna o HTML responsivo
+        return fig.to_html(full_html=False, include_plotlyjs='cdn', config={"responsive": True})
+
+
+
+
+    def top_instituicoes_colaboradoras(self, 
+                                       n_instituicoes: int | None = 10, 
+                                       tipo_instituicao: str | None = 'nacional',
+                                       ):
+
+        # 'nacional' será True se a string for "nacional", e False caso contrário
+        nacional = (tipo_instituicao == 'nacional')
+        
+        filtro_pais = Q(country_code='BR') if nacional else ~Q(country_code='BR')
 
         contagem_colaboracoes = Institution.objects.exclude(
-            institution_id=ufrj_id
+            institution_id=self.instituicao_id
         ).filter(
             filtro_pais
         ).annotate(
@@ -557,27 +696,43 @@ class PlotsColaboracao:
             instituicao=F('institution_name'),
             n_colabs=F('n_colabs'),
             codigo_pais=F('country_code'),
-        ).order_by('-n_colabs')[0:10]
+        ).order_by('-n_colabs')[0:n_instituicoes]
 
         df = pd.DataFrame.from_records(contagem_colaboracoes)
 
-        fig = grafico_barra_plotly(
+        # 1. Gera a sigla inicial para cada instituição
+        df['sigla'] = df['instituicao'].apply(gerar_sigla)
+
+        # 2. Renomeia siglas duplicadas
+        df['sigla'] = renomear_siglas_duplicadas(df['sigla'])
+    
+        # 3. Adiciona a coluna de posição
+        df['posicao'] = range(1, len(df) + 1)
+
+
+        fig = px.bar(
             df,
-            x='instituicao',
+            x='sigla',
             y='n_colabs',
-            titulo=f"Top instituições colaboradoras {'internacionais' if internacional else 'nacionais'}",
-            titulo_eixo_x="Nome da instituição",
-            titulo_eixo_y="Número de colaborações",
-            adicionar_rotulo_dados=False,
-            retornar_plotly=True,
-            largura= 700,
-            altura= 700,
+            title=f"Top instituições colaboradoras {'nacionais' if nacional else 'internacionais'}",
+            labels={
+                'sigla': 'Sigla da instituição',
+                'n_colabs': 'Número de colaborações'
+            },
+            # Define os dados que aparecem no hover
             hover_data={
                 "instituicao": True,
                 "codigo_pais": True,
                 "n_colabs": True,
-                },
+            },
+            # Adiciona a coluna 'rotulo' como texto sobre as barras
+            text='posicao',
         )
+
+        fig.update_traces( 
+            texttemplate="%{text}º", 
+            textposition='inside'
+            )
 
         fig.update_layout( 
             xaxis_tickangle=-45,  # ou 45, 90, etc.

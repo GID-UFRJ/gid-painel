@@ -85,7 +85,7 @@ class OpenAlexWorkParser:
                     institution_id=self._clean_id(inst.get("id")),
                     defaults={
                         "institution_name": inst.get("display_name"),
-                        "country_code": inst.get("country_code") or ""
+                        "country_code": inst.get("country_code") or None
                     }
                 )
                 AuthorshipInstitution.objects.get_or_create(

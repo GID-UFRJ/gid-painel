@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'baseGraficos',
     'rankings',
     'openalex',
+    'django_extensions',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

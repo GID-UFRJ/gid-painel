@@ -65,10 +65,16 @@ class Work(models.Model):
 class Institution(models.Model):
     institution_id = models.CharField(max_length=100, unique=True)
     institution_name = models.CharField(max_length=255, db_index=True)
-    country_code = models.CharField(max_length=10)
+    country_code = models.CharField(max_length=10, null=True, blank=True, db_index=True)
 
     def __str__(self):
         return self.institution_name
+    
+    def save(self, *args, **kwargs):
+        # Convert empty strings to None before saving to the database
+        if self.country_code == '':
+            self.country_code = None
+        super().save(*args, **kwargs)
 
 
 class Author(models.Model):
