@@ -203,41 +203,41 @@ class PlotsProducao:
         qs = WorkTopic.objects.filter(
             work__worktype__worktype='article'
         ).select_related('topic', 'work')
-
+    
         df = pd.DataFrame.from_records(qs.values(
             'work_id',
             'topic__domain_name',
             'topic__field_name',
             'topic__subfield_name'
         ))
-
-        # Remover duplicados para subfield
-        df_subfield = df.drop_duplicates(subset=['work_id', 'topic__subfield_name'])
+    
+        # Remover duplicados para subfield (with explicit copy)
+        df_subfield = df.drop_duplicates(subset=['work_id', 'topic__subfield_name']).copy()
         # Contagem por subfield
         df_subfield['article_count'] = 1
-
-        # Remover duplicados para field
-        df_field = df.drop_duplicates(subset=['work_id', 'topic__field_name'])
+    
+        # Remover duplicados para field (with explicit copy)
+        df_field = df.drop_duplicates(subset=['work_id', 'topic__field_name']).copy()
         df_field['article_count'] = 1
-
-        # Remover duplicados para domain
-        df_domain = df.drop_duplicates(subset=['work_id', 'topic__domain_name'])
+    
+        # Remover duplicados para domain (with explicit copy)
+        df_domain = df.drop_duplicates(subset=['work_id', 'topic__domain_name']).copy()
         df_domain['article_count'] = 1
-
+    
         # Concatenar e agregar por nível para sunburst
         df_all = pd.concat([df_domain, df_field, df_subfield], ignore_index=True)
         df_agg = df_all.groupby(
             ['topic__domain_name', 'topic__field_name', 'topic__subfield_name'],
             as_index=False
         ).sum()
-
+    
         # Criar gráfico sunburst
         fig = px.sunburst(
             df_agg.sort_values(by='topic__domain_name'),
             path=['topic__domain_name', 'topic__field_name', 'topic__subfield_name'],
             values='article_count'
         )
-
+    
         # Layout responsivo, título e nota
         fig.update_layout(
             autosize=True,
@@ -261,10 +261,9 @@ class PlotsProducao:
                 )
             ]
         )   
-
+    
         # Retornar HTML
         return to_html(fig, full_html=False, include_plotlyjs='cdn', config={"responsive": True})
-
 
     def metricas_por_topico_artigos(self):
         # Step 1: Precompute authors per work

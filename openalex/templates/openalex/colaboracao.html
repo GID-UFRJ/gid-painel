@@ -3,10 +3,9 @@
 {% block conteudo %}
         
 <div class='divisoria' id='id_teste'>
-    <img src = "data:image/png;base64, {{ card_01 }}" alt="" class='imagemsuperior'>
-    <img src = "data:image/png;base64, {{ card_02 }}" alt="" class='imagemsuperior'>
+    <img src="data:image/png;base64, {{ card_01|default:'' }}" alt="" class='imagemsuperior'>
+    <img src="data:image/png;base64, {{ card_02|default:'' }}" alt="" class='imagemsuperior'>
 </div>
-
 
 <!-- Colaborações por ano -->
 <div class="container mt-4">
@@ -17,7 +16,7 @@
         hx-get="{% url 'openalex:grafico_colaboracoes_por_ano' %}"
         hx-target="#colab-ano"
         hx-trigger="change delay:300ms"
-        hx-indicator=".htmx-indicator"
+        hx-indicator="#spinner-colab-ano"
         hx-include="closest form">
 
     <div class="row mb-3">
@@ -68,7 +67,7 @@
   </form>
 
   <!-- Gráfico com spinner overlay -->
-  {% include 'homepage/partials/_grafico_spinner.html' with grafico_html=graf_01 grafico_id='colab-ano' %}
+  {% include 'homepage/partials/_grafico_spinner.html' with grafico_html=graf_01 grafico_id='colab-ano' spinner_id='spinner-colab-ano' %}
 
 </div>
 
@@ -81,7 +80,7 @@
           hx-get="{% url 'openalex:grafico_top_colaboracoes' %}"
           hx-target="#top-colab"
           hx-trigger="change delay:300ms"
-          hx-indicator=".htmx-indicator"
+          hx-indicator="#spinner-top-colab"
           hx-include="closest form">
 
         <div class="row mb-3">
@@ -108,8 +107,8 @@
     </form>
 
     <!-- Gráfico com spinner overlay -->
-    {% include 'homepage/partials/_grafico_spinner.html' with grafico_html=graf_02 grafico_id='top-colab' %}
+    {% include 'homepage/partials/_grafico_spinner.html' with grafico_html=graf_02 grafico_id='top-colab' spinner_id='spinner-top-colab' %}
 
 </div>
 
-{% endblock %} 
+{% endblock %}

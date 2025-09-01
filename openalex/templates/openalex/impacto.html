@@ -15,7 +15,7 @@
           hx-get="{% url 'openalex:grafico_citacoes_por_ano' %}"
           hx-target="#citacoes-ano"
           hx-trigger="change delay:300ms"
-          hx-indicator=".htmx-indicator"
+          hx-indicator="#spinner-citacoes-ano"
           hx-include="closest form">
 
         <div class="row mb-3">
@@ -65,7 +65,7 @@
     </form>
 
     <!-- Gráfico com spinner overlay -->
-    {% include 'homepage/partials/_grafico_spinner.html' with grafico_html=graf_01 grafico_id='citacoes-ano' %}
+    {% include 'homepage/partials/_grafico_spinner.html' with grafico_html=graf_01 grafico_id='citacoes-ano' spinner_id='spinner-citacoes-ano' %}
 
 </div>
 

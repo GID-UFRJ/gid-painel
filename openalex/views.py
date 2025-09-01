@@ -39,7 +39,7 @@ def grafico_producao_por_ano(request):
                               )
 
     return render( request, 
-                  "openalex/partials/_plot_reativo.html", 
+                  "homepage/partials/_plot_reativo.html", 
                   {"graf": graf} 
                   )
 
@@ -72,7 +72,7 @@ def grafico_citacoes_por_ano(request):
 
     # Renderiza o partial específico para HTMX
     return render( request, 
-                  "openalex/partials/_plot_reativo.html", 
+                  "homepage/partials/_plot_reativo.html", 
                   {"graf": graf}
                   )
 
@@ -122,7 +122,7 @@ def grafico_colaboracoes_por_ano(request):
                                             )
     # Renderiza o partial específico para HTMX
     return render( request, 
-                  "openalex/partials/_plot_reativo.html", 
+                  "homepage/partials/_plot_reativo.html", 
                   {"graf": graf}
                   )
 
@@ -139,6 +139,6 @@ def grafico_top_colaboracoes(request):
 
     # Renderiza o partial específico para HTMX
     return render( request, 
-                  "openalex/partials/_plot_reativo.html", 
+                  "homepage/partials/_plot_reativo.html", 
                   {"graf": graf}
                   )

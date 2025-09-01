@@ -15,7 +15,7 @@
         hx-get="{% url 'openalex:grafico_producao_por_ano' %}"
         hx-target="#producao-ano"
         hx-trigger="change delay:300ms"
-        hx-indicator=".htmx-indicator">
+        hx-indicator="#spinner-producao-ano">
 
     <div class="row mb-3">
 
@@ -60,7 +60,7 @@
   </form>
 
   <!-- Gráfico com spinner overlay -->
-  {% include 'homepage/partials/_grafico_spinner.html' with grafico_html=graf_01 grafico_id='producao-ano' %}
+  {% include 'homepage/partials/_grafico_spinner.html' with grafico_html=graf_01 grafico_id='producao-ano' spinner_id='spinner-producao-ano' %}
 
 </div>
 
