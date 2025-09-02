@@ -81,6 +81,13 @@ class DiscenteSituacao(models.Model):
     def __str__(self):
         return self.nm_situacao_discente
 
+class FaixaEtaria(models.Model):
+    ds_faixa_etaria = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.ds_faixa_etaria
+
+
 class ProducaoIdentificador(models.Model):
     id_producao_hash = models.CharField(max_length=128, unique=True)
 
@@ -149,12 +156,14 @@ class AnoPrograma(models.Model):
 class Docente(models.Model):
     ano = models.ForeignKey(Ano, on_delete=models.CASCADE)
     pessoa = models.ForeignKey(Pessoa, on_delete=models.CASCADE)
+    faixa_etaria = models.ForeignKey(FaixaEtaria, on_delete=models.PROTECT, null=True, blank=True)
     programa = models.ForeignKey(Programa, on_delete=models.CASCADE)
     categoria = models.ForeignKey(DocenteCategoria, on_delete=models.PROTECT, null=True, blank=True)
     vinculo = models.ForeignKey(DocenteVinculo, on_delete=models.PROTECT, null=True, blank=True)
     regime_trabalho = models.ForeignKey(DocenteRegimeTrabalho, on_delete=models.PROTECT, null=True, blank=True)
     bolsa_produtividade = models.ForeignKey(DocenteBolsaProdutividade, on_delete=models.PROTECT, null=True, blank=True)
     grau_titulacao = models.ForeignKey(GrauCurso, on_delete=models.PROTECT, null=True, blank=True)
+
     
     class Meta:
         constraints = [
@@ -168,6 +177,7 @@ class Docente(models.Model):
 class Discente(models.Model):
     ano = models.ForeignKey(Ano, on_delete=models.CASCADE)
     pessoa = models.ForeignKey(Pessoa, on_delete=models.CASCADE)
+    faixa_etaria = models.ForeignKey(FaixaEtaria, on_delete=models.PROTECT, null=True, blank=True)
     programa = models.ForeignKey(Programa, on_delete=models.CASCADE)
     grau_academico = models.ForeignKey(GrauCurso, on_delete=models.PROTECT)
     st_ingressante = models.BooleanField(default=False)

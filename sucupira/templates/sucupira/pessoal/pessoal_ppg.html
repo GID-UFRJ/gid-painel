@@ -1,0 +1,113 @@
+{% extends 'homepage/base.html' %} 
+
+{% block conteudo %}
+<div class="divisoria">
+  {% for card in n_titulados_cards %}
+    <img src="data:image/png;base64, {{ card }}" alt="" class='imagemsuperior'/>
+  {% endfor %}
+  <img src="data:image/png;base64, {{ docentes_card }}" alt="" class='imagemsuperior'/>
+</div>
+
+<div class="w-full">
+    <!-- Abas de Navegação -->
+    <div class="mb-4 border-b border-gray-200">
+        <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="myTab" data-tabs-toggle="#myTabContent" role="tablist">
+            <li class="mr-2" role="presentation">
+                <button class="inline-block p-4 border-b-2 rounded-t-lg text-blue-600 border-blue-600" id="discentes-tab" data-tabs-target="#discentes" type="button" role="tab" aria-controls="discentes" aria-selected="true">Discentes</button>
+            </li>
+            <li class="mr-2" role="presentation">
+                <button class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300" id="docentes-tab" data-tabs-target="#docentes" type="button" role="tab" aria-controls="docentes" aria-selected="false">Docentes</button>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Conteúdo das Abas -->
+    <div id="myTabContent">
+        <!-- Aba Discentes -->
+        <div class="p-4 rounded-lg bg-white" id="discentes" role="tabpanel" aria-labelledby="discentes-tab">
+            <h2 class="text-2xl font-semibold mb-4">Análise de Discentes</h2>
+            
+            <!-- Formulário de Filtros -->
+            <form id="discentes-filters"
+                  hx-get="{% url 'pessoal:grafico_discentes_por_ano' %}"
+                  hx-trigger="change"
+                  hx-target="#grafico-discentes-container"
+                  class="p-4 mb-6 bg-gray-50 rounded-lg border border-gray-200 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+
+                <!-- Filtro Geral de Grau -->
+                <div>
+                    <label for="grau_curso" class="block mb-2 text-sm font-medium text-gray-900">Grau Acadêmico (Geral)</label>
+                    <select name="grau_curso" id="grau_curso" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <option value="">Todos</option>
+                        {% for grau in graus_curso %}
+                        <option value="{{ grau.id }}" {% if selected_grau == grau.id %}selected{% endif %}>{{ grau.nm_grau_curso }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Filtro Pessoal -->
+                <div>
+                    <label for="filtro_pessoal" class="block mb-2 text-sm font-medium text-gray-900">Característica Pessoal</label>
+                    <select name="filtro_pessoal" id="filtro_pessoal" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <option value="total" {% if selected_pessoal == 'total' %}selected{% endif %}>Sem filtro</option>
+                        <option value="sexo" {% if selected_pessoal == 'sexo' %}selected{% endif %}>Sexo</option>
+                        <option value="nacionalidade" {% if selected_pessoal == 'nacionalidade' %}selected{% endif %}>Nacionalidade</option>
+                        <option value="faixa_etaria" {% if selected_pessoal == 'faixa_etaria' %}selected{% endif %}>Faixa Etária</option>
+                    </select>
+                </div>
+                
+                <!-- Filtro de Agregação -->
+                <div>
+                    <label for="agregacao" class="block mb-2 text-sm font-medium text-gray-900">Tipo de Agregação</label>
+                    <select name="agregacao" id="agregacao" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <option value="total" {% if selected_agregacao == 'total' %}selected{% endif %}>Total de Alunos</option>
+                        <option value="situacao" {% if selected_agregacao == 'situacao' %}selected{% endif %}>Situação Discente</option>
+                        <option value="grande_area" {% if selected_agregacao == 'grande_area' %}selected{% endif %}>Grande Área</option>
+                    </select>
+                </div>
+
+                <!-- Filtro Ano Início -->
+                <div>
+                    <label for="ano_inicio" class="block mb-2 text-sm font-medium text-gray-900">Ano Início</label>
+                    <select name="ano_inicio" id="ano_inicio" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <option value="">Desde o início</option>
+                        {% for ano in anos_disponiveis %}
+                        <option value="{{ ano }}" {% if selected_ano_inicio == ano %}selected{% endif %}>{{ ano }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Filtro Ano Final -->
+                <div>
+                    <label for="ano_final" class="block mb-2 text-sm font-medium text-gray-900">Ano Final</label>
+                    <select name="ano_final" id="ano_final" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <option value="">Até o final</option>
+                        {% for ano in anos_disponiveis %}
+                        <option value="{{ ano }}" {% if selected_ano_final == ano %}selected{% endif %}>{{ ano }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+
+            <!-- Container do Gráfico 1 -->
+            <div id="grafico-discentes-container" class="w-full p-4 border rounded-lg shadow-md bg-white">
+                <p>Teste</p>
+                <!--
+                -->
+            </div>
+
+            <!-- Outros Gráficos (a serem implementados) -->
+            <!-- Gráfico 2: Top Países -->
+            <!-- Gráfico 3: Sunburst por Área -->
+        </div>
+
+        <!-- Aba Docentes -->
+        <div class="hidden p-4 rounded-lg bg-gray-50" id="docentes" role="tabpanel" aria-labelledby="docentes-tab">
+            <h2 class="text-2xl font-semibold mb-4">Análise de Docentes</h2>
+            <p class="text-gray-600">Conteúdo sobre docentes virá aqui...</p>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

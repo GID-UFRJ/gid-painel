@@ -170,6 +170,7 @@ class Command(BaseCommand):
                 regime = self._get_or_create(DocenteRegimeTrabalho, 'ds_regime_trabalho', row['DS_REGIME_TRABALHO'])
                 bolsa = self._get_or_create(DocenteBolsaProdutividade, 'cd_cat_bolsa_produtividade', row['CD_CAT_BOLSA_PRODUTIVIDADE'])
                 titulacao = self._get_or_create(GrauCurso, 'nm_grau_curso', row['NM_GRAU_TITULACAO'])
+                faixa_etaria = self._get_or_create(FaixaEtaria, 'ds_faixa_etaria', row['DS_FAIXA_ETARIA'])
 
                 Docente.objects.get_or_create(
                     ano=ano,
@@ -180,7 +181,8 @@ class Command(BaseCommand):
                         'vinculo': vinculo,
                         'regime_trabalho': regime,
                         'bolsa_produtividade': bolsa,
-                        'grau_titulacao': titulacao
+                        'grau_titulacao': titulacao,
+                        'faixa_etaria': faixa_etaria,
                     }
                 )
             except (Pessoa.DoesNotExist, Programa.DoesNotExist, Ano.DoesNotExist) as e:
@@ -201,6 +203,7 @@ class Command(BaseCommand):
 
                 grau = self._get_or_create(GrauCurso, 'nm_grau_curso', row['DS_GRAU_ACADEMICO_DISCENTE'])
                 situacao = self._get_or_create(DiscenteSituacao, 'nm_situacao_discente', row['NM_SITUACAO_DISCENTE'])
+                faixa_etaria = self._get_or_create(FaixaEtaria, 'ds_faixa_etaria', row['DS_FAIXA_ETARIA'])
 
                 Discente.objects.get_or_create(
                     ano=ano,
@@ -210,7 +213,8 @@ class Command(BaseCommand):
                     defaults={
                         'st_ingressante': row['ST_INGRESSANTE'].upper() == 'S',
                         'situacao': situacao,
-                        'qt_mes_titulacao': int(row['QT_MES_TITULACAO'] or 0)
+                        'qt_mes_titulacao': int(row['QT_MES_TITULACAO'] or 0),
+                        'faixa_etaria': faixa_etaria,
                     }
                 )
             except (Pessoa.DoesNotExist, Programa.DoesNotExist, Ano.DoesNotExist) as e:
