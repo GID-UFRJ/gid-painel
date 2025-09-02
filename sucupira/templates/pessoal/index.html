@@ -1,0 +1,21 @@
+{% extends "homepage/base_index.html" %}
+
+{% block conteudo_principal %}
+
+<h4> PESSOAL UFRJ</h4>
+
+<p>
+    Lorem ipsum....
+</p>
+
+
+{% endblock %} 
+
+{% block conteudo_secundario %}
+    <h5># <a href="{% url 'pessoal:pessoal_ppg' %}">Pessoal PPG UFRJ</a></h5>
+
+    <p>
+        Lorem ipsum...
+    </p>    
+
+{% endblock %}

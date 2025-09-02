@@ -4,8 +4,9 @@
     <ul class='menu_ul'>
         <li class='menu_li'><a href="{% url 'homepage:index' %}">Homepage</a></li>
         <li class='menu_li'><a href="{% url 'openalex:index' %}">Pesquisa</a></li>
+        <li class='menu_li'><a href="{% url 'pessoal:index' %}">Pessoal</a></li>
+        <li class='menu_li'><a href="{% url 'posgrad:index' %}">Pós-Graduação</a></li>
         <li class='menu_li'><a href="{% url 'rankings:index' %}">Rankings</a></li>
-        <li class='menu_li'><a href="{% url 'sucupira:index' %}">Pós-Graduação</a></li>
 
         {% for item in menu_items %}
           <li class='menu_li'><a href="{% url 'url_grafico_painel' item %}">{{ item.nome }}</a></li>

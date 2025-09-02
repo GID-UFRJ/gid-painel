@@ -1,17 +1,27 @@
 from collections import defaultdict
 from django.shortcuts import render, get_object_or_404
 from django.shortcuts import HttpResponse
+from .utils.plots import PlotsPessoal
 from .models import Programa
 
 # Create your views here.
 
-def index(request):
-    return render(request, 'sucupira/index.html')
+def index(request): #index unificado
+    namespace = request.resolver_match.namespace # pega o namespace atual (vem do include no urls.py principal)
+    return render(request, f"{namespace}/index.html")
+
+def pessoal_ppg(request):
+    p = PlotsPessoal()
+
+    return render(request, r'pessoal/pessoal_ppg.html', {
+        'n_titulados_cards': p.cards_total_alunos_titulados_por_grau,
+        'docentes_card': p.card_total_docentes_ultimo_ano,
+
+    }
+)
 
 def posgrad_ufrj(request):
     return HttpResponse('Página em construção')
-
-
 
 def ppgs(request):
     """
@@ -34,7 +44,7 @@ def ppgs(request):
     context = {
         'programas_agrupados': programas_agrupados
     }
-    return render(request, 'sucupira/ppgs.html', context)
+    return render(request, 'posgrad/ppgs.html', context)
 
 
 def ppg_detalhe(request, programa_id):
@@ -54,4 +64,4 @@ def ppg_detalhe(request, programa_id):
         # 'docentes': docentes, # Adicione outros dados aqui
     }
     
-    return render(request, 'sucupira/ppg_detalhe.html', context)
+    return render(request, 'posgrad/ppg_detalhe.html', context)
