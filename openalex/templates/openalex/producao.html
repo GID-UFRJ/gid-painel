@@ -7,62 +7,13 @@
     <img src = "data:image/png;base64, {{ card_02 }}" alt="" class='imagemsuperior'>
 </div>
 
-<div class="container mt-4">
 
-  <!-- Filtros em um único form -->
-  <form x-data="{}" 
-        x-init="$el.reset()"
-        hx-get="{% url 'openalex:grafico_producao_por_ano' %}"
-        hx-target="#producao-ano"
-        hx-trigger="change delay:300ms"
-        hx-indicator="#spinner-producao-ano">
 
-    <div class="row mb-3">
+{% url 'openalex:grafico_producao_por_ano' as url_producao_ano %}
 
-      <!-- Intervalo de anos -->
-      <div class="col-md-4">
-        <label class="form-label">Intervalo de anos</label>
-        <div class="d-flex align-items-center">
-          <input type="number" name="ano_inicial" value="1990"
-                 class="form-control me-2"
-                 hx-include="#ano_final,#tipo_producao,#tipo_grafico">
-          <span class="mx-2">até</span>
-          <input type="number" name="ano_final" value="2024"
-                 class="form-control ms-2"
-                 hx-include="#ano_inicial,#tipo_producao,#tipo_grafico">
-        </div>
-      </div>
+<!-- Citações por ano -->
+{% include "openalex/partials/producao/_plot_producao_por_ano.html" with url_grafico=url_producao_ano grafico_id="producao-ano" spinner_id="spinner-producao-ano" grafico_html=graf_01 %}
 
-      <!-- Tipo de produção -->
-      <div class="col-md-4">
-        <label class="form-label">Dividir produção por</label>
-        <select name="tipo_producao" class="form-select"
-                hx-include="#ano_inicial,#ano_final,#tipo_grafico">
-          <option value="total" selected>Total</option>
-          <option value="tipo_documento">Tipo de Documento</option>
-          <option value="acesso_aberto">Acesso Aberto</option>
-          <option value="dominio">Domínio</option>
-          <option value="autor_correspondente">Autor correspondente</option>
-        </select>
-      </div>
-
-      <!-- Tipo de gráfico -->
-      <div class="col-md-4">
-        <label class="form-label">Tipo de gráfico</label>
-        <select name="tipo_grafico" class="form-select"
-                hx-include="#ano_inicial,#ano_final,#tipo_producao">
-          <option value="barra" selected>Barra</option>
-          <option value="linha">Linha</option>
-        </select>
-      </div>
-
-    </div>
-  </form>
-
-  <!-- Gráfico com spinner overlay -->
-  {% include 'homepage/partials/_grafico_spinner.html' with grafico_html=graf_01 grafico_id='producao-ano' spinner_id='spinner-producao-ano' %}
-
-</div>
 
 <!-- Gráfico - Distribuição temática de documentos UFRJ -->
 <div class="container mt-4">

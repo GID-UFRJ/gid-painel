@@ -7,66 +7,11 @@
     <img src="data:image/png;base64, {{ card_02 }}" alt="" class='imagemsuperior'>
 </div>
 
-<div class="container mt-4">
+{% url 'openalex:grafico_citacoes_por_ano' as url_citacoes_ano %}
 
-    <!-- Filtros em um único form para Citações -->
-    <form x-data="{}"
-          x-init="$el.reset()"
-          hx-get="{% url 'openalex:grafico_citacoes_por_ano' %}"
-          hx-target="#citacoes-ano"
-          hx-trigger="change delay:300ms"
-          hx-indicator="#spinner-citacoes-ano"
-          hx-include="closest form">
 
-        <div class="row mb-3">
+<!-- Citações por ano -->
+{% include "openalex/partials/impacto/_plot_citacoes_por_ano.html" with url_grafico=url_citacoes_ano grafico_id="citacoes-ano" spinner_id="spinner-citacoes-ano" grafico_html=graf_01 %}
 
-            <!-- Intervalo de anos -->
-            <div class="col-md-3">
-                <label class="form-label">Intervalo de anos</label>
-                <div class="d-flex align-items-center">
-                    <input type="number" name="ano_inicial" value="1990" class="form-control me-2">
-                    <span class="mx-2">até</span>
-                    <input type="number" name="ano_final" value="2024" class="form-control ms-2">
-                </div>
-            </div>
-
-            <!-- Tipo de produção -->
-            <div class="col-md-3">
-                <label class="form-label">Dividir por</label>
-                <select name="tipo_producao" class="form-select">
-                    <option value="total" selected>Total</option>
-                    <option value="acesso_aberto">Acesso Aberto</option>
-                    <option value="dominio">Domínio</option>
-                </select>
-            </div>
-
-            <!-- Métrica -->
-            <div class="col-md-3">
-                <label class="form-label">Métrica</label>
-                <select name="metrica" class="form-select">
-                    <option value="total_citacoes" selected>Total de Citações</option>
-                    <option value="total_citacoes_acumuladas">Total Acumulado</option>
-                    <option value="media">Média</option>
-                    <option value="hindex">H-index</option>
-                </select>
-            </div>
-
-            <!-- Tipo de gráfico -->
-            <div class="col-md-3">
-                <label class="form-label">Tipo de gráfico</label>
-                <select name="tipo_grafico" class="form-select">
-                    <option value="barra" selected>Barra</option>
-                    <option value="linha">Linha</option>
-                </select>
-            </div>
-
-        </div>
-
-    </form>
-
-    <!-- Gráfico com spinner overlay -->
-    {% include 'homepage/partials/_grafico_spinner.html' with grafico_html=graf_01 grafico_id='citacoes-ano' spinner_id='spinner-citacoes-ano' %}
-
-</div>
 
 {% endblock %}

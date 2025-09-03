@@ -100,6 +100,7 @@ li a:hover:not(.active) {
   display: flex;
   justify-content: center;
   align-items: center;
+  aspect-ratio: 16 / 9; /* setar aspect-ratio evita o flickering na atualização dos gráficos */
 }
 
 .grafico > div {

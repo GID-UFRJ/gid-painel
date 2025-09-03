@@ -1,0 +1,19 @@
+{# top_colaboracoes.html #}
+{% extends "homepage/partials/_grafico_com_filtros.html" %}
+
+{% block filtros %}
+<div class="row mb-3">
+    <div class="col-md-3">
+        <label class="form-label">Número de instituições</label>
+        <input type="number" name="n_instituicoes" value="10" class="form-control">
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">Dividir por</label>
+        <select name="tipo_instituicao" class="form-select">
+          <option value="nacional" selected>Nacional</option>
+          <option value="internacional">Internacional</option>
+        </select>
+    </div>
+</div>
+{% endblock filtros %}

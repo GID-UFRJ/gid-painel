@@ -1,0 +1,45 @@
+{# colaboracoes_por_ano.html #}
+{% extends "homepage/partials/_grafico_com_filtros.html" %}
+
+{% block filtros %}
+<div class="row mb-3">
+    <!-- Intervalo de anos -->
+    <div class="col-md-4">
+        <label class="form-label">Intervalo de anos</label>
+        <div class="d-flex align-items-center">
+            <input type="number" name="ano_inicial" value="1990" class="form-control me-2">
+            <span class="mx-2">até</span>
+            <input type="number" name="ano_final" value="2024" class="form-control ms-2">
+        </div>
+    </div>
+
+    <!-- Tipo de colaboração -->
+    <div class="col-md-3">
+        <label class="form-label">Tipo de colaboração</label>
+        <select name="tipo_colaboracao" class="form-select">
+          <option value="nacional" selected>Nacional</option>
+          <option value="internacional">Internacional</option>
+        </select>
+    </div>
+
+    <!-- Tipo de produção -->
+    <div class="col-md-3">
+        <label class="form-label">Dividir produção por</label>
+        <select name="tipo_producao" class="form-select">
+          <option value="total" selected>Total</option>
+          <option value="tipo_documento">Tipo de Documento</option>
+          <option value="acesso_aberto">Acesso Aberto</option>
+          <option value="dominio">Domínio</option>
+        </select>
+    </div>
+
+    <!-- Tipo de gráfico -->
+    <div class="col-md-2">
+        <label class="form-label">Tipo de gráfico</label>
+        <select name="tipo_grafico" class="form-select">
+          <option value="barra" selected>Barra</option>
+          <option value="linha">Linha</option>
+        </select>
+    </div>
+</div>
+{% endblock %}
