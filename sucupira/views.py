@@ -78,7 +78,7 @@ def ppgs(request):
     context = {
         'programas_agrupados': programas_agrupados
     }
-    return render(request, 'posgrad/ppgs.html', context)
+    return render(request, 'sucupira/posgrad/ppgs.html', context)
 
 
 def ppg_detalhe(request, programa_id):
@@ -98,4 +98,4 @@ def ppg_detalhe(request, programa_id):
         # 'docentes': docentes, # Adicione outros dados aqui
     }
     
-    return render(request, 'posgrad/ppg_detalhe.html', context)
+    return render(request, 'sucupira/posgrad/ppg_detalhe.html', context)
