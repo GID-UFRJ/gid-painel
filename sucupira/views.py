@@ -3,6 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from django.shortcuts import HttpResponse
 from .utils.plots import PlotsPessoal
 from .models import Programa
+from .models import Programa, DiscenteSituacao, ProgramaGrandeArea, GrauCurso 
 
 # Create your views here.
 
@@ -16,10 +17,21 @@ def pessoal_ppg(request):
     return render(request, r'sucupira/pessoal/pessoal_ppg.html', {
         'n_titulados_cards': p.cards_total_alunos_titulados_por_grau,
         'docentes_card': p.card_total_docentes_ultimo_ano,
+        'discentes_ano_plot': p.discentes_por_ano()
 
     }
 )
 
+def filtros_grafico_discentes(request):
+    """
+    View que renderiza a página com os filtros.
+    """
+    context = {
+        'situacoes': DiscenteSituacao.objects.all().order_by('nm_situacao_discente'),
+        'grandes_areas': ProgramaGrandeArea.objects.all().order_by('nm_grande_area_conhecimento'),
+        'graus_curso': GrauCurso.objects.all().order_by('nm_grau_curso'), # <-- NOVO CONTEXTO
+    }
+    return render(request, 'sucupira/partials/pessoal/_plot_discentes.html', context)
 
 def grafico_discentes_por_ano(request):
     """
@@ -28,30 +40,33 @@ def grafico_discentes_por_ano(request):
     p = PlotsPessoal()
 
     # Pega os valores dos filtros do GET request
-    grau_curso_id = request.GET.get('grau_curso', None)
-    filtro_pessoal = request.GET.get('filtro_pessoal', None)
-    situacao = request.GET.get('situacao', None)
-    grande_area = request.GET.get('grande_area', None)
-    ano_inicio = request.GET.get('ano_inicio', None)
-    ano_final = request.GET.get('ano_final', None)
+    grau_curso = request.GET.get('grau_curso', 'total')
+    agrupamento = request.GET.get('agrupamento', 'total')
+    situacao = request.GET.get('situacao', 'total')
+    grande_area = request.GET.get('grande_area', 'total')
+    ano_inicial = request.GET.get('ano_inicial', 1990)
+    ano_final = request.GET.get('ano_final', 2024)
+    tipo_grafico = request.GET.get('tipo_grafico', 'barra')
+
+    # Converte anos para int
+    try:
+        ano_inicial = int(ano_inicial)
+        ano_final = int(ano_final)
+    except ValueError:
+        ano_inicial, ano_final = 1990, 2024
 
     # Gera o novo gráfico com os filtros aplicados
-    graf = p.grafico_discentes_por_ano(
-        grau_curso_id=grau_curso_id,
-        filtro_pessoal=filtro_pessoal,
+    graf = p.discentes_por_ano(
+        grau_curso=grau_curso,
+        agrupamento=agrupamento,
         situacao=situacao,
         grande_area=grande_area,
-        ano_inicio=ano_inicio,
-        ano_final=ano_final
+        ano_inicial=ano_inicial,
+        ano_final=ano_final,
+        tipo_grafico=tipo_grafico,
     )
     
-    context = {
-        'graf': graf,
-    }
-    
-    # Retorna apenas o HTML do gráfico
-    return render(request, 'dashboard/partials/grafico_discentes_ano.html', context)
-
+    return render(request, "homepage/partials/_plot_reativo.html", {'graf': graf})
 
 
 def posgrad_ufrj(request):

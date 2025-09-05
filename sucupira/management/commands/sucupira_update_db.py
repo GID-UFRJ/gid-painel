@@ -55,31 +55,33 @@ class Command(BaseCommand):
         self.stdout.write('2. Populando Pessoas...')
         path = os.path.join(DATA_DIR, 'pessoas.csv')
         df = pd.read_csv(path, dtype=str).fillna('')
-
-        # Criando tabelas de dimensão juntamente com dicionários para preenchimentos dos campos em
+    
+        # Criando tabelas de dimensão
         sexo_lookup = {s: self._get_or_create(PessoaSexo, 'sexo', s) for s in df['TP_SEXO'].unique() if s}
         pais_lookup = {p: self._get_or_create(PessoaPais, 'pais', p) for p in df['NM_PAIS_NACIONALIDADE'].unique() if p}
-        
-        # O campo 'ano_nascimento' é um IntegerField, portanto o valor será atribuído diretamente.
+        tipo_nacionalidade_lookup = {
+            t: self._get_or_create(PessoaTipoNacionalidade, 'ds_tipo_nacionalidade', t)
+            for t in df['DS_TIPO_NACIONALIDADE'].unique() if t
+        }
+    
         for _, row in df.iterrows():
             if not row['ID_PESSOA_HASH']:
                 continue
             
-            # Conversão direta do ano para inteiro.
-            ano_nasc = None
-            if row['AN_NASCIMENTO'] and row['AN_NASCIMENTO'].isdigit():
-                ano_nasc = int(row['AN_NASCIMENTO'])
-
-            # Atribuição dos valores das colunas
+            # Conversão direta do ano para inteiro
+            ano_nasc = int(row['AN_NASCIMENTO']) if row['AN_NASCIMENTO'] and row['AN_NASCIMENTO'].isdigit() else None
+    
             Pessoa.objects.update_or_create(
                 id_pessoa_hash=row['ID_PESSOA_HASH'],
                 defaults={
                     'tp_sexo': sexo_lookup.get(row['TP_SEXO']),
-                    'ano_nascimento': ano_nasc, #Ano de nascimento é passado diretamente
-                    'pais_nacionalidade': pais_lookup.get(row['NM_PAIS_NACIONALIDADE'])
+                    'ano_nascimento': ano_nasc,
+                    'pais_nacionalidade': pais_lookup.get(row['NM_PAIS_NACIONALIDADE']),
+                    'tipo_nacionalidade': tipo_nacionalidade_lookup.get(row['DS_TIPO_NACIONALIDADE']),
                 }
             )
         self.stdout.write(self.style.SUCCESS('Pessoas populadas.'))
+
 
     def _populate_programas(self):
         self.stdout.write('3. Populando Programas...')
@@ -172,7 +174,7 @@ class Command(BaseCommand):
                 titulacao = self._get_or_create(GrauCurso, 'nm_grau_curso', row['NM_GRAU_TITULACAO'])
                 faixa_etaria = self._get_or_create(FaixaEtaria, 'ds_faixa_etaria', row['DS_FAIXA_ETARIA'])
 
-                Docente.objects.get_or_create(
+                Docente.objects.update_or_create(
                     ano=ano,
                     pessoa=pessoa,
                     programa=programa,
@@ -205,7 +207,7 @@ class Command(BaseCommand):
                 situacao = self._get_or_create(DiscenteSituacao, 'nm_situacao_discente', row['NM_SITUACAO_DISCENTE'])
                 faixa_etaria = self._get_or_create(FaixaEtaria, 'ds_faixa_etaria', row['DS_FAIXA_ETARIA'])
 
-                Discente.objects.get_or_create(
+                Discente.objects.update_or_create(
                     ano=ano,
                     pessoa=pessoa,
                     programa=programa,

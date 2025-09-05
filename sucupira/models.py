@@ -20,6 +20,12 @@ class PessoaPais(models.Model):
     def __str__(self):
         return self.pais
 
+class PessoaTipoNacionalidade(models.Model):
+    ds_tipo_nacionalidade = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.ds_tipo_nacionalidade
+
 class ProgramaGrandeArea(models.Model):
     nm_grande_area_conhecimento = models.CharField(max_length=255, unique=True)
 
@@ -109,6 +115,7 @@ class Pessoa(models.Model):
     tp_sexo = models.ForeignKey(PessoaSexo, on_delete=models.PROTECT, related_name='pessoas', default=None)
     ano_nascimento = models.IntegerField(null=True, blank=True)
     pais_nacionalidade = models.ForeignKey(PessoaPais, on_delete=models.PROTECT, related_name='pessoas', null=True, default=None)
+    tipo_nacionalidade = models.ForeignKey(PessoaTipoNacionalidade, on_delete=models.PROTECT, related_name='pessoas', null=True, default=None)
 
     def __str__(self):
         return self.id_pessoa_hash

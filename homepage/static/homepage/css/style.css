@@ -131,3 +131,31 @@ li a:hover:not(.active) {
   height: 200px;
   border-radius: 20px;
 }
+
+
+/* ===========================
+   Abas de navegação (conteúdo)
+=========================== */
+    .nav-pills .nav-link {
+        color: #495057;
+        font-weight: 500;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.3s ease;
+        border-radius: 0.5rem !important;
+        margin-right: 0.5rem;
+    }
+    
+    .nav-pills .nav-link:hover {
+        background-color: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+    }
+    
+    .nav-pills .nav-link.active {
+        background-color: #0d6efd;
+        color: white;
+        box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
+    }
+    
+    .nav-pills {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
