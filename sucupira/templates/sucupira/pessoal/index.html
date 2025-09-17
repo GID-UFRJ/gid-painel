@@ -2,20 +2,55 @@
 
 {% block conteudo_principal %}
 
-<h4> PESSOAL UFRJ</h4>
+<h4> Painel de dados sobre o PESSOAL na pós-graduação da UFRJ</h4>
 
 <p>
-    Lorem ipsum....
+    Os dados disponíveis neste painel foram coletados do Portal de Dados Abertos da Capes, 
+    que disponibiliza informações em série histórica, desde o ano de 2013 (quando a coleta passou a ser através da plataforma <a href='https://sucupira.capes.gov.br/'>Sucupira</a>), 
+    sobre o corpo docente e discente de todos os programas de pós-graduação registrados no país (ver: https://dadosabertos.capes.gov.br/)
 </p>
 
+<p>
+    Para a recuperação dos dados de pessoal, ou seja do corpo docente e corpo discente vinculados à UFRJ, foram baixados todos os arquivos csv relativos à 
+    <a href="https://dadosabertos.capes.gov.br/organization/diretoria-de-avaliacao">avaliação da Pós-Graduação</a> disponibilizados pela CAPES. Posteriormente,
+    os registros relativos à UFRJ foram programaticamente extraídos de todos os arquivos através da linguagem Python. Os dados filtrados foram limpos e reestruturados,
+    sendo posteriormente utilizados para a população do banco de dados utilizado para os painéis de pessoal e pós-graduação. À medida que a CAPES disponibilizar dados para 
+    anos mais recentes, a equipe do GID irá baixá-los, limpá-los e adicioná-los ao banco de dados para que as análises disponibilizadas estejam tão atualizadas quanto possível.
+</p>
 
 {% endblock %} 
 
 {% block conteudo_secundario %}
-    <h5># <a href="{% url 'pessoal:pessoal_ppg' %}">Pessoal PPG UFRJ</a></h5>
+<h5># <a href="{% url 'pessoal:pessoal_ppg' %}">Pessoal PPG UFRJ</a></h5>
 
-    <p>
-        Lorem ipsum...
-    </p>    
+<p>
+    Para este painel, os dados estão apresentados em duas abas, Discentes e Docentes. Para cada um deles selecionamos 
+    algumas variáveis que descrevem aspectos relevantes da pesquisa realizada na e pela UFRJ.
+</p>
+
+
+<h6># Discentes</h6>
+
+<p>
+    Inclui os totais de discentes por ano na PG segundo cada grau de curso (todos os cursos, mestrado, doutorado, mestrado profissional, etc...). 
+    Para cada um destes grupos, é possível usar os filtros de: (a) nacionalidade (brasileira ou estrangeira), (b) sexo (feminino ou masculino), (c) faixa etária 
+    (de 19 ou menos a 70 ou mais anos, com as categorias intermediárias correspondendo a intervalos de 5 anos), (d) grande área e 
+    (e) situação do/a discente (concluinte, matriculado, etc…). Importante destacar que os dados sobre sexo dos discentes vinculados aos PPGs da UFRJ foram atribuídos 
+    pela equipe GID, uma vez que os dados originais da Capes não contém essa informação. Essa inferência foi feita a partir do dataset 
+    <a href="https://brasil.io/dataset/genero-nomes/grupos/">Gêneros dos Nomes</a>, disponibilizado pelo projeto <a href="https://brasil.io/home/">BrasilIO</a> e
+    extraído de dados oficiais do <a href="https://censo2010.ibge.gov.br/nomes/#/search">Censo 2010</a>. Os dados descrevem a porcentagem de homens e mulheres que 
+    possuem um determinado primeiro nome. Caso a porcentagem de mulheres para um dado nome seja maior que o de homens, o nome é considerado feminino e vice-versa. Nomes não 
+    encontrados nesses dados são classificados como 'D' (sexo desconhecido).
+</p>
+
+<h6># Docentes</h6>
+
+<p>
+    Inclui os totais de docentes por ano na PG. Para cada um destes grupos, é possível usar os filtros de: 
+    (a) nacionalidade (brasileira ou estrangeira), (b) sexo (feminino e masculino), (c) faixa etária (mesmas categorias dos discentes),  
+    (d) grande área, (e) tipo de programa (acdêmico ou profissional), e 
+    (f) categoria do/a docente (permanente, colaborador ou visitante). Tal como os discentes, os dados sobre sexo dos docentes 
+    vinculados às PPGs da UFRJ foram atribuídos pela equipe GID, uma vez que os dados originais da Capes não contém essa informação. 
+</p>
 
 {% endblock %}

@@ -29,7 +29,7 @@ def filtros_grafico_discentes(request):
     context = {
         'situacoes': DiscenteSituacao.objects.all().order_by('nm_situacao_discente'),
         'grandes_areas': ProgramaGrandeArea.objects.all().order_by('nm_grande_area_conhecimento'),
-        'graus_curso': GrauCurso.objects.all().order_by('nm_grau_curso'), # <-- NOVO CONTEXTO
+        'graus_curso': GrauCurso.objects.all().order_by('nm_grau_curso')
     }
     return render(request, 'sucupira/partials/pessoal/_plot_discentes.html', context)
 
@@ -96,21 +96,100 @@ def ppgs(request):
     return render(request, 'sucupira/posgrad/ppgs.html', context)
 
 
+#def ppg_detalhe(request, programa_id):
+#    """
+#    Exibe os detalhes de um programa de pós-graduação.
+#    """
+#    # Tenta buscar o objeto Programa pelo ID, ou retorna 404 se não existir.
+#    programa = get_object_or_404(Programa, pk=programa_id)
+#    
+#    # Aqui, você pode buscar outros dados relacionados ao programa
+#    # para exibir no gráfico, por exemplo, docentes ou discentes.
+#    # Exemplo:
+#    # docentes = programa.docente_set.all().order_by('ano__ano_valor')
+#    
+#    context = {
+#        'programa': programa,
+#        # 'docentes': docentes, # Adicione outros dados aqui
+#    }
+#    
+#    return render(request, 'sucupira/posgrad/ppg_detalhe.html', context)
+
+
+from django.shortcuts import render, get_object_or_404
+from django.db.models import Avg
+import pandas as pd
+import plotly.express as px
+from .models import Programa, Discente, GrauCurso, Curso
+
+
+def gerar_grafico(programa_id, grau_nome, titulo_extra=""):
+    """
+    Gera um gráfico de tempo médio de titulação para um determinado grau.
+    Retorna HTML do gráfico ou None se não houver dados.
+    """
+    grau = GrauCurso.objects.filter(nm_grau_curso__iexact=grau_nome).first()
+    if not grau:
+        return None
+
+
+
+    qs = (
+        Discente.objects
+        .filter(
+            programa_id=programa_id,
+            grau_academico=grau,
+            situacao__nm_situacao_discente__icontains="TITULADO",
+        )
+        .exclude(qt_mes_titulacao=0)  # opcional: remove valores 0
+        .values("ano__ano_valor")
+        .annotate(media_qt_mes=Avg("qt_mes_titulacao"))
+        .order_by("ano__ano_valor")
+    )
+
+    df = pd.DataFrame(list(qs))
+    if df.empty:
+        return None
+
+    df.rename(columns={"ano__ano_valor": "Ano", "media_qt_mes": "Média"}, inplace=True)
+
+    fig = px.line(
+        df,
+        x="Ano",
+        y="Média",
+        markers=True,
+        title=f"Média de meses para titulação ({grau_nome}{titulo_extra})",
+    )
+    fig.update_traces(connectgaps=True)
+    fig.update_layout(
+        autosize=True,
+        margin=dict(l=40, r=40, t=60, b=40),
+        xaxis_title="Ano",
+        yaxis_title="Média de meses para titulação",
+        xaxis=dict(type="category"),
+    )
+    return fig.to_html(full_html=False, include_plotlyjs="cdn", config={"responsive": True})
+
+
 def ppg_detalhe(request, programa_id):
-    """
-    Exibe os detalhes de um programa de pós-graduação.
-    """
-    # Tenta buscar o objeto Programa pelo ID, ou retorna 404 se não existir.
     programa = get_object_or_404(Programa, pk=programa_id)
-    
-    # Aqui, você pode buscar outros dados relacionados ao programa
-    # para exibir no gráfico, por exemplo, docentes ou discentes.
-    # Exemplo:
-    # docentes = programa.docente_set.all().order_by('ano__ano_valor')
-    
+
+    cursos = (
+        Curso.objects
+        .filter(programa=programa)
+        .select_related("grau_curso")
+        .order_by("grau_curso__nm_grau_curso")
+    )
+
+    graficos = {}
+    for grau_nome in ["Mestrado", "Doutorado", "Mestrado Acadêmico"]:
+        grafico_html = gerar_grafico(programa_id, grau_nome)
+        if grafico_html:
+            graficos[grau_nome] = grafico_html
+
     context = {
-        'programa': programa,
-        # 'docentes': docentes, # Adicione outros dados aqui
+        "programa": programa,
+        "graficos": graficos,
+        "cursos": cursos,
     }
-    
-    return render(request, 'sucupira/posgrad/ppg_detalhe.html', context)
+    return render(request, "sucupira/posgrad/ppg_detalhe.html", context)

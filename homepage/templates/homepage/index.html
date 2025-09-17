@@ -6,125 +6,45 @@
     <br>
     <div class="row justify-content-center">
         <div class="col-8">
-            <h2 class="text-center text-black">Painel de monitoramento da PR-2</h2>
+            <h2 class="text-center text-black">PG e Pesquisa da UFRJ em números</h2>
             <br>
             <div class="text-black">
                 <p>
-                    A Pró-Reitoria de Pesquisa e Pós-Graduação (<a href="https://pr2.ufrj.br/">PR-2</a>) da UFRJ
-                    desenvolveu este painel com o intuito de promover acesso perene às mais diversas
-                    métricas e dados institucionais, em especial àqueles associados à produção
-                    científica e PPGs (Programas de Pós-Graduação) da instituição.
+                    O Painel “PG e Pesquisa da UFRJ em números” apresenta informações relevantes sobre os dois pilares de sustentação da <a href="https://pr2.ufrj.br/">PR2</a> da UFRJ, 
+                    a pós-graduação e a pesquisa, oferecendo um panorama rico e útil tanto seja para a tomada de decisão na gestão de nossa instituição 
+                    seja para o público geral que pode, a partir das análises temporais e com uso de filtros, conhecer e monitorar o desempenho da maior 
+                    universidade pública do sistema federal nesses dois quesitos.
                 </p>
                 <p>
-                    Este painel é dividido em vários subpainéis, que detalham vários aspectos da
-                    pesquisa e pós-graduação da UFRJ. Esperamos que estes proverão informações valiosas
-                    tanto para uso institucional interno (em auditoria e gerenciamento, por exemplo) quanto
-                    para o consumo pelo público geral.
+                    A construção deste Painel, que é resultado do esforço coletivo da equipe <a href="https://pr2.ufrj.br/gid">GID</a>, priorizou o uso de ferramentas abertas disponíveis em Python 
+                    e também de fontes abertas, como a Plataforma Sucupira e a base bibliográfica OpenAlex, das quais foram coletadas grande parte das informações apresentadas aqui. 
+                    Além disso, ao ter seu código-fonte disponível na íntegra no <a href="https://github.com/GID-UFRJ/gid-painel">GitHub</a> e permitir a extração integral dos dados de cada uma das análises, 
+                    o Painel está em completa sintonia com o conceito de transparência pública, na mesma direção de outras iniciativas da UFRJ e do governo federal.
                 </p>
-                <p>
-                    Os painéis utilizam várias fontes de dados distintas e, quando possível, abertas. Por exemplo, nossas análises de produção científica advém
-                    de dados obtidos da base bibliográfica <a href="https://openalex.org/">OpenAlex</a>, enquanto que a maior parte das informações sobre as PPGs
-                    da UFRJ são retiradas dos <a href="https://dadosabertos.capes.gov.br/">Dados Abertos CAPES</a>. Informações adicionais são coletadas pelo 
-                    Escritório de Gestão de Indicadores de Desempenho (<a href="https://pr2.ufrj.br/gid">GID</a>). Este órgão, vinculado à PR-2, tem
-                    como um de seus principais objetivos o levantamento de informações para preenchimento de rankings institucionais. A manutenção deste painel 
-                    depende diretamente da atuação do GID enquanto fonte primária de dados.
-                </p>
-                <p>
-                    Esta ferramenta foi desenvolvida em Python, utiliza exclusivamente bibliotecas abertas e
-                    seu código-fonte está disponível na íntegra no <a href="https://github.com/GID-UFRJ/gid-painel">GitHub</a>.
-                    Essas medidas foram tomadas no sentido de tornar este painel tão acessível e transparente quanto possível.
-                </p>
-            </div>
-            <!--
-            <br>
-            <h3 class="text-center text-dark">Painéis disponíveis:</h3>
-            -->
-        </div>
-    </div>
-    
-    <!--
-    <div class="row justify-content-center p-4">
-        <div class="col-2">
-            <a href="{% url 'openalex:index' %}" class="text-decoration-none">
-                <div class="card d-flex flex-column h-100 shadow rounded border-info card-hover" style="border: 3px solid; overflow: hidden;">
-                    <div class="card-body bg-white text-center">
-                        <i class="fa fa-file fa-3x text-info"></i>
-                    </div>
-                    <div class="card-footer bg-info text-white fw-bold mt-auto fixed-footer text-center">
-                        <div>Produção científica</div>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="col-2">
-            <a href="{% url 'sucupira:index' %}" class="text-decoration-none">
-                <div class="card d-flex flex-column h-100 shadow rounded border-info card-hover" style="border: 3px solid; overflow: hidden;">
-                    <div class="card-body bg-white text-center">
-                        <i class="fa fa-graduation-cap fa-3x text-info"></i>
-                    </div>
-                    <div class="card-footer bg-info text-white fw-bold mt-auto fixed-footer text-center">
-                        <div>Pós-Graduação</div>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="col-2">
-            <a href="/rankings" class="text-decoration-none">
-                <div class="card d-flex flex-column h-100 shadow rounded border-info card-hover" style="border: 3px solid; overflow: hidden;">
-                    <div class="card-body bg-white text-center">
-                        <i class="fa fa-trophy fa-3x text-info"></i>
-                    </div>
-                    <div class="card-footer bg-info text-white fw-bold mt-auto fixed-footer text-center">
-                        <div>Desempenho em rankings</div>
-                    </div>
-                </div>
-            </a>
-        </div>
-    </div>
-   --> 
 
+                <p>
+                    Para melhor compreensão de todos, as informações estão dispostas em quatro painéis de dados específicos sobre:
+                </p>
+                
+                <div class="d-flex flex-wrap justify-content-between">
+                    <a href="{% url 'openalex:index' %}" class="btn btn-secondary flex-fill mx-1 my-1">
+                        <i class="fas fa-search"></i> Pesquisa
+                    </a>
+                    <a href="{% url 'pessoal:index' %}" class="btn btn-secondary flex-fill mx-1 my-1">
+                        <i class="fas fa-users"></i> Pessoal
+                    </a>
+                    <a href="{% url 'posgrad:index' %}" class="btn btn-secondary flex-fill mx-1 my-1">
+                         <i class="fas fa-graduation-cap"></i> Pós-Graduação
+                    </a>
+                    <a href="{% url 'rankings:index' %}" class="btn btn-secondary flex-fill mx-1 my-1">
+                        <i class="fas fa-trophy"></i> Rankings
+                    </a>
+                </div>
+
+            </div>
+        </div>
     </div>
 </div>
 
+
 {% endblock %} 
-
-{% block style %}
-    <style>
-    .grafico{
-        border: 2px solid blue;
-        padding:5px;
-        margin:5px;
-        background-color: white;
-        border-radius: 20px;
-    }
-    .divisoria{
-        display:flex;
-        flex-wrap: wrap;
-        align-items: center; 
-        justify-content: center; 
-        margin:5; 
-        padding: 0
-    }
-    .imagem{
-        margin:5;
-        width:500;
-        height:400;
-        border-radius: 20px;
-    }
-    .imagemsuperior{
-        border: 5px solid blue;
-        margin:5;
-        width:500;
-        height:200;
-        border-radius: 20px;
-    }
-    .card-hover {
-        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-    }
-    .card-hover:hover {
-        transform: translateY(-5px) scale(1.03); /* Move o cartão um pouco para cima e o aumenta */
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Aumenta a sombra para dar profundidade */
-    }
-    </style>
-
-{% endblock %}
