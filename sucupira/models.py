@@ -26,6 +26,18 @@ class PessoaTipoNacionalidade(models.Model):
     def __str__(self):
         return self.ds_tipo_nacionalidade
 
+class ProgramaNome(models.Model):
+    nm_programa_ies = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.nm_programa_ies
+
+class ProgramaModalidade(models.Model):
+    nm_modalidade_programa = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.nm_modalidade_programa
+
 class ProgramaGrandeArea(models.Model):
     nm_grande_area_conhecimento = models.CharField(max_length=255, unique=True)
 
@@ -45,11 +57,26 @@ class ProgramaAreaAvaliacao(models.Model):
     def __str__(self):
         return f"{self.cd_area_avaliacao} - {self.nm_area_avaliacao}"
 
+class ProgramaConceito(models.Model):
+    cd_conceito_programa = models.IntegerField(unique=True)
+    ds_conceito = models.CharField(max_length=100, null=True, blank=True) #Descrição do conceito
+
+    def __str__(self):
+        return f"{self.cd_conceito_programa} - {self.descricao_conceito}"
+
+
 class GrauCurso(models.Model):
     nm_grau_curso = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.nm_grau_curso
+
+
+class GrauDocente(models.Model):
+    nm_grau_titulacao = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.nm_grau_titulacao
 
 class ProgramaSituacao(models.Model):
     ds_situacao_programa = models.CharField(max_length=100, unique=True)
@@ -93,7 +120,6 @@ class FaixaEtaria(models.Model):
     def __str__(self):
         return self.ds_faixa_etaria
 
-
 class ProducaoIdentificador(models.Model):
     id_producao_hash = models.CharField(max_length=128, unique=True)
 
@@ -122,14 +148,10 @@ class Pessoa(models.Model):
 
 class Programa(models.Model):
     id_programa_hash = models.CharField(max_length=128, unique=True)
-    nm_programa_ies = models.CharField(max_length=255)
-    grande_area = models.ForeignKey(ProgramaGrandeArea, on_delete=models.PROTECT, related_name='programas')
-    area_conhecimento = models.ForeignKey(ProgramaAreaConhecimento, on_delete=models.PROTECT, related_name='programas', null=True, blank=True)
-    area_avaliacao = models.ForeignKey(ProgramaAreaAvaliacao, on_delete=models.PROTECT, related_name='programas')
     an_inicio_programa = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
-        return self.nm_programa_ies
+        return self.id_programa_hash
 
 class Curso(models.Model):
     programa = models.ForeignKey(Programa, on_delete=models.CASCADE, related_name='cursos')
@@ -142,14 +164,19 @@ class Curso(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.programa.nm_programa_ies} - {self.grau_curso.nm_grau_curso}"
+        return f"{self.programa} - {self.grau_curso.nm_grau_curso}"
 
 class AnoPrograma(models.Model):
-    ano = models.ForeignKey(Ano, on_delete=models.CASCADE, related_name='programas_avaliados')
-    programa = models.ForeignKey(Programa, on_delete=models.CASCADE, related_name='avaliacoes_anuais')
-    cd_conceito_programa = models.CharField(max_length=5)
+    ano = models.ForeignKey(Ano, on_delete=models.CASCADE, related_name='ano_programa')
+    programa = models.ForeignKey(Programa, on_delete=models.CASCADE, related_name='ano_programa')
+    nm_programa_ies = models.ForeignKey(ProgramaNome, on_delete=models.PROTECT, related_name='ano_programa')
+    nm_modalidade_programa = models.ForeignKey(ProgramaModalidade, on_delete=models.PROTECT, related_name='ano_programa')
+    grande_area = models.ForeignKey(ProgramaGrandeArea, on_delete=models.PROTECT, related_name='ano_programa')
+    area_conhecimento = models.ForeignKey(ProgramaAreaConhecimento, on_delete=models.PROTECT, related_name='ano_programa', null=True, blank=True)
+    area_avaliacao = models.ForeignKey(ProgramaAreaAvaliacao, on_delete=models.PROTECT, related_name='ano_programa')
+    cd_conceito_programa = models.ForeignKey(ProgramaConceito, on_delete=models.PROTECT, related_name='ano_programa')
     in_rede = models.BooleanField(default=False)
-    situacao = models.ForeignKey(ProgramaSituacao, on_delete=models.PROTECT, related_name='programas_no_ano')
+    situacao = models.ForeignKey(ProgramaSituacao, on_delete=models.PROTECT, related_name='ano_programa')
 
     class Meta:
         constraints = [
@@ -169,7 +196,7 @@ class Docente(models.Model):
     vinculo = models.ForeignKey(DocenteVinculo, on_delete=models.PROTECT, null=True, blank=True)
     regime_trabalho = models.ForeignKey(DocenteRegimeTrabalho, on_delete=models.PROTECT, null=True, blank=True)
     bolsa_produtividade = models.ForeignKey(DocenteBolsaProdutividade, on_delete=models.PROTECT, null=True, blank=True)
-    grau_titulacao = models.ForeignKey(GrauCurso, on_delete=models.PROTECT, null=True, blank=True)
+    grau_titulacao = models.ForeignKey(GrauDocente, on_delete=models.PROTECT, null=True, blank=True)
 
     
     class Meta:
@@ -197,7 +224,7 @@ class Discente(models.Model):
         ]
 
     def __str__(self):
-        return f"Discente {self.pessoa_id} em {self.programa_id} ({self.ano_id})"
+        return f"Discente {self.pessoa} em {self.programa} ({self.ano})"
 
 
 class Producao(models.Model):
@@ -210,4 +237,4 @@ class Producao(models.Model):
     nivel_discente = models.ForeignKey(GrauCurso, on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
-        return self.id_producao_hash
+        return f'Produção: {self.producao} - Autor: {self.autor_pessoa}'

@@ -1,97 +1,89 @@
 {% extends 'homepage/base.html' %} 
 
 {% block conteudo %}
-    <h1 class="mb-4">Detalhes do Programa: {{ programa.nm_programa_ies }}</h1>
+    <h1 class="mb-4">Detalhes do Programa: {{ programa.nm_programa_ies|default:"Nome não disponível" }}</h1>
 
-        <div class="card", style="width: 80%; margin-left: auto; margin-right: auto;">
-            <div class="card-body">
-                <h5 class="card-title">Informações Gerais</h5>
-                <ul>
-                    <li><strong>Grande Área:</strong> {{ programa.grande_area.nm_grande_area_conhecimento }}</li>
-                    <li><strong>Área de Avaliação:</strong> {{ programa.area_avaliacao.nm_area_avaliacao }} ({{ programa.area_avaliacao.cd_area_avaliacao }})</li>
-                    <li><strong>Ano de Início:</strong> {{ programa.an_inicio_programa|default:"Não informado" }}</li>
-                    <li>
-                          <strong>Cursos Oferecidos:</strong>
-                          {% if cursos %}
-                            <ul>
-                              {% for curso in cursos %}
+    <div class="card" style="width: 80%; margin-left: auto; margin-right: auto;">
+        <div class="card-body">
+            <h5 class="card-title">Informações Gerais</h5>
+            <ul>
+                <li><strong>Grande Área:</strong> {{ programa.grande_area_nome|default:"Não informado" }}</li>
+                <li><strong>Área de Avaliação:</strong> {{ programa.area_avaliacao_nome|default:"Não informado" }} ({{ programa.area_avaliacao_codigo|default:"Não informado" }})</li>
+                <li><strong>Ano de Início:</strong> {{ programa.an_inicio_programa|default:"Não informado" }}</li>
+                <li><strong>Modalidade Atual:</strong> {{ programa.modalidade_atual|default:"Não informado" }}</li>
+                <li><strong>Conceito Atual:</strong> {{ programa.conceito_atual|default:"Não informado" }}</li>
+                <li><strong>Situação Atual:</strong> {{ programa.situacao_atual|default:"Não informado" }}</li>
+                <li><strong>Último Ano com Dados:</strong> {{ programa.ultimo_ano|default:"Não informado" }}</li>
+                <li>
+                    <strong>Cursos Oferecidos:</strong>
+                    {% if cursos %}
+                        <ul>
+                            {% for curso in cursos %}
                                 <li>{{ curso.grau_curso.nm_grau_curso }} 
                                     {% if curso.an_inicio_curso %}
-                                      (Desde {{ curso.an_inicio_curso }})
+                                        (Desde {{ curso.an_inicio_curso }})
                                     {% endif %}
                                 </li>
-                              {% endfor %}
-                            </ul>
-                          {% else %}
-                            Não informado
-                          {% endif %}
-                        </li>
-                </ul>
-            </div>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        Não informado
+                    {% endif %}
+                </li>
+            </ul>
         </div>
+    </div>
 
+    <div class="container-fluid p-0">
+        <!-- Abas de Navegação Estilizadas -->
+        <ul class="nav nav-pills mb-4 p-3 bg-light rounded shadow-sm" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="discentes-tab" data-bs-toggle="pill" 
+                        data-bs-target="#discentes" type="button" role="tab" aria-controls="discentes" 
+                        aria-selected="true">
+                    <i class="fas fa-user-graduate me-2"></i>Discentes
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="docentes-tab" data-bs-toggle="pill" 
+                        data-bs-target="#docentes" type="button" role="tab" aria-controls="docentes" 
+                        aria-selected="false">
+                    <i class="fas fa-chalkboard-teacher me-2"></i>Docentes
+                </button>
+            </li>
+        </ul>
 
-<div class="container-fluid p-0">
-    <!-- Abas de Navegação Estilizadas -->
-    <ul class="nav nav-pills mb-4 p-3 bg-light rounded shadow-sm" id="myTab" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="discentes-tab" data-bs-toggle="pill" 
-                    data-bs-target="#discentes" type="button" role="tab" aria-controls="discentes" 
-                    aria-selected="true">
-                <i class="fas fa-user-graduate me-2"></i>Discentes
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="docentes-tab" data-bs-toggle="pill" 
-                    data-bs-target="#docentes" type="button" role="tab" aria-controls="docentes" 
-                    aria-selected="false">
-                <i class="fas fa-chalkboard-teacher me-2"></i>Docentes
-            </button>
-        </li>
-    </ul>
-
-    <!-- Conteúdo das Abas -->
-    <div class="tab-content" id="myTabContent">
-        <!-- Aba Discentes -->
-        <div class="tab-pane fade show active" id="discentes" role="tabpanel" aria-labelledby="discentes-tab">
-            <div class="card border-0 shadow">
-                <div class="card-body">
-                    <h2 class="card-title text-primary mb-4"><i class="fas fa-user-graduate me-2"></i>Análise de Discentes</h2>
-                    
-
-
-                    <div class="container mt-4">
-                        {% if graficos %}
-                          {% for grau, grafico in graficos.items %}
-                            <div class="grafico">
-                              {{ grafico|safe }}
-                            </div>
-                          {% endfor %}
-                        {% else %}
-                          <p class="text-center text-muted mt-4">Nenhum dado de titulação encontrado para este programa.</p>
-                        {% endif %}
+        <!-- Conteúdo das Abas -->
+        <div class="tab-content" id="myTabContent">
+            <!-- Aba Discentes -->
+            <div class="tab-pane fade show active" id="discentes" role="tabpanel" aria-labelledby="discentes-tab">
+                <div class="card border-0 shadow">
+                    <div class="card-body">
+                        <h2 class="card-title text-primary mb-4"><i class="fas fa-user-graduate me-2"></i>Análise de Discentes</h2>
+                        <div class="container mt-4">
+                            {% if graficos %}
+                                {% for grau, grafico in graficos.items %}
+                                    <div class="grafico">
+                                        {{ grafico|safe }}
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-center text-muted mt-4">Nenhum dado de titulação encontrado para este programa.</p>
+                            {% endif %}
+                        </div>
                     </div>
-
-
-
-                    <!-- Outros Gráficos -->
                 </div>
             </div>
-        </div>
 
-        <!-- Aba Docentes -->
-        <div class="tab-pane fade" id="docentes" role="tabpanel" aria-labelledby="docentes-tab">
-            <div class="card border-0 shadow">
-                <div class="card-body">
-                    <h2 class="card-title text-primary mb-4"><i class="fas fa-chalkboard-teacher me-2"></i>Análise de Docentes</h2>
-                    <p class="text-muted">Conteúdo sobre docentes virá aqui...</p>
+            <!-- Aba Docentes -->
+            <div class="tab-pane fade" id="docentes" role="tabpanel" aria-labelledby="docentes-tab">
+                <div class="card border-0 shadow">
+                    <div class="card-body">
+                        <h2 class="card-title text-primary mb-4"><i class="fas fa-chalkboard-teacher me-2"></i>Análise de Docentes</h2>
+                        <p class="text-muted">Conteúdo sobre docentes virá aqui...</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
-
-
-
- {% endblock %}
+{% endblock %}

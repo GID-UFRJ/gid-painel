@@ -13,6 +13,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS('Iniciando a população do banco de dados...'))
 
+        self._clear_database() #Limpa todas as tabelas antes de popular (limpa valores órfãos nas tabelas de dimensão - talvez implementar uma flag pra isso no futuro...)
+
         self._create_anos_from_csvs()
         self._populate_pessoas()
         self._populate_programas()
@@ -84,33 +86,29 @@ class Command(BaseCommand):
 
 
     def _populate_programas(self):
-        self.stdout.write('3. Populando Programas...')
+        self.stdout.write('3. Populando Programas (base)...')
         path = os.path.join(DATA_DIR, 'programas.csv')
+        if not os.path.exists(path):
+            self.stdout.write(self.style.WARNING('Arquivo programas.csv não encontrado. Pulando.'))
+            return
+            
         df = pd.read_csv(path, dtype=str).fillna('')
-
+        
+        programas_para_criar = []
         for _, row in df.iterrows():
-            grande_area = self._get_or_create(ProgramaGrandeArea, 'nm_grande_area_conhecimento', row['NM_GRANDE_AREA_CONHECIMENTO'])
-            area = self._get_or_create(ProgramaAreaConhecimento, 'nm_area_conhecimento', row['NM_AREA_CONHECIMENTO'])
-            area_aval = self._get_or_create(ProgramaAreaAvaliacao, 'cd_area_avaliacao', row['CD_AREA_AVALIACAO'], defaults={'nm_area_avaliacao': row['NM_AREA_AVALIACAO']})
-
-            # Conversão direta do ano para inteiro.
-            ano_inicio_programa = None
-            if row['AN_INICIO_PROGRAMA'] and row['AN_INICIO_PROGRAMA'].isdigit():
-                ano_inicio_programa = int(row['AN_INICIO_PROGRAMA'])
-
-
-
+            if not row['ID_PROGRAMA_HASH']:
+                continue
+                
+            an_inicio = int(row['AN_INICIO_PROGRAMA']) if row['AN_INICIO_PROGRAMA'].isdigit() else None
+            
+            # Usando update_or_create para garantir que não haja duplicatas se o script for executado novamente
             Programa.objects.update_or_create(
                 id_programa_hash=row['ID_PROGRAMA_HASH'],
                 defaults={
-                    'nm_programa_ies': row['NM_PROGRAMA_IES'],
-                    'grande_area': grande_area,
-                    'area_conhecimento': area,
-                    'area_avaliacao': area_aval,
-                    'an_inicio_programa': ano_inicio_programa, #Ano de início do programa é passado diretamente
+                    'an_inicio_programa': an_inicio
                 }
             )
-        self.stdout.write(self.style.SUCCESS('Programas populados.'))
+        self.stdout.write(self.style.SUCCESS('Programas (base) populados.'))
 
     def _populate_cursos(self):
         self.stdout.write('4. Populando Cursos...')
@@ -132,28 +130,54 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Cursos populados.'))
 
     def _populate_ano_programas(self):
-        self.stdout.write('5. Populando Ano-Programas...')
+        self.stdout.write('5. Populando Ano-Programas (detalhes anuais)...')
         path = os.path.join(DATA_DIR, 'ano_programas.csv')
         df = pd.read_csv(path, dtype=str).fillna('')
+        
+        # Cache de objetos para performance
+        anos = {a.ano_valor: a for a in Ano.objects.all()}
+        programas = {p.id_programa_hash: p for p in Programa.objects.all()}
 
         for _, row in df.iterrows():
+            # Tenta converter para int, tratando possíveis erros de valor
             try:
-                ano = Ano.objects.get(ano_valor=int(row['AN_BASE']))
-                programa = Programa.objects.get(id_programa_hash=row['ID_PROGRAMA_HASH'])
-                situacao = self._get_or_create(ProgramaSituacao, 'ds_situacao_programa', row['DS_SITUACAO_PROGRAMA'])
+                ano_valor = int(float(row['AN_BASE']))
+            except (ValueError, TypeError):
+                self.stdout.write(self.style.WARNING(f"  -> Valor de AN_BASE inválido '{row['AN_BASE']}'. Pulando linha."))
+                continue
 
-                AnoPrograma.objects.get_or_create(
-                    ano=ano,
-                    programa=programa,
-                    defaults={
-                        'cd_conceito_programa': row['CD_CONCEITO_PROGRAMA'],
-                        'in_rede': row['IN_REDE'].upper() == 'S', # Assumindo 'S' ou 'N' como valores comuns
-                        'situacao': situacao
-                    }
-                )
-            except (Programa.DoesNotExist, Ano.DoesNotExist):
+            ano_obj = anos.get(ano_valor)
+            programa_obj = programas.get(row['ID_PROGRAMA_HASH'])
+
+            if not ano_obj or not programa_obj:
                 self.stdout.write(self.style.WARNING(f"  -> Ano ou Programa não encontrado para a linha: {row.to_dict()}"))
                 continue
+
+            # Criar/obter objetos das tabelas de dimensão
+            nm_programa_obj = self._get_or_create(ProgramaNome, 'nm_programa_ies', row['NM_PROGRAMA_IES'])
+            grande_area_obj = self._get_or_create(ProgramaGrandeArea, 'nm_grande_area_conhecimento', row['NM_GRANDE_AREA_CONHECIMENTO'])
+            area_conhecimento_obj = self._get_or_create(ProgramaAreaConhecimento, 'nm_area_conhecimento', row['NM_AREA_CONHECIMENTO'])
+            area_avaliacao_obj = self._get_or_create(ProgramaAreaAvaliacao, 'cd_area_avaliacao', row['CD_AREA_AVALIACAO'], defaults={'nm_area_avaliacao': row['NM_AREA_AVALIACAO']})
+            conceito_obj = self._get_or_create(ProgramaConceito, 'cd_conceito_programa', row['CD_CONCEITO_PROGRAMA'], defaults={'ds_conceito': row.get('DS_CONCEITO')})
+            modalidade_obj = self._get_or_create(ProgramaModalidade, 'nm_modalidade_programa', row['NM_MODALIDADE_PROGRAMA'])
+            situacao_obj = self._get_or_create(ProgramaSituacao, 'ds_situacao_programa', row['DS_SITUACAO_PROGRAMA'])
+            
+            in_rede_val = str(row.get('IN_REDE', '')).upper() == 'TRUE'
+
+            AnoPrograma.objects.update_or_create(
+                ano=ano_obj,
+                programa=programa_obj,
+                defaults={
+                    'nm_programa_ies': nm_programa_obj,
+                    'nm_modalidade_programa': modalidade_obj,
+                    'grande_area': grande_area_obj,
+                    'area_conhecimento': area_conhecimento_obj,
+                    'area_avaliacao': area_avaliacao_obj,
+                    'cd_conceito_programa': conceito_obj,
+                    'in_rede': in_rede_val,
+                    'situacao': situacao_obj
+                }
+            )
         self.stdout.write(self.style.SUCCESS('Ano-Programas populados.'))
 
     def _populate_docentes(self):
@@ -171,7 +195,7 @@ class Command(BaseCommand):
                 vinculo = self._get_or_create(DocenteVinculo, 'ds_tipo_vinculo_docente_ies', row['DS_TIPO_VINCULO_DOCENTE_IES'])
                 regime = self._get_or_create(DocenteRegimeTrabalho, 'ds_regime_trabalho', row['DS_REGIME_TRABALHO'])
                 bolsa = self._get_or_create(DocenteBolsaProdutividade, 'cd_cat_bolsa_produtividade', row['CD_CAT_BOLSA_PRODUTIVIDADE'])
-                titulacao = self._get_or_create(GrauCurso, 'nm_grau_curso', row['NM_GRAU_TITULACAO'])
+                titulacao = self._get_or_create(GrauDocente, 'nm_grau_titulacao', row['NM_GRAU_TITULACAO'])
                 faixa_etaria = self._get_or_create(FaixaEtaria, 'ds_faixa_etaria', row['DS_FAIXA_ETARIA'])
 
                 Docente.objects.update_or_create(
@@ -262,3 +286,40 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.WARNING(f"  -> Objeto relacionado não encontrado para a linha de produção: {row['ID_PRODUCAO_HASH']}. Erro: {e}"))
                 continue
         self.stdout.write(self.style.SUCCESS('Produção populada.'))
+
+    def _clear_database(self):
+        self.stdout.write(self.style.WARNING("Limpando todas as tabelas (evitar valores órfãos graças a updates dos dados da CAPES)"))
+
+        # A ordem importa por causa das FKs
+        Producao.objects.all().delete()
+        Docente.objects.all().delete()
+        Discente.objects.all().delete()
+        AnoPrograma.objects.all().delete()
+        Curso.objects.all().delete()
+
+        # Agora as tabelas de dimensão
+        ProducaoIdentificador.objects.all().delete()
+        ProducaoTpAutor.objects.all().delete()
+        DocenteCategoria.objects.all().delete()
+        DocenteVinculo.objects.all().delete()
+        DocenteRegimeTrabalho.objects.all().delete()
+        DocenteBolsaProdutividade.objects.all().delete()
+        GrauDocente.objects.all().delete()
+        GrauCurso.objects.all().delete()
+        FaixaEtaria.objects.all().delete()
+        ProgramaNome.objects.all().delete()
+        ProgramaGrandeArea.objects.all().delete()
+        ProgramaAreaConhecimento.objects.all().delete()
+        ProgramaAreaAvaliacao.objects.all().delete()
+        ProgramaConceito.objects.all().delete()
+        ProgramaSituacao.objects.all().delete()
+        Pessoa.objects.all().delete()
+        PessoaSexo.objects.all().delete()
+        PessoaPais.objects.all().delete()
+        PessoaTipoNacionalidade.objects.all().delete()
+
+        # Por último, tabelas base
+        Programa.objects.all().delete()
+        Ano.objects.all().delete()
+
+        self.stdout.write(self.style.SUCCESS("Banco de dados limpo."))

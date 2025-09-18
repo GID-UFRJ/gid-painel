@@ -192,7 +192,7 @@ class PlotsPessoal:
             queryset = queryset.filter(situacao__nm_situacao_discente=situacao)
     
         if grande_area and grande_area != 'total':
-            queryset = queryset.filter(programa__grande_area__nm_grande_area_conhecimento=grande_area)
+            queryset = queryset.filter(programa__ano_programa__grande_area__nm_grande_area_conhecimento=grande_area)
     
         if grau_curso and grau_curso != 'total':
             queryset = queryset.filter(grau_academico__nm_grau_curso=grau_curso)
