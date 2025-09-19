@@ -22,16 +22,43 @@ def pessoal_ppg(request):
     }
 )
 
-def filtros_grafico_discentes(request):
+#def filtros_grafico_discentes(request):
+#    """
+#    View que renderiza a página com os filtros.
+#    """
+#    context = {
+#        'situacoes': DiscenteSituacao.objects.all().order_by('nm_situacao_discente'),
+#        'grandes_areas': ProgramaGrandeArea.objects.all().order_by('nm_grande_area_conhecimento'),
+#        'graus_curso': GrauCurso.objects.all().order_by('nm_grau_curso')
+#    }
+#    return render(request, 'sucupira/partials/_plot_pessoal_por_ano.html', context)
+
+def filtros_grafico_pessoal(request, tipo):
     """
-    View que renderiza a página com os filtros.
+    View genérica que renderiza os filtros de discentes ou docentes
+    junto com o gráfico.
     """
-    context = {
-        'situacoes': DiscenteSituacao.objects.all().order_by('nm_situacao_discente'),
-        'grandes_areas': ProgramaGrandeArea.objects.all().order_by('nm_grande_area_conhecimento'),
-        'graus_curso': GrauCurso.objects.all().order_by('nm_grau_curso')
-    }
-    return render(request, 'sucupira/partials/pessoal/_plot_discentes.html', context)
+    context = {}
+
+    if tipo == "discentes":
+        context.update({
+            'partial_filtros': 'sucupira/partials/_filtros_discentes.html',
+            'situacoes': DiscenteSituacao.objects.all().order_by('nm_situacao_discente'),
+            'grandes_areas': ProgramaGrandeArea.objects.all().order_by('nm_grande_area_conhecimento'),
+            'graus_curso': GrauCurso.objects.all().order_by('nm_grau_curso'),
+        })
+    elif tipo == "docentes":
+        context.update({
+            'partial_filtros': 'sucupira/partials/_filtros_docentes.html',
+            'modalidades': ProgramaModalidade.objects.all().order_by('nm_modalidade_programa'),
+            'categorias': DocenteCategoria.objects.all().order_by('ds_categoria_docente'),
+            'bolsas': DocenteBolsaProdutividade.objects.all().order_by('cd_cat_bolsa_produtividade'),
+        })
+    else:
+        raise ValueError("Tipo de filtro inválido")
+
+    return render(request, 'sucupira/partials/_plot_pessoal_por_ano.html', context)
+
 
 def grafico_discentes_por_ano(request):
     """
@@ -67,6 +94,9 @@ def grafico_discentes_por_ano(request):
     )
     
     return render(request, "homepage/partials/_plot_reativo.html", {'graf': graf})
+
+
+
 
 
 def posgrad_ufrj(request):

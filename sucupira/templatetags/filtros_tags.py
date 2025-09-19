@@ -4,7 +4,7 @@ from ..models import DiscenteSituacao, ProgramaGrandeArea, GrauCurso
 register = template.Library()
 
 #Tags para filtros específicos do gráfico de discentes
-@register.inclusion_tag('sucupira/partials/_plot_discentes_por_ano.html')
+@register.inclusion_tag('sucupira/partials/_plot_pessoal_por_ano.html')
 def render_filtros_discentes(url_grafico, grafico_id, spinner_id, grafico_html):
     """
     Monta os dados para os filtros de discentes e renderiza o partial
