@@ -597,6 +597,7 @@ class PlotsPessoal:
         grande_area="total",
         modalidade="total",
         categoria_docente="total",
+        bolsa_produtividade="total",
         tipo_grafico="barra",
     ):
         mapa_agrupamento = {
@@ -609,6 +610,7 @@ class PlotsPessoal:
             "programa__ano_programa__grande_area__nm_grande_area_conhecimento": grande_area,
             "programa__ano_programa__nm_modalidade_programa__nm_modalidade_programa": modalidade,
             "categoria__ds_categoria_docente": categoria_docente,
+            "bolsa_produtividade__cd_cat_bolsa_produtividade": bolsa_produtividade,
         }
 
         return self._entidades_por_ano(

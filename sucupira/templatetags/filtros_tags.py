@@ -1,28 +1,47 @@
 from django import template
-from ..models import DiscenteSituacao, ProgramaGrandeArea, GrauCurso
+from sucupira.models import (
+    ProgramaGrandeArea, GrauCurso, DiscenteSituacao,
+    ProgramaModalidade, DocenteCategoria, DocenteBolsaProdutividade
+)
 
 register = template.Library()
 
-#Tags para filtros específicos do gráfico de discentes
-@register.inclusion_tag('sucupira/partials/_plot_pessoal_por_ano.html')
-def render_filtros_discentes(url_grafico, grafico_id, spinner_id, grafico_html):
-    """
-    Monta os dados para os filtros de discentes e renderiza o partial
-    junto com o gráfico.
-    """
-    return {
-        # filtros
-        'situacoes': DiscenteSituacao.objects.all().order_by('nm_situacao_discente'),
-        'grandes_areas': ProgramaGrandeArea.objects.all().order_by('nm_grande_area_conhecimento'),
-        'graus_curso': GrauCurso.objects.all().order_by('nm_grau_curso').exclude,
 
+@register.inclusion_tag("sucupira/partials/_plot_pessoal_por_ano.html")
+def render_filtros_pessoal(tipo, url_grafico, grafico_id, spinner_id, grafico_html):
+    """
+    Templatetag genérica para renderizar filtros de docentes ou discentes.
+    Mantém partials separados, mas evita duplicação de código.
+    """
+    #contexto geral
+    context = {
+        # filtros comuns a todos os gráficos
+        "grandes_areas": ProgramaGrandeArea.objects.all().order_by("nm_grande_area_conhecimento"),
         # parâmetros do gráfico
-        'url_grafico': url_grafico,
-        'grafico_id': grafico_id,
-        'spinner_id': spinner_id,
-        'grafico_html': grafico_html,
+        "url_grafico": url_grafico,
+        "grafico_id": grafico_id,
+        "spinner_id": spinner_id,
+        "grafico_html": grafico_html,
     }
 
+    # filtros específicos
+    if tipo == "discentes":
+        context.update({
+            "partial_filtros": "sucupira/partials/_filtros_discentes.html",
+            "graus_curso": GrauCurso.objects.all().order_by("nm_grau_curso"),
+            "situacoes": DiscenteSituacao.objects.all().order_by("nm_situacao_discente"),
+        })
+    elif tipo == "docentes":
+        context.update({
+            "partial_filtros": "sucupira/partials/_filtros_docentes.html",
+            "modalidades": ProgramaModalidade.objects.all().order_by("nm_modalidade_programa"),
+            "categorias": DocenteCategoria.objects.all().order_by("ds_categoria_docente"),
+            "bolsas": DocenteBolsaProdutividade.objects.all().order_by("cd_cat_bolsa_produtividade"),
+        })
+    else:
+        raise ValueError("Tipo de filtro inválido")
+
+    return context
 
 
 #Conectivos que não devem ser capitalizados

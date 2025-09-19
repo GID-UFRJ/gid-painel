@@ -17,47 +17,10 @@ def pessoal_ppg(request):
     return render(request, r'sucupira/pessoal/pessoal_ppg.html', {
         'n_titulados_cards': p.cards_total_alunos_titulados_por_grau,
         'docentes_card': p.card_total_docentes_ultimo_ano,
-        'discentes_ano_plot': p.discentes_por_ano()
-
+        'discentes_ano_plot': p.discentes_por_ano(),
+        'docentes_ano_plot': p.docentes_por_ano(),
     }
 )
-
-#def filtros_grafico_discentes(request):
-#    """
-#    View que renderiza a página com os filtros.
-#    """
-#    context = {
-#        'situacoes': DiscenteSituacao.objects.all().order_by('nm_situacao_discente'),
-#        'grandes_areas': ProgramaGrandeArea.objects.all().order_by('nm_grande_area_conhecimento'),
-#        'graus_curso': GrauCurso.objects.all().order_by('nm_grau_curso')
-#    }
-#    return render(request, 'sucupira/partials/_plot_pessoal_por_ano.html', context)
-
-def filtros_grafico_pessoal(request, tipo):
-    """
-    View genérica que renderiza os filtros de discentes ou docentes
-    junto com o gráfico.
-    """
-    context = {}
-
-    if tipo == "discentes":
-        context.update({
-            'partial_filtros': 'sucupira/partials/_filtros_discentes.html',
-            'situacoes': DiscenteSituacao.objects.all().order_by('nm_situacao_discente'),
-            'grandes_areas': ProgramaGrandeArea.objects.all().order_by('nm_grande_area_conhecimento'),
-            'graus_curso': GrauCurso.objects.all().order_by('nm_grau_curso'),
-        })
-    elif tipo == "docentes":
-        context.update({
-            'partial_filtros': 'sucupira/partials/_filtros_docentes.html',
-            'modalidades': ProgramaModalidade.objects.all().order_by('nm_modalidade_programa'),
-            'categorias': DocenteCategoria.objects.all().order_by('ds_categoria_docente'),
-            'bolsas': DocenteBolsaProdutividade.objects.all().order_by('cd_cat_bolsa_produtividade'),
-        })
-    else:
-        raise ValueError("Tipo de filtro inválido")
-
-    return render(request, 'sucupira/partials/_plot_pessoal_por_ano.html', context)
 
 
 def grafico_discentes_por_ano(request):
@@ -96,7 +59,42 @@ def grafico_discentes_por_ano(request):
     return render(request, "homepage/partials/_plot_reativo.html", {'graf': graf})
 
 
+def grafico_docentes_por_ano(request):
+    """
+    View acionada pelo HTMX para atualizar o gráfico de docentes.
+    """
+    p = PlotsPessoal()
 
+    # Pega os valores dos filtros do GET request
+    agrupamento = request.GET.get('agrupamento', 'total')
+    grande_area = request.GET.get('grande_area', 'total')
+    modalidade = request.GET.get('modalidade', 'total')
+    categoria_docente = request.GET.get('categoria_docente', 'total')
+    bolsa_produtividade = request.GET.get('bolsa_produtividade', 'total')
+    ano_inicial = request.GET.get('ano_inicial', 1990)
+    ano_final = request.GET.get('ano_final', 2024)
+    tipo_grafico = request.GET.get('tipo_grafico', 'barra')
+
+    # Converte anos para int
+    try:
+        ano_inicial = int(ano_inicial)
+        ano_final = int(ano_final)
+    except ValueError:
+        ano_inicial, ano_final = 1990, 2024
+
+    # Gera o novo gráfico com os filtros aplicados
+    graf = p.docentes_por_ano(
+        agrupamento=agrupamento,
+        grande_area=grande_area,
+        modalidade=modalidade,
+        categoria_docente=categoria_docente,
+        bolsa_produtividade=bolsa_produtividade,
+        ano_inicial=ano_inicial,
+        ano_final=ano_final,
+        tipo_grafico=tipo_grafico,
+    )
+    
+    return render(request, "homepage/partials/_plot_reativo.html", {'graf': graf})
 
 
 def posgrad_ufrj(request):

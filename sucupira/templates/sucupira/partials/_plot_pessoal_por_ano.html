@@ -1,3 +1,5 @@
+{# sucupira/partials/_plot_pessoal_por_ano.html #}
+
 {% extends "homepage/partials/_grafico_com_filtros.html" %}
 
 {% load filtros_tags %}
@@ -5,14 +7,25 @@
 {% block filtros %}
 
 <div class="row g-3 align-items-end">
+
     <div class="col-md-2">
         <label for="ano_inicial" class="form-label">Ano Inicial</label>
         <input type="number" id="ano_inicial" name="ano_inicial" class="form-control" value="2013">
     </div>
+
     <div class="col-md-2">
         <label for="ano_final" class="form-label">Ano Final</label>
         <input type="number" id="ano_final" name="ano_final" class="form-control" value="2023">
     </div>
+
+    <div class="col-md-2">
+        <label for="tipo_grafico" class="form-label">Tipo de Gráfico</label>
+        <select id="tipo_grafico" name="tipo_grafico" class="form-select">
+            <option value="barra" selected>Barras</option>
+            <option value="linha">Linhas</option>
+        </select>
+    </div>
+
     <div class="col-md-2">
         <label for="agrupamento" class="form-label">Agrupar por</label>
         <select id="agrupamento" name="agrupamento" class="form-select">
@@ -22,32 +35,7 @@
             <option value="faixa_etaria">Faixa Etária</option>
         </select>
     </div>
-    <div class="col-md-2">
-        <label for="tipo_grafico" class="form-label">Tipo de Gráfico</label>
-        <select id="tipo_grafico" name="tipo_grafico" class="form-select">
-            <option value="barra" selected>Barras</option>
-            <option value="linha">Linhas</option>
-        </select>
-    </div>
-    
-    <div class="col-md-3">
-        <label for="grau_curso" class="form-label">Grau do Curso</label>
-        <select id="grau_curso" name="grau_curso" class="form-select">
-            <option value="total" selected>Todos</option>
-            {% for grau in graus_curso %}
-            <option value="{{ grau.nm_grau_curso }}">{{ grau.nm_grau_curso|capitalizar_frase }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div class="col-md-3">
-        <label for="situacao" class="form-label">Situação</label>
-        <select id="situacao" name="situacao" class="form-select">
-            <option value="total" selected>Todas</option>
-            {% for s in situacoes %}
-            <option value="{{ s.nm_situacao_discente }}">{{ s.nm_situacao_discente|capitalizar_frase }}</option>
-            {% endfor %}
-        </select>
-    </div>
+
     <div class="col-md-3">
         <label for="grande_area" class="form-label">Grande Área</label>
         <select id="grande_area" name="grande_area" class="form-select">
@@ -57,6 +45,10 @@
             {% endfor %}
         </select>
     </div>
+
+   <!-- bloco dinâmico com filtros específicos para discentes/docentes --> 
+    {% include partial_filtros %}
+
 </div>
 
 {% endblock %}

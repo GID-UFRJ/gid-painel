@@ -38,7 +38,7 @@
                     <h2 class="card-title text-primary mb-4"><i class="fas fa-user-graduate me-2"></i>Análise de Discentes</h2>
                     
                     {% url 'pessoal:grafico_discentes_por_ano' as url_discentes_ano %}
-                    {% render_filtros_discentes url_discentes_ano "discentes-ano" "spinner-discentes-ano" discentes_ano_plot %}
+                    {% render_filtros_pessoal "discentes" url_discentes_ano "discentes-ano" "spinner-discentes-ano" discentes_ano_plot %}
 
                     <!-- Outros Gráficos -->
                 </div>
@@ -50,7 +50,12 @@
             <div class="card border-0 shadow">
                 <div class="card-body">
                     <h2 class="card-title text-primary mb-4"><i class="fas fa-chalkboard-teacher me-2"></i>Análise de Docentes</h2>
-                    <p class="text-muted">Conteúdo sobre docentes virá aqui...</p>
+
+                    {% url 'pessoal:grafico_docentes_por_ano' as url_docentes_ano %}
+                    {% render_filtros_pessoal "docentes" url_docentes_ano "docentes-ano" "spinner-docentes-ano" docentes_ano_plot %}
+                    
+
+
                 </div>
             </div>
         </div>
