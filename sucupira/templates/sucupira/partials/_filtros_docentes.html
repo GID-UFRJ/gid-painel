@@ -3,7 +3,7 @@
 {% load common_filters %}
 
 <div class="col-md-3">
-    <label for="modalidade" class="form-label">Modalidade</label>
+    <label for="modalidade" class="form-label">Modalidade do Programa</label>
     <select id="modalidade" name="modalidade" class="form-select">
         <option value="total" selected>Todas</option>
         {% for modalidade in modalidades %}
@@ -12,7 +12,7 @@
     </select>
 </div>
 <div class="col-md-3">
-    <label for="categoria_docente" class="form-label">Categoria</label>
+    <label for="categoria_docente" class="form-label">Categoria do Discente</label>
     <select id="categoria_docente" name="categoria_docente" class="form-select">
         <option value="total" selected>Todas</option>
         {% for c in categorias %}
