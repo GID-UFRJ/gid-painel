@@ -4,6 +4,11 @@ import pandas as pd
 import plotly.express as px
 
 class BasePlots:
+    '''
+    Classe base auxiliar relacionadas à plotagem 
+    Engloba tanto a geração de gráficos quanto a recuperação dos dados para o mesmo
+    (Se a classe crescer demais, podemos separar essas duas funcionalidades em classes distintas)
+    '''
 
     # Defaults para ordenação de categorias
     CATEGORY_ORDERS = {
