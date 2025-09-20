@@ -38,6 +38,7 @@ ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',')]
 # Application definition
 
 INSTALLED_APPS = [
+    'common',
     'homepage',
     'sucupira',
 #    'programa',

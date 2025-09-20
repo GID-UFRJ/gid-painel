@@ -72,7 +72,7 @@ def grafico_citacoes_por_ano(request):
 
     # Renderiza o partial específico para HTMX
     return render( request, 
-                  "homepage/partials/_plot_reativo.html", 
+                  "common/partials/_plot_reativo.html", 
                   {"graf": graf}
                   )
 
@@ -122,7 +122,7 @@ def grafico_colaboracoes_por_ano(request):
                                             )
     # Renderiza o partial específico para HTMX
     return render( request, 
-                  "homepage/partials/_plot_reativo.html", 
+                  "common/partials/_plot_reativo.html", 
                   {"graf": graf}
                   )
 
@@ -139,6 +139,6 @@ def grafico_top_colaboracoes(request):
 
     # Renderiza o partial específico para HTMX
     return render( request, 
-                  "homepage/partials/_plot_reativo.html", 
+                  "common/partials/_plot_reativo.html", 
                   {"graf": graf}
                   )

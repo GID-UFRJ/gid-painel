@@ -56,7 +56,7 @@ def grafico_discentes_por_ano(request):
         tipo_grafico=tipo_grafico,
     )
     
-    return render(request, "homepage/partials/_plot_reativo.html", {'graf': graf})
+    return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
 
 
 def grafico_docentes_por_ano(request):
@@ -94,7 +94,7 @@ def grafico_docentes_por_ano(request):
         tipo_grafico=tipo_grafico,
     )
     
-    return render(request, "homepage/partials/_plot_reativo.html", {'graf': graf})
+    return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
 
 
 def posgrad_ufrj(request):
