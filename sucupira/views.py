@@ -14,7 +14,25 @@ def index(request): #index unificado
 def pessoal_ppg(request):
     p = PlotsPessoal()
 
+    abas = [
+        {
+            "id": "discentes", 
+            "label": "Discentes", 
+            "icone": "fas fa-user-graduate", 
+            "titulo": "Análise de Discentes",
+            "template_name": "sucupira/partials/pessoal/_aba_discentes_conteudo.html"  # Caminho para o conteúdo
+        },
+        {
+            "id": "docentes", 
+            "label": "Docentes", 
+            "icone": "fas fa-chalkboard-teacher", 
+            "titulo": "Análise de Docentes",
+            "template_name": "sucupira/partials/pessoal/_aba_docentes_conteudo.html"   # Caminho para o conteúdo
+        },
+    ]
+
     return render(request, r'sucupira/pessoal/pessoal_ppg.html', {
+        "abas": abas,
         'n_titulados_cards': p.cards_total_alunos_titulados_por_grau,
         'docentes_card': p.card_total_docentes_ultimo_ano,
         'discentes_ano_plot': p.discentes_por_ano(),

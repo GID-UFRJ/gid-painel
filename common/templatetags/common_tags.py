@@ -26,3 +26,23 @@ def breadcrumbs(context):
         breadcrumbs.append((name, url))
 
     return breadcrumbs
+
+@register.inclusion_tag('common/partials/_abas_componente.html', takes_context=True)
+def render_abas(context, abas, abas_id="default-abas"):
+    """
+    Renderiza um componente de abas Bootstrap.
+
+    A variável 'abas' deve ser uma lista de dicionários. Cada dicionário DEVE conter:
+    - 'id': um identificador único para a aba.
+    - 'label': o texto que aparece no botão da aba.
+    - 'icone': a classe do ícone usado no botão da aba (ex: 'fas fa-user') - Opcional.
+    - 'titulo': o título que aparece dentro do conteúdo da aba.
+    - 'template_name': o caminho para o template que contém o conteúdo da aba.
+    """
+
+    ctx = context.flatten()  # pega todas as variáveis do contexto pai
+    ctx.update({
+        'abas': abas,
+        'abas_id': abas_id,
+    })
+    return ctx

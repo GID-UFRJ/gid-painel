@@ -1,0 +1,40 @@
+{# common/templates/common/partials/_abas_componente.html #}
+
+<div class="container-fluid p-0">
+    <ul class="nav nav-pills mb-4 p-3 bg-light rounded shadow-sm" id="{{ abas_id }}" role="tablist">
+        {% for aba in abas %}
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {% if forloop.first %}active{% endif %}" 
+                    id="{{ aba.id }}-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#{{ aba.id }}"
+                    type="button" role="tab"
+                    aria-controls="{{ aba.id }}"
+                    aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+                {% if aba.icone %} <i class="{{ aba.icone }} me-2"></i> {% endif %}
+                {{ aba.label }}
+            </button>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <div class="tab-content" id="{{ abas_id }}Content">
+        {% for aba in abas %}
+        <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" 
+             id="{{ aba.id }}" role="tabpanel" aria-labelledby="{{ aba.id }}-tab">
+            <div class="card border-0 shadow">
+                <div class="card-body">
+                    <h2 class="card-title text-primary mb-4">
+                        {% if aba.icone %} <i class="{{ aba.icone }} me-2"></i> {% endif %}
+                        {{ aba.titulo }}
+                    </h2>
+                    
+                    {# Incluindo o template com o conteúdo específico para esta aba #}
+                    {% include aba.template_name %}
+
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>

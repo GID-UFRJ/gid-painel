@@ -1,0 +1,5 @@
+{# sucupira/templates/sucupira/partials/pessoal/_aba_discentes_conteudo.html #}
+
+{% load sucupira_tags %} {# Ou o nome que você deu para suas tags #}
+{% url 'pessoal:grafico_discentes_por_ano' as url_discentes_ano %}
+{% render_filtros_pessoal "discentes" url_discentes_ano "discentes-ano" "spinner-discentes-ano" discentes_ano_plot %}
