@@ -8,9 +8,11 @@ from django.db.models.functions import Coalesce
 from gid.utils_scripts_graficos import cores, grafico_barra, grafico_kpi
 from gid.utils_scripts_graficos_plotly import grafico_linha_plotly, grafico_barra_plotly, grafico_barra_plotly2
 from common.utils.baseplots import BasePlots
+from .mapeamentos import MAPEAMENTOS
 
 class PlotsPessoal(BasePlots):
     '''Gráficos sobre discentes/docentes da Pós-Graduação na UFRJ'''
+    MAPEAMENTOS = MAPEAMENTOS
 
     def cards_total_alunos_titulados_por_grau(self):
 
@@ -63,73 +65,38 @@ class PlotsPessoal(BasePlots):
 
     def discentes_por_ano(
         self,
-        ano_inicial=2013,
-        ano_final=2024,
-        agrupamento="total",   # sexo | nacionalidade | faixa_etaria
-        situacao="total",
-        grande_area="total",
-        grau_curso="total",
-        tipo_grafico="barra",
+        ano_inicial=2013, ano_final=2024, agrupamento="total",
+        tipo_grafico="barra", **kwargs
     ):
-        mapa_agrupamento = {
-            "sexo": "pessoa__tp_sexo__sexo",
-            "nacionalidade": "pessoa__tipo_nacionalidade__ds_tipo_nacionalidade",
-            "faixa_etaria": "faixa_etaria__ds_faixa_etaria",
-        }
-
-        filtros = {
-            "situacao__nm_situacao_discente": situacao,
-            "programa__ano_programa__grande_area__nm_grande_area_conhecimento": grande_area,
-            "grau_academico__nm_grau_curso": grau_curso,
-        }
+        """
+        Gera gráfico de discentes por ano.
+        Argumentos de filtro (ex: situacao='Ativo') são passados via **kwargs.
+        """
         return self._entidades_por_ano(
-            modelo=Discente,
+            tipo_entidade="discentes",
             ano_inicial=ano_inicial,
             ano_final=ano_final,
-            agrupamento=agrupamento,
-            mapa_agrupamento=mapa_agrupamento,
-            filtros=filtros,
+            agrupamento=None if agrupamento == "total" else agrupamento,
+            filtros_selecionados=kwargs,
             tipo_grafico=tipo_grafico,
-            titulo_base="Discentes",
-            campo_agregacao="pessoa_id",
-            agregacao="count",
             distinct=True,
         )
 
     def docentes_por_ano(
         self,
-        ano_inicial=2013,
-        ano_final=2024,
-        agrupamento="total",    # sexo | nacionalidade | faixa_etaria
-        grande_area="total",
-        modalidade="total",
-        categoria_docente="total",
-        bolsa_produtividade="total",
-        tipo_grafico="barra",
+        ano_inicial=2013, ano_final=2024, agrupamento="total",
+        tipo_grafico="barra", **kwargs
     ):
-        mapa_agrupamento = {
-            "sexo": "pessoa__tp_sexo__sexo",
-            "nacionalidade": "pessoa__tipo_nacionalidade__ds_tipo_nacionalidade",
-            "faixa_etaria": "faixa_etaria__ds_faixa_etaria",
-        }
-
-        filtros = {
-            "programa__ano_programa__grande_area__nm_grande_area_conhecimento": grande_area,
-            "programa__ano_programa__nm_modalidade_programa__nm_modalidade_programa": modalidade,
-            "categoria__ds_categoria_docente": categoria_docente,
-            "bolsa_produtividade__cd_cat_bolsa_produtividade": bolsa_produtividade,
-        }
-
+        """
+        Gera gráfico de docentes por ano.
+        Argumentos de filtro (ex: grande_area='Ciências Exatas') são passados via **kwargs.
+        """
         return self._entidades_por_ano(
-            modelo=Docente,
+            tipo_entidade="docentes",
             ano_inicial=ano_inicial,
             ano_final=ano_final,
-            agrupamento=agrupamento,
-            mapa_agrupamento= mapa_agrupamento,
-            filtros=filtros,
+            agrupamento=None if agrupamento == "total" else agrupamento,
+            filtros_selecionados=kwargs,
             tipo_grafico=tipo_grafico,
-            titulo_base="Docentes",
-            agregacao="count",
-            campo_agregacao="pessoa_id", #Conta por id da tabela 'pessoa'
-            distinct=True,  # evita contar a mesma pessoa mais de uma vez
+            distinct=True,
         )

@@ -7,7 +7,7 @@ from sucupira.models import (
 register = template.Library()
 
 
-@register.inclusion_tag("sucupira/partials/_plot_pessoal_por_ano.html")
+@register.inclusion_tag("sucupira/partials/pessoal/_filtros_pessoal_por_ano.html")
 def render_filtros_pessoal(tipo, url_grafico, grafico_id, spinner_id, grafico_html):
     """
     Templatetag genérica para renderizar filtros de docentes ou discentes.
@@ -27,13 +27,13 @@ def render_filtros_pessoal(tipo, url_grafico, grafico_id, spinner_id, grafico_ht
     # filtros específicos
     if tipo == "discentes":
         context.update({
-            "partial_filtros": "sucupira/partials/_filtros_discentes.html",
+            "partial_filtros": "sucupira/partials/pessoal/_filtros_discentes.html",
             "graus_curso": GrauCurso.objects.all().order_by("nm_grau_curso"),
             "situacoes": DiscenteSituacao.objects.all().order_by("nm_situacao_discente"),
         })
     elif tipo == "docentes":
         context.update({
-            "partial_filtros": "sucupira/partials/_filtros_docentes.html",
+            "partial_filtros": "sucupira/partials/pessoal/_filtros_docentes.html",
             "modalidades": ProgramaModalidade.objects.all().order_by("nm_modalidade_programa"),
             "categorias": DocenteCategoria.objects.all().order_by("ds_categoria_docente"),
             "bolsas": DocenteBolsaProdutividade.objects.all().order_by("cd_cat_bolsa_produtividade"),

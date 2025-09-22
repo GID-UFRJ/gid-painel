@@ -3,8 +3,8 @@
 {% load common_filters %}
 
 <div class="col-md-3">
-    <label for="modalidade" class="form-label">Modalidade do Programa</label>
-    <select id="modalidade" name="modalidade" class="form-select">
+    <label for="modalidade_programa" class="form-label">Modalidade do Programa</label>
+    <select id="modalidade_programa" name="modalidade" class="form-select">
         <option value="total" selected>Todas</option>
         {% for modalidade in modalidades %}
         <option value="{{ modalidade.nm_modalidade_programa }}">{{ modalidade.nm_modalidade_programa|capitalizar_frase }}</option>

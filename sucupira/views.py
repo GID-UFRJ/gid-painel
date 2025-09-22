@@ -40,39 +40,30 @@ def pessoal_ppg(request):
     }
 )
 
-
 def grafico_discentes_por_ano(request):
     """
     View acionada pelo HTMX para atualizar o gráfico de discentes.
+    Refatorada para funcionar com o novo modelo de PlotsPessoal.
     """
-    p = PlotsPessoal()
+    plotter = PlotsPessoal()
 
-    # Pega os valores dos filtros do GET request
-    grau_curso = request.GET.get('grau_curso', 'total')
-    agrupamento = request.GET.get('agrupamento', 'total')
-    situacao = request.GET.get('situacao', 'total')
-    grande_area = request.GET.get('grande_area', 'total')
-    ano_inicial = request.GET.get('ano_inicial', 1990)
-    ano_final = request.GET.get('ano_final', 2024)
-    tipo_grafico = request.GET.get('tipo_grafico', 'barra')
+    # Coleta todos os parâmetros da URL em um único dicionário.
+    # A classe PlotsPessoal saberá como usar cada um.
+    params = request.GET.dict()
 
-    # Converte anos para int
+    # Converte os anos para inteiros, com valores padrão seguros.
     try:
-        ano_inicial = int(ano_inicial)
-        ano_final = int(ano_final)
-    except ValueError:
-        ano_inicial, ano_final = 1990, 2024
-
-    # Gera o novo gráfico com os filtros aplicados
-    graf = p.discentes_por_ano(
-        grau_curso=grau_curso,
-        agrupamento=agrupamento,
-        situacao=situacao,
-        grande_area=grande_area,
-        ano_inicial=ano_inicial,
-        ano_final=ano_final,
-        tipo_grafico=tipo_grafico,
-    )
+        params['ano_inicial'] = int(params.get('ano_inicial', 2013))
+        params['ano_final'] = int(params.get('ano_final', 2024))
+    except (ValueError, TypeError):
+        params['ano_inicial'] = 2013
+        params['ano_final'] = 2024
+    
+    # Gera o gráfico passando todos os parâmetros de uma vez.
+    # Os argumentos da assinatura do método (ano_inicial, agrupamento, etc.)
+    # serão extraídos, e o restante (situacao, grau_curso) será capturado
+    # pelo **kwargs dentro do método.
+    graf = plotter.discentes_por_ano(**params)
     
     return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
 
@@ -80,37 +71,97 @@ def grafico_discentes_por_ano(request):
 def grafico_docentes_por_ano(request):
     """
     View acionada pelo HTMX para atualizar o gráfico de docentes.
+    Refatorada para funcionar com o novo modelo de PlotsPessoal.
     """
-    p = PlotsPessoal()
+    plotter = PlotsPessoal()
 
-    # Pega os valores dos filtros do GET request
-    agrupamento = request.GET.get('agrupamento', 'total')
-    grande_area = request.GET.get('grande_area', 'total')
-    modalidade = request.GET.get('modalidade', 'total')
-    categoria_docente = request.GET.get('categoria_docente', 'total')
-    bolsa_produtividade = request.GET.get('bolsa_produtividade', 'total')
-    ano_inicial = request.GET.get('ano_inicial', 1990)
-    ano_final = request.GET.get('ano_final', 2024)
-    tipo_grafico = request.GET.get('tipo_grafico', 'barra')
+    # Coleta todos os parâmetros da URL.
+    params = request.GET.dict()
 
-    # Converte anos para int
+    # Garante que os anos sejam inteiros.
     try:
-        ano_inicial = int(ano_inicial)
-        ano_final = int(ano_final)
-    except ValueError:
-        ano_inicial, ano_final = 1990, 2024
+        params['ano_inicial'] = int(params.get('ano_inicial', 2013))
+        params['ano_final'] = int(params.get('ano_final', 2024))
+    except (ValueError, TypeError):
+        params['ano_inicial'] = 2013
+        params['ano_final'] = 2024
 
-    # Gera o novo gráfico com os filtros aplicados
-    graf = p.docentes_por_ano(
-        agrupamento=agrupamento,
-        grande_area=grande_area,
-        modalidade=modalidade,
-        categoria_docente=categoria_docente,
-        bolsa_produtividade=bolsa_produtividade,
-        ano_inicial=ano_inicial,
-        ano_final=ano_final,
-        tipo_grafico=tipo_grafico,
-    )
+    # A chamada para gerar o gráfico é idêntica, apenas mudando o método.
+    graf = plotter.docentes_por_ano(**params)
+    
+    return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
+
+
+#def grafico_discentes_por_ano(request):
+#    """
+#    View acionada pelo HTMX para atualizar o gráfico de discentes.
+#    """
+#    p = PlotsPessoal()
+#
+#    # Pega os valores dos filtros do GET request
+#    grau_curso = request.GET.get('grau_curso', 'total')
+#    agrupamento = request.GET.get('agrupamento', 'total')
+#    situacao = request.GET.get('situacao', 'total')
+#    grande_area = request.GET.get('grande_area', 'total')
+#    ano_inicial = request.GET.get('ano_inicial', 1990)
+#    ano_final = request.GET.get('ano_final', 2024)
+#    tipo_grafico = request.GET.get('tipo_grafico', 'barra')
+#
+#    # Converte anos para int
+#    try:
+#        ano_inicial = int(ano_inicial)
+#        ano_final = int(ano_final)
+#    except ValueError:
+#        ano_inicial, ano_final = 1990, 2024
+#
+#    # Gera o novo gráfico com os filtros aplicados
+#    graf = p.discentes_por_ano(
+#        grau_curso=grau_curso,
+#        agrupamento=agrupamento,
+#        situacao=situacao,
+#        grande_area=grande_area,
+#        ano_inicial=ano_inicial,
+#        ano_final=ano_final,
+#        tipo_grafico=tipo_grafico,
+#    )
+#    
+#    return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
+#
+#
+#def grafico_docentes_por_ano(request):
+#    """
+#    View acionada pelo HTMX para atualizar o gráfico de docentes.
+#    """
+#    p = PlotsPessoal()
+#
+#    # Pega os valores dos filtros do GET request
+#    agrupamento = request.GET.get('agrupamento', 'total')
+#    grande_area = request.GET.get('grande_area', 'total')
+#    modalidade = request.GET.get('modalidade', 'total')
+#    categoria_docente = request.GET.get('categoria_docente', 'total')
+#    bolsa_produtividade = request.GET.get('bolsa_produtividade', 'total')
+#    ano_inicial = request.GET.get('ano_inicial', 1990)
+#    ano_final = request.GET.get('ano_final', 2024)
+#    tipo_grafico = request.GET.get('tipo_grafico', 'barra')
+#
+#    # Converte anos para int
+#    try:
+#        ano_inicial = int(ano_inicial)
+#        ano_final = int(ano_final)
+#    except ValueError:
+#        ano_inicial, ano_final = 1990, 2024
+#
+#    # Gera o novo gráfico com os filtros aplicados
+#    graf = p.docentes_por_ano(
+#        agrupamento=agrupamento,
+#        grande_area=grande_area,
+#        modalidade=modalidade,
+#        categoria_docente=categoria_docente,
+#        bolsa_produtividade=bolsa_produtividade,
+#        ano_inicial=ano_inicial,
+#        ano_final=ano_final,
+#        tipo_grafico=tipo_grafico,
+#    )
     
     return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
 
