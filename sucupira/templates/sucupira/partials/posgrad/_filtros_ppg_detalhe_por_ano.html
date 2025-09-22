@@ -1,4 +1,4 @@
-{# sucupira/partials/pessoal/_filtros_pessoal_por_ano.html #}
+{# sucupira/partials/_plot_pessoal_por_ano.html #}
 
 {% extends "common/partials/_grafico_com_filtros.html" %}
 
@@ -36,15 +36,6 @@
         </select>
     </div>
 
-    <div class="col-md-3">
-        <label for="grande_area" class="form-label">Grande Área</label>
-        <select id="grande_area" name="grande_area" class="form-select">
-            <option value="total" selected>Todas</option>
-            {% for area in grandes_areas %}
-            <option value="{{ area.nm_grande_area_conhecimento }}">{{ area.nm_grande_area_conhecimento|capitalizar_frase }}</option>
-            {% endfor %}
-        </select>
-    </div>
 
    <!-- bloco dinâmico com filtros específicos para discentes/docentes --> 
     {% include partial_filtros %}
