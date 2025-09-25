@@ -100,3 +100,52 @@ class PlotsPessoal(BasePlots):
             tipo_grafico=tipo_grafico,
             distinct=True,
         )
+
+class PlotsPpgDetalhe(BasePlots):
+    '''Gráficos sobre discentes/docentes da Pós-Graduação na UFRJ'''
+    MAPEAMENTOS = MAPEAMENTOS
+    def __init__(self, programa_id=None):
+        self.programa_id = programa_id
+
+    def discentes_por_ano(
+        self,
+        ano_inicial=2013, ano_final=2024, agrupamento="total",
+        tipo_grafico="barra", **kwargs
+    ):
+        """
+        Gera gráfico de discentes por ano.
+        Argumentos de filtro (ex: situacao='Ativo') são passados via **kwargs.
+        """
+        if self.programa_id:
+            kwargs["programa_id"] = self.programa_id
+        return self._entidades_por_ano(
+            tipo_entidade="discentes_ppg",
+            ano_inicial=ano_inicial,
+            ano_final=ano_final,
+            agrupamento=None if agrupamento == "total" else agrupamento,
+            filtros_selecionados=kwargs,
+            tipo_grafico=tipo_grafico,
+            distinct=True,
+        )
+
+    def docentes_por_ano(
+        self,
+        ano_inicial=2013, ano_final=2024, agrupamento="total",
+        tipo_grafico="barra", **kwargs
+    ):
+        """
+        Gera gráfico de docentes por ano.
+        Argumentos de filtro (ex: grande_area='Ciências Exatas') são passados via **kwargs.
+        """
+        if self.programa_id:
+            kwargs["programa_id"] = self.programa_id
+
+        return self._entidades_por_ano(
+            tipo_entidade="docentes_ppg",
+            ano_inicial=ano_inicial,
+            ano_final=ano_final,
+            agrupamento=None if agrupamento == "total" else agrupamento,
+            filtros_selecionados=kwargs,
+            tipo_grafico=tipo_grafico,
+            distinct=True,
+        )

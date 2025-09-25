@@ -1,0 +1,5 @@
+{# sucupira/templates/sucupira/partials/posgrad/_aba_discentes_conteudo.html #}
+
+{% load sucupira_tags %} 
+{% url 'posgrad:grafico_discentes_por_ano_ppg' programa.id as url_discentes_ano %}
+{% render_filtros_ppg_detalhe "discentes" url_discentes_ano "discentes-ano" "spinner-discentes-ano" discentes_ano_plot %}

@@ -3,16 +3,7 @@
 {% load common_filters %}
 
 <div class="col-md-3">
-    <label for="modalidade_programa" class="form-label">Modalidade do Programa</label>
-    <select id="modalidade_programa" name="modalidade" class="form-select">
-        <option value="total" selected>Todas</option>
-        {% for modalidade in modalidades %}
-        <option value="{{ modalidade.nm_modalidade_programa }}">{{ modalidade.nm_modalidade_programa|capitalizar_frase }}</option>
-        {% endfor %}
-    </select>
-</div>
-<div class="col-md-3">
-    <label for="categoria_docente" class="form-label">Categoria do Discente</label>
+    <label for="categoria_docente" class="form-label">Categoria do Docente</label>
     <select id="categoria_docente" name="categoria_docente" class="form-select">
         <option value="total" selected>Todas</option>
         {% for c in categorias %}
