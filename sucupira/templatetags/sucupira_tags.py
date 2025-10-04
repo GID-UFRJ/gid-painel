@@ -60,7 +60,7 @@ def render_filtros_ppg_detalhe(tipo, url_grafico, grafico_id, spinner_id, grafic
         "grafico_html": grafico_html,
     }
 
-    # filtros específicos
+    # filtros específicos (um conjunto de filtros por gráfico)
     if tipo == "discentes":
         context.update({
             "partial_filtros": "sucupira/partials/posgrad/ppg_detalhe/_filtros_discentes.html",
@@ -73,6 +73,13 @@ def render_filtros_ppg_detalhe(tipo, url_grafico, grafico_id, spinner_id, grafic
             "categorias": DocenteCategoria.objects.all().order_by("ds_categoria_docente"),
             "bolsas": DocenteBolsaProdutividade.objects.all().order_by("cd_cat_bolsa_produtividade"),
         })
+    elif tipo == "discentes_titulacao":
+        context.update({
+            "partial_filtros": "sucupira/partials/posgrad/ppg_detalhe/_filtros_docentes.html",
+            "categorias": DocenteCategoria.objects.all().order_by("ds_categoria_docente"),
+            "bolsas": DocenteBolsaProdutividade.objects.all().order_by("cd_cat_bolsa_produtividade"),
+        })
+
     else:
         raise ValueError("Tipo de filtro inválido")
 

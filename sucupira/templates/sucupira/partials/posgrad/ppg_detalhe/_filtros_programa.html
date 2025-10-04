@@ -1,0 +1,24 @@
+{% extends "common/partials/_grafico_com_filtros.html" %}
+
+{% load common_filters %}
+
+{% block filtros %}
+
+<div class="row g-3 align-items-end">
+
+    <div class="col-md-2">
+        <label for="ano_inicial" class="form-label">Ano Inicial</label>
+        <input type="number" id="ano_inicial" name="ano_inicial" class="form-control" value="2013">
+    </div>
+
+    <div class="col-md-2">
+        <label for="ano_final" class="form-label">Ano Final</label>
+        <input type="number" id="ano_final" name="ano_final" class="form-control" value="2023">
+    </div>
+
+   <!-- bloco dinâmico com filtros específicos para discentes/docentes --> 
+    {% include partial_filtros %}
+
+</div>
+
+{% endblock %}

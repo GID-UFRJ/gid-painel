@@ -3,6 +3,7 @@ from django.db.models import Count, Sum, Avg, Max, Min
 import pandas as pd
 import plotly.express as px
 
+
 class BasePlots:
     '''
     Classe base auxiliar relacionadas à plotagem 
@@ -178,4 +179,3 @@ class BasePlots:
         }
     
         return self._gerar_grafico(df, tipo_grafico, params)
-    

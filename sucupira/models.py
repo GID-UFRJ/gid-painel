@@ -62,7 +62,7 @@ class ProgramaConceito(models.Model):
     ds_conceito = models.CharField(max_length=100, null=True, blank=True) #Descrição do conceito
 
     def __str__(self):
-        return f"{self.cd_conceito_programa} - {self.descricao_conceito}"
+        return f"{self.cd_conceito_programa} - {self.ds_conceito}"
 
 
 class GrauCurso(models.Model):

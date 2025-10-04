@@ -205,6 +205,13 @@ def ppg_detalhe(request, programa_id):
             "titulo": "Análise de Docentes",
             "template_name": "sucupira/partials/posgrad/ppg_detalhe/_aba_docentes_conteudo.html"   # Caminho para o conteúdo
         },
+        {
+            "id": "programa", 
+            "label": "Programa", 
+            "icone": "fas fa-user-graduate", 
+            "titulo": "Análise do Programa",
+            "template_name": "sucupira/partials/pessoal/_aba_discentes_conteudo.html"  # Caminho para o conteúdo
+        },
     ]
 
     # Subquery para o último AnoPrograma deste programa
@@ -269,7 +276,32 @@ def ppg_detalhe(request, programa_id):
 def grafico_discentes_por_ano_ppg(request, programa_id):
     """
     View acionada pelo HTMX para atualizar o gráfico de discentes.
-    Refatorada para funcionar com o novo modelo de PlotsPessoal.
+    """
+    plotter = PlotsPpgDetalhe(programa_id=programa_id)
+
+    # Coleta todos os parâmetros da URL em um único dicionário.
+    # A classe PlotsPessoal saberá como usar cada um.
+    params = request.GET.dict()
+
+    # Converte os anos para inteiros, com valores padrão seguros.
+    try:
+        params['ano_inicial'] = int(params.get('ano_inicial', 2013))
+        params['ano_final'] = int(params.get('ano_final', 2024))
+    except (ValueError, TypeError):
+        params['ano_inicial'] = 2013
+        params['ano_final'] = 2024
+    
+    # Gera o gráfico passando todos os parâmetros de uma vez.
+    # Os argumentos da assinatura do método (ano_inicial, agrupamento, etc.)
+    # serão extraídos, e o restante (situacao, grau_curso) será capturado
+    # pelo **kwargs dentro do método.
+    graf = plotter.discentes_por_ano(**params)
+    
+    return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
+
+def grafico_media_titulação_por_ano_ppg(request, programa_id):
+    """
+    View acionada pelo HTMX para atualizar o gráfico de média de tempo de titulação
     """
     plotter = PlotsPpgDetalhe(programa_id=programa_id)
 
@@ -297,7 +329,6 @@ def grafico_discentes_por_ano_ppg(request, programa_id):
 def grafico_docentes_por_ano_ppg(request, programa_id):
     """
     View acionada pelo HTMX para atualizar o gráfico de docentes.
-    Refatorada para funcionar com o novo modelo de PlotsPessoal.
     """
     plotter = PlotsPpgDetalhe(programa_id=programa_id)
 
@@ -317,3 +348,5 @@ def grafico_docentes_por_ano_ppg(request, programa_id):
     
     return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
 
+def grafico_programa_por_ano_ppg(request, programa_id):
+    pass

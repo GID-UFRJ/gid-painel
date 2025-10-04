@@ -44,5 +44,5 @@ def render_abas(context, abas, abas_id="default-abas"):
     ctx.update({
         'abas': abas,
         'abas_id': abas_id,
-    })
+    }) # adiciona o contexto das abas
     return ctx

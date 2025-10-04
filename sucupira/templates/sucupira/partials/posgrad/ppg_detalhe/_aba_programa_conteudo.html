@@ -1,0 +1,5 @@
+{# sucupira/templates/sucupira/partials/posgrad/_aba_programa_conteudo.html #}
+
+{% load sucupira_tags %}
+{% url 'posgrad:grafico_programa_por_ano_ppg' programa.id as url_programa_ano %}
+{% render_filtros_ppg_detalhe "programa" url_programa_ano "programa-ano" "spinner-programa-ano" programa_ano_plot %}
