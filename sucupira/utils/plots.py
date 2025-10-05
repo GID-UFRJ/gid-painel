@@ -11,16 +11,28 @@ from common.utils.baseplots import BasePlots
 from django.shortcuts import render
 from .mapeamentos import MAPEAMENTOS
 
+# sucupira/utils/plots.py (ou onde sua classe está)
+
+from django.db.models import Count, Max
+from common.utils.baseplots import BasePlots
+from .mapeamentos import MAPEAMENTOS
+from sucupira.models import Discente, Docente, Ano
+
+# Supondo que 'grafico_kpi' seja uma função que você já tenha
+# from .kpi_generator import grafico_kpi 
+
 class PlotsPessoal(BasePlots):
-    '''Gráficos sobre discentes/docentes da Pós-Graduação na UFRJ'''
+    '''Gráficos gerais sobre discentes e docentes da Pós-Graduação.'''
     MAPEAMENTOS = MAPEAMENTOS
 
+    # =========================================================================
+    # MÉTODOS DE CARD (KPI) - MANTIDOS EXATAMENTE COMO OS ORIGINAIS
+    # =========================================================================
     def cards_total_alunos_titulados_por_grau(self):
-
         # Query que conta alunos titulados por grau de curso
         qs = (
             Discente.objects
-            .filter(situacao__nm_situacao_discente="TITULADO") #Não adicionei o 'Mudança de nível sem defesa' ainda
+            .filter(situacao__nm_situacao_discente="TITULADO")
             .values("grau_academico__nm_grau_curso")
             .annotate(total=Count("id"))
             .order_by("grau_academico__nm_grau_curso")
@@ -46,7 +58,7 @@ class PlotsPessoal(BasePlots):
         ultimo_ano = Ano.objects.aggregate(max_ano=Max("ano_valor"))["max_ano"]
 
         if ultimo_ano is None:
-            return None  # ou {}, se preferir vazio
+            return None
 
         # Conta docentes do último ano
         total = (
@@ -64,158 +76,157 @@ class PlotsPessoal(BasePlots):
         
         return img
 
+
+    # =========================================================================
+    # MÉTODOS DE GRÁFICO - ADAPTADOS PARA A NOVA BasePlots
+    # =========================================================================
     def discentes_por_ano(
         self,
-        ano_inicial=2013, ano_final=2024, agrupamento="total",
-        tipo_grafico="barra", **kwargs
+        tipo_grafico="barra",
+        titulo_override: str | None = None,
+        **kwargs
     ):
         """
+        # ADAPTADO
         Gera gráfico de discentes por ano.
-        Argumentos de filtro (ex: situacao='Ativo') são passados via **kwargs.
+        Argumentos de filtro (ex: ano_inicial, situacao) são passados via **kwargs.
         """
-        return self._entidades_por_ano(
-            tipo_entidade="discentes",
-            ano_inicial=ano_inicial,
-            ano_final=ano_final,
-            agrupamento=None if agrupamento == "total" else agrupamento,
-            filtros_selecionados=kwargs,
+        # A nova BasePlots lida com os filtros diretamente
+        return self._gerar_grafico_agregado(
+            tipo_entidade="discentes_geral", # Usa o mapeamento geral "discentes"
             tipo_grafico=tipo_grafico,
+            filtros_selecionados=kwargs,
+            agrupamento=kwargs.get("agrupamento"),
+            titulo_override=titulo_override,
             distinct=True,
         )
 
     def docentes_por_ano(
         self,
-        ano_inicial=2013, ano_final=2024, agrupamento="total",
-        tipo_grafico="barra", **kwargs
+        tipo_grafico="barra",
+        titulo_override: str | None = None,
+        **kwargs
     ):
         """
+        # ADAPTADO
         Gera gráfico de docentes por ano.
-        Argumentos de filtro (ex: grande_area='Ciências Exatas') são passados via **kwargs.
+        Argumentos de filtro (ex: ano_final, grande_area) são passados via **kwargs.
         """
-        return self._entidades_por_ano(
-            tipo_entidade="docentes",
-            ano_inicial=ano_inicial,
-            ano_final=ano_final,
-            agrupamento=None if agrupamento == "total" else agrupamento,
-            filtros_selecionados=kwargs,
+        return self._gerar_grafico_agregado(
+            tipo_entidade="docentes_geral", # Usa o mapeamento geral "docentes"
             tipo_grafico=tipo_grafico,
+            filtros_selecionados=kwargs,
+            agrupamento=kwargs.get("agrupamento"),
+            titulo_override=titulo_override,
             distinct=True,
         )
 
+
+# sucupira/utils/plots.py (ou onde sua classe está)
+
+from django.shortcuts import render
+# Adicione a importação da sua função de limites de ano
+# from .helpers import get_limites_de_ano_global
+
 class PlotsPpgDetalhe(BasePlots):
-    '''Gráficos sobre discentes/docentes da Pós-Graduação na UFRJ'''
+    '''Gráficos específicos de um Programa de Pós-Graduação.'''
     MAPEAMENTOS = MAPEAMENTOS
+
     def __init__(self, programa_id=None):
+        if programa_id is None:
+            raise ValueError("O ID do programa é obrigatório para PlotsPpgDetalhe.")
         self.programa_id = programa_id
 
+    @staticmethod
     def gerar_grafico_view(request, programa_id, metodo_plot):
         """
-        View genérica para gerar gráficos de detalhes de um PPG (Programa de Pós-Graduação).
-        Seu principal objetivo é evitar repetição de código no views.py.
-
-        Args:
-            request (HttpRequest): Objeto de requisição HTTP do Django.
-            programa_id (int): ID do programa para filtrar os dados.
-            metodo_plot (str): Nome do método da classe `PlotsPpgDetalhe`
-                               que será chamado dinamicamente para gerar o gráfico.
-                               Exemplo: "docentes_por_ano", "discentes_por_ano", etc.
-
-        Returns:
-            HttpResponse: Renderiza o template "_plot_reativo.html" com o gráfico gerado.
+        # ADAPTADO
+        View genérica que agora usa defaults dinâmicos para os anos.
         """
-
-        # Cria uma instância da classe de geração de gráficos, já vinculada ao programa específico
         plotter = PlotsPpgDetalhe(programa_id=programa_id)
+        
+        # Opcional, mas recomendado: use defaults do DB para os anos
+        # limites_db = get_limites_de_ano_global()
+        # ano_inicial_default = limites_db['min_ano']
+        # ano_final_default = limites_db['max_ano']
+        
+        # Fallback caso não use a função acima
+        ano_inicial_default = 2013
+        ano_final_default = 2025 # Usando o ano atual + 1 como default
 
-        # Extrai os parâmetros da URL (?ano_inicial=2015&ano_final=2020&agrupamento=sexo...)
-        # Transformando-os em um dicionário Python
+        # Extrai os parâmetros da URL, aplicando os defaults
         params = request.GET.dict()
+        params.setdefault('ano_inicial', ano_inicial_default)
+        params.setdefault('ano_final', ano_final_default)
 
-        # --- Tratamento seguro de intervalo de anos ---
-        try:
-            # Se vierem na query string, converte para inteiro
-            params['ano_inicial'] = int(params.get('ano_inicial', 2013))
-            params['ano_final'] = int(params.get('ano_final', 2024))
-        except (ValueError, TypeError):
-            # Se algum valor inválido for passado, define defaults seguros
-            params['ano_inicial'] = 2013
-            params['ano_final'] = 2024
+        # Chama o método de plotagem dinamicamente
+        if hasattr(plotter, metodo_plot):
+            metodo = getattr(plotter, metodo_plot)
+            graf = metodo(**params)
+        else:
+            graf = f"<p class='text-danger'>Erro: Método de plotagem '{metodo_plot}' não encontrado.</p>"
 
-        # --- Chamada dinâmica do método ---
-        # Usamos getattr() para buscar dentro do objeto `plotter` o método
-        # cujo nome foi passado via parâmetro `metodo_plot`.
-        #
-        # Exemplo:
-        #   metodo_plot = "discentes_por_ano"
-        #   getattr(plotter, "discentes_por_ano") → retorna a função plotter.discentes_por_ano
-        #
-        # Depois chamamos essa função, passando os parâmetros coletados da requisição.
-        graf = getattr(plotter, metodo_plot)(**params)
-
-        # Renderiza o template parcial que exibe o gráfico, passando o objeto `graf`
-        # Esse template é usado em componentes reativos (HTMX/AJAX) para atualizar só o gráfico.
         return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
 
     def discentes_por_ano(
         self,
-        ano_inicial=2013, ano_final=2024, agrupamento="total",
-        tipo_grafico="barra", **kwargs
+        tipo_grafico="barra",
+        titulo_override: str | None = None,
+        **kwargs
     ):
         """
-        Gera gráfico de discentes por ano.
-        Argumentos de filtro (ex: situacao='Ativo') são passados via **kwargs.
+        # ADAPTADO E SIMPLIFICADO
+        Gera gráfico de discentes por ano para um programa específico.
         """
-        if self.programa_id:
-            kwargs["programa_id"] = self.programa_id
-        return self._entidades_por_ano(
+        # Adiciona o filtro de programa_id que é mandatório para esta classe
+        kwargs['programa_id'] = self.programa_id
+        
+        return self._gerar_grafico_agregado(
             tipo_entidade="discentes_ppg",
-            ano_inicial=ano_inicial,
-            ano_final=ano_final,
-            agrupamento=None if agrupamento == "total" else agrupamento,
-            filtros_selecionados=kwargs,
             tipo_grafico=tipo_grafico,
+            filtros_selecionados=kwargs,
+            agrupamento=kwargs.get("agrupamento"),
+            titulo_override=titulo_override,
             distinct=True,
         )
-
+ 
     def docentes_por_ano(
         self,
-        ano_inicial=2013, ano_final=2024, agrupamento="total",
-        tipo_grafico="barra", **kwargs
+        tipo_grafico="barra",
+        titulo_override: str | None = None,
+        **kwargs
     ):
         """
-        Gera gráfico de docentes por ano.
-        Argumentos de filtro (ex: grande_area='Ciências Exatas') são passados via **kwargs.
+        # ADAPTADO
+        Gera gráfico de docentes por ano para um programa específico.
         """
-        if self.programa_id:
-            kwargs["programa_id"] = self.programa_id
+        kwargs['programa_id'] = self.programa_id
 
-        return self._entidades_por_ano(
+        return self._gerar_grafico_agregado(
             tipo_entidade="docentes_ppg",
-            ano_inicial=ano_inicial,
-            ano_final=ano_final,
-            agrupamento=None if agrupamento == "total" else agrupamento,
-            filtros_selecionados=kwargs,
             tipo_grafico=tipo_grafico,
+            filtros_selecionados=kwargs,
+            agrupamento=kwargs.get("agrupamento"),
+            titulo_override=titulo_override,
             distinct=True,
         )
     
     def conceito_programa_por_ano(
         self,
-        ano_inicial=2013, ano_final=2024,
-        tipo_grafico="linha", **kwargs
+        tipo_grafico="linha",
+        titulo_override: str | None = None,
+        **kwargs
     ):
         """
-        Gera gráfico de docentes por ano.
-        Argumentos de filtro (ex: grande_area='Ciências Exatas') são passados via **kwargs.
+        # CORRIGIDO E ADAPTADO
+        Gera gráfico da evolução do conceito do programa.
         """
-        if self.programa_id:
-            kwargs["programa_id"] = self.programa_id
-
-        return self._entidades_por_ano(
-            tipo_entidade="docentes_ppg",
-            ano_inicial=ano_inicial,
-            ano_final=ano_final,
-            filtros_selecionados=kwargs,
+        kwargs['programa_id'] = self.programa_id
+        
+        # Corrigido para chamar o método de gráfico direto e o mapeamento correto
+        return self._gerar_grafico_direto(
+            tipo_entidade="conceito_ppg", 
             tipo_grafico=tipo_grafico,
-            distinct=True,
+            filtros_selecionados=kwargs,
+            titulo_override=titulo_override,
         )
