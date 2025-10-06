@@ -192,6 +192,13 @@ def ppg_detalhe(request, programa_id):
 
     abas = [
         {
+            "id": "programa", 
+            "label": "Programa", 
+            "icone": "fas fa-graduation-cap", 
+            "titulo": "Análise do Programa",
+            "template_name": "sucupira/partials/posgrad/ppg_detalhe/_aba_programa_conteudo.html"   # Caminho para o conteúdo
+        },
+        {
             "id": "discentes", 
             "label": "Discentes", 
             "icone": "fas fa-user-graduate", 
@@ -204,13 +211,6 @@ def ppg_detalhe(request, programa_id):
             "icone": "fas fa-chalkboard-teacher", 
             "titulo": "Análise de Docentes",
             "template_name": "sucupira/partials/posgrad/ppg_detalhe/_aba_docentes_conteudo.html"   # Caminho para o conteúdo
-        },
-        {
-            "id": "programa", 
-            "label": "Programa", 
-            "icone": "fas fa-user-graduate", 
-            "titulo": "Análise do Programa",
-            "template_name": "sucupira/partials/pessoal/_aba_discentes_conteudo.html"  # Caminho para o conteúdo
         },
     ]
 
@@ -254,20 +254,14 @@ def ppg_detalhe(request, programa_id):
         params['ano_inicial'] = 2013
         params['ano_final'] = 2023
 
-    # Gerar gráficos
-    #graficos = {}
-    #for grau_nome in ["Mestrado", "Doutorado", "Mestrado Acadêmico"]:
-    #    grafico_html = gerar_grafico(programa_id, grau_nome)
-    #    if grafico_html:
-    #        graficos[grau_nome] = grafico_html
-
     context = {
         "abas": abas,
         "programa": programa,
         "cursos": cursos,
         'discentes_ano_plot': p.discentes_por_ano(**params),
         'docentes_ano_plot': p.docentes_por_ano(**params),
-
+        'conceito_programa_ano_plot': p.conceito_programa_por_ano(**params),
+        'media_titulacao_ano_plot': p.media_titulacao_por_ano(**params),
     }
 
     return render(request, "sucupira/posgrad/ppg_detalhe.html", context)
@@ -348,5 +342,47 @@ def grafico_docentes_por_ano_ppg(request, programa_id):
     
     return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
 
-def grafico_programa_por_ano_ppg(request, programa_id):
-    pass
+def grafico_conceito_programa_por_ano_ppg(request, programa_id):
+    """
+    View acionada pelo HTMX para atualizar o gráfico de conceito CAPES.
+    """
+    plotter = PlotsPpgDetalhe(programa_id=programa_id)
+
+    # Coleta todos os parâmetros da URL.
+    params = request.GET.dict()
+
+    # Garante que os anos sejam inteiros.
+    try:
+        params['ano_inicial'] = int(params.get('ano_inicial', 2013))
+        params['ano_final'] = int(params.get('ano_final', 2024))
+    except (ValueError, TypeError):
+        params['ano_inicial'] = 2013
+        params['ano_final'] = 2024
+
+    # A chamada para gerar o gráfico é idêntica, apenas mudando o método.
+    graf = plotter.conceito_programa_por_ano(**params)
+    
+    return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
+
+
+def grafico_media_titulacao_por_ano_ppg(request, programa_id):
+    """
+    View acionada pelo HTMX para atualizar o gráfico de docentes.
+    """
+    plotter = PlotsPpgDetalhe(programa_id=programa_id)
+
+    # Coleta todos os parâmetros da URL.
+    params = request.GET.dict()
+
+    # Garante que os anos sejam inteiros.
+    try:
+        params['ano_inicial'] = int(params.get('ano_inicial', 2013))
+        params['ano_final'] = int(params.get('ano_final', 2024))
+    except (ValueError, TypeError):
+        params['ano_inicial'] = 2013
+        params['ano_final'] = 2024
+
+    # A chamada para gerar o gráfico é idêntica, apenas mudando o método.
+    graf = plotter.media_titulacao_por_ano(**params)
+    
+    return render(request, "common/partials/_plot_reativo.html", {'graf': graf})

@@ -132,7 +132,7 @@ class BasePlots:
              titulo_final = f"{titulo_base} por {agrupamento.replace('_', ' ').capitalize()}"
 
         params = {"x": eixo_x_nome, "y": eixo_y_nome, "color": grupo_plotly, "title": titulo_final}
-        return self._gerar_grafico(df, tipo_grafico, params)
+        return self._gerar_grafico(df, tipo_grafico, params, **kwargs)
 
     # ... (os métodos _gerar_grafico_direto e _gerar_grafico permanecem os mesmos) ...
     def _gerar_grafico_direto(self, tipo_entidade: str, tipo_grafico: str, filtros_selecionados: dict, titulo_override: str | None = None, **kwargs,):
@@ -160,15 +160,45 @@ class BasePlots:
         titulo_base = titulo_override if titulo_override is not None else mapeamento['titulo_base']
         titulo_final = f"{titulo_base} por {eixo_x_nome}"
         params = {"x": eixo_x_nome, "y": eixo_y_nome, "title": titulo_final}
-        return self._gerar_grafico(df, tipo_grafico, params)
+        return self._gerar_grafico(df, tipo_grafico, params, **kwargs)
 
-    def _gerar_grafico(self, df: pd.DataFrame, tipo_grafico: str, params: dict):
+    def _gerar_grafico(
+        self,
+        df: pd.DataFrame,
+        tipo_grafico: str,
+        params: dict,
+        pronto_para_plot: bool = True,
+        **kwargs
+    ):
+        """
+        Gera um gráfico Plotly com base nas configurações e retorna
+        o HTML ou o objeto bruto, dependendo da flag 'pronto_para_plot'.
+
+        Parâmetros:
+        -----------
+        df : pd.DataFrame
+            Dados de entrada.
+        tipo_grafico : str
+            Tipo de gráfico (ex: 'barra', 'linha').
+        params : dict
+            Parâmetros específicos do gráfico (x, y, color, title, etc.).
+        pronto_para_plot : bool
+            Se True, retorna o HTML pronto para renderização.
+            Se False, retorna o objeto Plotly Figure para personalização.
+        """
+
         func = self.PLOT_FUNCS.get(tipo_grafico)
         if not func:
             raise ValueError(f"Tipo de gráfico '{tipo_grafico}' não suportado.")
+
+        # Combina configurações padrão e parâmetros passados
         plot_args = self.PLOT_CONFIGS.get(tipo_grafico, {}).copy()
         plot_args.update({k: v for k, v in params.items() if v is not None})
+
+        # Cria a figura
         fig = func(df, **plot_args)
+
+        # Layout padrão
         fig.update_layout(
             autosize=True,
             margin=dict(l=40, r=40, t=60, b=40),
@@ -178,6 +208,18 @@ class BasePlots:
             legend_title_text=params.get("color", ""),
             xaxis=dict(type="category"),
         )
+
+        # Ajuste específico para gráficos de barra
         if tipo_grafico == "barra":
             fig.update_traces(textposition="outside")
-        return fig.to_html(full_html=False, include_plotlyjs="cdn", config={"responsive": True})
+
+        # Se o gráfico for para renderização imediata, converte para HTML
+        if pronto_para_plot:
+            return fig.to_html(
+                full_html=False,
+                include_plotlyjs="cdn",
+                config={"responsive": True},
+            )
+
+        # Caso contrário, retorna o objeto Plotly para customizações
+        return fig

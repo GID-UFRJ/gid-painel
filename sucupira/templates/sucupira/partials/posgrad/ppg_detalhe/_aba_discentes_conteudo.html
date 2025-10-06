@@ -1,5 +1,15 @@
 {# sucupira/templates/sucupira/partials/posgrad/_aba_discentes_conteudo.html #}
 
 {% load sucupira_tags %} 
+
+
+<h3 style="text-align: center;">Contagem de discentes</h3>
+
 {% url 'posgrad:grafico_discentes_por_ano_ppg' programa.id as url_discentes_ano %}
 {% render_filtros_ppg_detalhe "discentes" url_discentes_ano "discentes-ano" "spinner-discentes-ano" discentes_ano_plot %}
+
+<br>
+<h3 style="text-align: center;">Média de meses para titulação</h3>
+
+{% url 'posgrad:grafico_media_titulacao_por_ano_ppg' programa.id as url_media_titulacao_ano %}
+{% render_filtros_ppg_detalhe "media_titulacao" url_media_titulacao_ano "media-titulacao-ano" "spinner-discentes-ano" media_titulacao_ano_plot %}

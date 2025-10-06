@@ -1,5 +1,34 @@
 {# sucupira/templates/sucupira/partials/posgrad/_aba_programa_conteudo.html #}
 
 {% load sucupira_tags %}
-{% url 'posgrad:grafico_programa_por_ano_ppg' programa.id as url_programa_ano %}
-{% render_filtros_ppg_detalhe "programa" url_programa_ano "programa-ano" "spinner-programa-ano" programa_ano_plot %}
+
+<div class="d-flex align-items-center mb-3 justify-content-center">
+    
+    {# 1. O seu título H3 #}
+    <h3 class="mb-0 me-2">Evolução do Conceito CAPES</h3>
+
+    {# 2. O ícone de interrogação clicável #}
+    <a  class="text-secondary"
+        data-bs-toggle="collapse" 
+        href="#explicacaoConceito" 
+        role="button" 
+        aria-expanded="false" 
+        aria-controls="explicacaoConceito">
+        <i class="fa-solid fa-circle-question"></i>
+    </a>
+</div>
+
+{# 3. O conteúdo que será mostrado/escondido #}
+<div class="collapse mb-4" id="explicacaoConceito">
+    <div class="card card-body bg-light border-0">
+        <p class="mb-0 small text-muted">
+            Este gráfico de linha mostra a evolução da nota (conceito) atribuída pela CAPES a este programa de pós-graduação ao longo das diferentes avaliações anuais. O eixo Y representa a nota, que varia de 1 a 7. 
+            Gaps na linha indicam anos em que não houve avaliação ou dados disponíveis.
+            O conceito 0 (zero) significa a ausência de conceito, comum em programas recentes que ainda não passaram por uma avaliação da CAPES.
+        </p>
+    </div>
+</div>
+
+
+{% url 'posgrad:grafico_conceito_programa_por_ano_ppg' programa.id as url_conceito_programa_ano %}
+{% render_filtros_ppg_detalhe "conceito_programa" url_conceito_programa_ano "programa-ano" "spinner-programa-ano" conceito_programa_ano_plot %}

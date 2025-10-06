@@ -218,15 +218,65 @@ class PlotsPpgDetalhe(BasePlots):
         **kwargs
     ):
         """
-        # CORRIGIDO E ADAPTADO
-        Gera gráfico da evolução do conceito do programa.
+        Gera o gráfico da evolução do conceito do programa,
+        com o eixo Y fixo de 0 a 7 e apenas com inteiros.
         """
         kwargs['programa_id'] = self.programa_id
         
-        # Corrigido para chamar o método de gráfico direto e o mapeamento correto
-        return self._gerar_grafico_direto(
+        # 1. Adicione 'pronto_para_plot=False' aos kwargs para que ele seja passado
+        #    para a classe base e nos retorne o objeto fig.
+        kwargs['pronto_para_plot'] = False
+        
+        fig = self._gerar_grafico_direto(
             tipo_entidade="conceito_ppg", 
             tipo_grafico=tipo_grafico,
             filtros_selecionados=kwargs,
             titulo_override=titulo_override,
+            **kwargs # Passa o 'pronto_para_plot=False' adiante
         )
+
+        # 2. Verifique se o que voltou é um gráfico (e não uma string de "sem dados")
+        if 'Figure' in str(type(fig)):
+            
+            # 3. Faça a customização do eixo Y
+            fig.update_yaxes(
+                range=[0, 7.5],
+                tickmode='linear',
+                tick0=0,
+                dtick=1
+            )
+        
+            # 4. Converta o objeto modificado para HTML.
+            return fig.to_html(full_html=False, include_plotlyjs="cdn", config={"responsive": True})
+        
+        # 5. Se fig não for um gráfico, apenas retorne-o.
+        return fig
+
+    def media_titulacao_por_ano(
+        self,
+        tipo_grafico="barra", 
+        titulo_override: str | None = None,
+        **kwargs
+    ):
+        """
+        Gera gráfico da média de meses para titulação por ano,
+        formatando APENAS o texto no gráfico para 1 casa decimal.
+        """
+        kwargs['programa_id'] = self.programa_id
+        
+        fig = self._gerar_grafico_agregado(
+            tipo_entidade="media_titulacao",
+            tipo_grafico=tipo_grafico,
+            filtros_selecionados=kwargs,
+            agrupamento=kwargs.get("agrupamento"),
+            titulo_override=titulo_override,
+            pronto_para_plot=False
+        )
+
+        fig.update_traces(texttemplate="%{y:.1f}")
+
+        return  fig.to_html(
+                full_html=False,
+                include_plotlyjs="cdn",
+                config={"responsive": True},
+            )

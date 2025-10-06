@@ -123,28 +123,6 @@ docentes_por_ano_ppg = {
     },
 }
 
-docentes_por_faixa_etaria_ppg = {
-    "modelo": Docente,
-    "titulo_base": "Distribuição de Docentes por Faixa Etária",
-    
-    "eixo_x_campo": "faixa_etaria__ds_faixa_etaria",
-    "eixo_x_nome": "Faixa Etária",
-    
-    "eixo_y_campo": "pessoa_id",
-    "eixo_y_nome": "Número de Docentes",
-    "eixo_y_agregacao": "count_distinct",
-
-    "filtros": {
-        "programa_id": "programa_id",
-        "ano": "ano__ano_valor",
-    },
-    "filtros_padrao": {"ano": 2025}, # Mostra o ano atual por padrão
-
-    "agrupamentos": {
-        "sexo": "pessoa__tp_sexo__sexo",
-        "vinculo": "vinculo__ds_tipo_vinculo_docente_ies",
-    },
-}
 
 conceito_programa_por_ano = {
     "modelo": AnoPrograma,
@@ -166,6 +144,47 @@ conceito_programa_por_ano = {
     "filtros_padrao": {"ano_inicial": 2013},
 }
 
+media_titulacao_por_ano_ppg = {
+    # --- Configurações Gerais ---
+    "modelo": Discente,
+    "titulo_base": "Tempo Médio para Titulação",
+    
+    # --- Eixo X ---
+    "eixo_x_campo": "ano__ano_valor",
+    "eixo_x_nome": "Ano de Titulação",
+    "eixo_x_tipo": "numerico_continuo",
+
+    # --- Eixo Y (A Lógica Principal) ---
+    "eixo_y_campo": "qt_mes_titulacao",        # O campo que queremos calcular a média
+    "eixo_y_nome": "Média de Meses",          # O título que aparecerá no eixo Y
+    "eixo_y_agregacao": "avg",                 # A operação de agregação: média (average)
+    
+    # --- Filtragem ---
+    "filtros": {
+        "programa_id": "programa_id",
+        "situacao": "situacao__nm_situacao_discente",
+        "grau_curso": "grau_academico__nm_grau_curso",
+        "ano_inicial": "ano__ano_valor__gte",
+        "ano_final": "ano__ano_valor__lte",
+    },
+    # Este filtro padrão garante que a análise SEMPRE será feita apenas com titulados.
+    "filtros_padrao": {
+        "situacao": "TITULADO",
+        "ano_inicial": 2013,
+    },
+
+    # --- Agrupamentos Opcionais ---
+    "agrupamentos": {
+        "sexo": "pessoa__tp_sexo__sexo",
+        "nacionalidade": "pessoa__tipo_nacionalidade__ds_tipo_nacionalidade", 
+        "faixa_etaria": "faixa_etaria__ds_faixa_etaria",
+    },
+}
+
+
+
+
+
 # =============================================================================
 # DICIONÁRIO FINAL - Importado pelas classes de Plots
 # =============================================================================
@@ -176,9 +195,10 @@ MAPEAMENTOS = {
 
     # Gráficos Específicos de um PPG
     "discentes_ppg": discentes_por_ano_ppg,
+    "media_titulacao": media_titulacao_por_ano_ppg,
     "docentes_ppg": docentes_por_ano_ppg,
-    "docentes_faixa_etaria_ppg": docentes_por_faixa_etaria_ppg,
     "conceito_ppg": conceito_programa_por_ano,
+
 }
 
 
