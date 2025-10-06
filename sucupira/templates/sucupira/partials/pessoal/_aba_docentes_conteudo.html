@@ -3,3 +3,8 @@
 {% load sucupira_tags %}
 {% url 'pessoal:grafico_docentes_por_ano' as url_docentes_ano %}
 {% render_filtros_pessoal "docentes" url_docentes_ano "docentes-ano" "spinner-docentes-ano" docentes_ano_plot %}
+
+<hr class="my-5">
+
+{% url 'pessoal:grafico_docentes_sunburst' as url_docentes_sunburst %}
+{% render_filtros_pessoal "sunburst" url_docentes_sunburst "docentes-sunburst" "spinner-docentes-sunburst" docentes_sunburst_plot %}

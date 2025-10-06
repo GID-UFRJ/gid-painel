@@ -121,6 +121,26 @@ class PlotsPessoal(BasePlots):
             distinct=True,
         )
 
+    def discentes_por_area_sunburst(self, **kwargs):
+        """
+        Gera gráfico Sunburst da distribuição de discentes por área.
+        """
+        return self._gerar_grafico_hierarquico(
+            tipo_entidade="discentes_sunburst",
+            tipo_grafico="sunburst", # Especifica o tipo de gráfico
+            filtros_selecionados=kwargs,
+            **kwargs
+        )
+
+    def docentes_por_area_sunburst(self, **kwargs):
+        """
+        Gera gráfico Sunburst da distribuição de docentes por área.
+        """
+        return self._gerar_grafico_hierarquico(
+            tipo_entidade="docentes_sunburst",
+            tipo_grafico="sunburst",
+            filtros_selecionados=kwargs
+        )
 
 # sucupira/utils/plots.py (ou onde sua classe está)
 

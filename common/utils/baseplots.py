@@ -13,7 +13,13 @@ class BasePlots:
     def MAPEAMENTOS(self):
         raise NotImplementedError("Subclasses devem implementar o atributo MAPEAMENTOS")
     CATEGORY_ORDERS = {"sexo": ["M", "F", "D"],}
-    PLOT_FUNCS = {"barra": px.bar,"linha": px.line,"pizza": px.pie,}
+    PLOT_FUNCS = {
+        "barra": px.bar,
+        "linha": px.line,
+        "pizza": px.pie,
+        "sunburst": px.sunburst, 
+        "treemap": px.treemap,   
+    }
     PLOT_CONFIGS = {"barra": {"text_auto": True, "barmode": "group"},"linha": {"markers": True},}
     def _get_mapeamento(self, tipo_entidade: str):
         mapeamento = self.MAPEAMENTOS.get(tipo_entidade)
@@ -223,3 +229,69 @@ class BasePlots:
 
         # Caso contrário, retorna o objeto Plotly para customizações
         return fig
+
+    def _gerar_grafico_hierarquico(
+        self,
+        tipo_entidade: str,
+        tipo_grafico: str,
+        filtros_selecionados: dict,
+        titulo_override: str | None = None,
+        **kwargs,
+    ):
+        """
+        Gera um gráfico hierárquico (Sunburst, Treemap) a partir de um mapeamento.
+        """
+        queryset, mapeamento, filtros_finais = self._get_base_queryset(tipo_entidade, filtros_selecionados)
+
+        if not queryset.exists():
+            return "<p class='text-center text-muted mt-4'>Nenhum dado encontrado para os filtros selecionados.</p>"
+
+        # --- 1. Extrair configurações hierárquicas do mapeamento ---
+        path_config = mapeamento.get("grafico_hierarquico_path")
+        values_campo = mapeamento.get("grafico_hierarquico_values_campo")
+        values_nome = mapeamento.get("grafico_hierarquico_values_nome", "Total")
+        agregacao_str = mapeamento.get("grafico_hierarquico_agregacao", "count")
+
+        if not path_config or not values_campo:
+            raise KeyError(f"Mapeamento '{tipo_entidade}' precisa das chaves 'grafico_hierarquico_path' e 'grafico_hierarquico_values_campo'.")
+
+        # --- 2. Montar e executar a query de agregação ---
+        # Agruparemos por todos os campos no 'path'
+        campos_do_path = list(path_config.values())
+        
+        distinct = 'distinct' in agregacao_str.lower()
+        agregacao_base = agregacao_str.split('_')[0]
+        agg_map = {"count": Count(values_campo, distinct=distinct), "sum": Sum(values_campo), "avg": Avg(values_campo)}
+        agg_func = agg_map.get(agregacao_base)
+        
+        dados = queryset.values(*campos_do_path).annotate(total_agregado=agg_func).order_by()
+
+        # --- 3. Preparar o DataFrame ---
+        df = pd.DataFrame(list(dados))
+        
+        # Renomeia as colunas para nomes amigáveis que serão usados no gráfico
+        mapa_renomeacao = {v: k for k, v in path_config.items()}
+        df.rename(columns=mapa_renomeacao, inplace=True)
+        df.rename(columns={'total_agregado': values_nome}, inplace=True)
+
+        # --- 4. Gerar o Gráfico ---
+        titulo = titulo_override if titulo_override is not None else mapeamento.get("titulo_base", "")
+
+        # Parâmetros específicos para gráficos hierárquicos
+        params = {
+            "path": list(path_config.keys()), # Lista com os nomes amigáveis das colunas
+            "values": values_nome,
+            "title": titulo,
+        }
+        
+        # O método _gerar_grafico não é adequado aqui, pois os parâmetros são muito diferentes.
+        # Chamamos diretamente o Plotly e o to_html.
+        func = self.PLOT_FUNCS.get(tipo_grafico)
+        fig = func(df, **params)
+        
+        # Customizações específicas para Sunburst
+        if tipo_grafico == 'sunburst':
+            fig.update_traces(textinfo="label+percent entry")
+            fig.update_layout(margin=dict(t=50, l=25, r=25, b=25))
+
+        return fig.to_html(full_html=False, include_plotlyjs="cdn", config={"responsive": True})

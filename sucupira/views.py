@@ -37,6 +37,8 @@ def pessoal_ppg(request):
         'docentes_card': p.card_total_docentes_ultimo_ano,
         'discentes_ano_plot': p.discentes_por_ano(),
         'docentes_ano_plot': p.docentes_por_ano(),
+        'discentes_sunburst_plot': p.discentes_por_area_sunburst(**request.GET.dict()),
+        'docentes_sunburst_plot': p.docentes_por_area_sunburst(**request.GET.dict()),
     }
 )
 
@@ -91,6 +93,55 @@ def grafico_docentes_por_ano(request):
     
     return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
 
+def grafico_discentes_sunburst(request):
+    """
+    View acionada pelo HTMX para atualizar o gráfico de discentes.
+    Refatorada para funcionar com o novo modelo de PlotsPessoal.
+    """
+    plotter = PlotsPessoal()
+
+    # Coleta todos os parâmetros da URL em um único dicionário.
+    # A classe PlotsPessoal saberá como usar cada um.
+    params = request.GET.dict()
+
+    # Converte os anos para inteiros, com valores padrão seguros.
+    try:
+        params['ano'] = int(params.get('ano', 2013))
+    except (ValueError, TypeError):
+        params['ano'] = 2013
+    
+    # Gera o gráfico passando todos os parâmetros de uma vez.
+    # Os argumentos da assinatura do método (ano_inicial, agrupamento, etc.)
+    # serão extraídos, e o restante (situacao, grau_curso) será capturado
+    # pelo **kwargs dentro do método.
+    graf = plotter.discentes_por_area_sunburst(**params)
+    
+    return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
+
+def grafico_docentes_sunburst(request):
+    """
+    View acionada pelo HTMX para atualizar o gráfico de discentes.
+    Refatorada para funcionar com o novo modelo de PlotsPessoal.
+    """
+    plotter = PlotsPessoal()
+
+    # Coleta todos os parâmetros da URL em um único dicionário.
+    # A classe PlotsPessoal saberá como usar cada um.
+    params = request.GET.dict()
+
+    # Converte os anos para inteiros, com valores padrão seguros.
+    try:
+        params['ano'] = int(params.get('ano', 2013))
+    except (ValueError, TypeError):
+        params['ano'] = 2013
+    
+    # Gera o gráfico passando todos os parâmetros de uma vez.
+    # Os argumentos da assinatura do método (ano_inicial, agrupamento, etc.)
+    # serão extraídos, e o restante (situacao, grau_curso) será capturado
+    # pelo **kwargs dentro do método.
+    graf = plotter.docentes_por_area_sunburst(**params)
+    
+    return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
 
 def posgrad_ufrj(request):
     return HttpResponse('Página em construção')

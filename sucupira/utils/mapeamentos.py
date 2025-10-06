@@ -182,6 +182,53 @@ media_titulacao_por_ano_ppg = {
 }
 
 
+discentes_por_area_sunburst = {
+    "modelo": Discente,
+    "titulo_base": "Distribuição de Discentes por Área do Conhecimento",
+
+    # --- NOVAS CHAVES PARA GRÁFICOS HIERÁRQUICOS ---
+    "grafico_hierarquico_path": {
+        "Grande Área": "programa__ano_programa__grande_area__nm_grande_area_conhecimento",
+        "Área de Conhecimento": "programa__ano_programa__area_conhecimento__nm_area_conhecimento",
+    },
+    "grafico_hierarquico_values_campo": "pessoa_id",
+    "grafico_hierarquico_values_nome": "Quantidade",
+    "grafico_hierarquico_agregacao": "count_distinct",
+
+    # --- Filtros reutilizados ---
+    "filtros": {
+        "ano": "ano__ano_valor",
+        "situacao": "situacao__nm_situacao_discente",
+    },
+    "filtros_padrao": {
+        "ano": 2013, # Retrato de um ano específico
+    },
+}
+
+
+docentes_por_area_sunburst = {
+    "modelo": Docente,
+    "titulo_base": "Distribuição de Docentes por Área do Conhecimento",
+
+    # A hierarquia é a mesma, mas a busca parte do modelo Docente
+    "grafico_hierarquico_path": {
+        "Grande Área": "programa__ano_programa__grande_area__nm_grande_area_conhecimento",
+        "Área de Conhecimento": "programa__ano_programa__area_conhecimento__nm_area_conhecimento",
+    },
+    
+    # A contagem é sobre os docentes únicos
+    "grafico_hierarquico_values_campo": "pessoa_id",
+    "grafico_hierarquico_values_nome": "Quantidade",
+    "grafico_hierarquico_agregacao": "count_distinct",
+
+    "filtros": {
+        "ano": "ano__ano_valor",
+        #"categoria_docente": "categoria__ds_categoria_docente", # Filtro extra!
+    },
+    "filtros_padrao": {
+        "ano": 2013, 
+    },
+}
 
 
 
@@ -191,7 +238,9 @@ media_titulacao_por_ano_ppg = {
 MAPEAMENTOS = {
     # Gráficos Gerais
     "discentes_geral": discentes_geral_por_ano,
+    "discentes_sunburst": discentes_por_area_sunburst,
     "docentes_geral": docentes_geral_por_ano,
+    "docentes_sunburst": docentes_por_area_sunburst,
 
     # Gráficos Específicos de um PPG
     "discentes_ppg": discentes_por_ano_ppg,
