@@ -1,0 +1,11 @@
+{# common/templates/common/partials/filtros/_filtro_modalidade.html #}
+{% load common_filters %}
+<div class="col-md-3">
+    <label for="{{ grafico_id }}-modalidade" class="form-label">Modalidade do Programa</label>
+    <select id="{{ grafico_id }}-modalidade" name="modalidade" class="form-select">
+        <option value="total" selected>Todas</option>
+        {% for modalidade in modalidades %}
+        <option value="{{ modalidade.nm_modalidade_programa }}">{{ modalidade.nm_modalidade_programa|capitalizar_frase }}</option>
+        {% endfor %}
+    </select>
+</div>

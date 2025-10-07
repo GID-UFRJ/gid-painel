@@ -1,0 +1,11 @@
+{# common/templates/common/partials/filtros/_filtro_grande_area.html #}
+{% load common_filters %}
+<div class="col-md-3">
+    <label for="{{ grafico_id }}-grande_area" class="form-label">Grande Área</label>
+    <select id="{{ grafico_id }}-grande_area" name="grande_area" class="form-select">
+        <option value="total" selected>Todas</option>
+        {% for area in grandes_areas %}
+        <option value="{{ area.nm_grande_area_conhecimento }}">{{ area.nm_grande_area_conhecimento|capitalizar_frase }}</option>
+        {% endfor %}
+    </select>
+</div>

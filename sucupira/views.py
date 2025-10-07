@@ -33,12 +33,17 @@ def pessoal_ppg(request):
 
     return render(request, r'sucupira/pessoal/pessoal_ppg.html', {
         "abas": abas,
+
         'n_titulados_cards': p.cards_total_alunos_titulados_por_grau,
         'docentes_card': p.card_total_docentes_ultimo_ano,
+        # Gráficos da primeira aba (visível): gerado agora
         'discentes_ano_plot': p.discentes_por_ano(),
-        'docentes_ano_plot': p.docentes_por_ano(),
         'discentes_sunburst_plot': p.discentes_por_area_sunburst(**request.GET.dict()),
-        'docentes_sunburst_plot': p.docentes_por_area_sunburst(**request.GET.dict()),
+        # Gráficos das abas escondidas: serão carregados depois via HTMX
+        'docentes_sunburst_plot': None,
+        'docentes_ano_plot': None,
+        #'docentes_sunburst_plot': p.docentes_por_area_sunburst(**request.GET.dict()),
+        #'docentes_ano_plot': p.docentes_por_ano(),
     }
 )
 
@@ -182,63 +187,6 @@ def ppgs(request):
 
 
 
-
-#from django.shortcuts import render, get_object_or_404
-#from django.db.models import Avg
-#import pandas as pd
-#import plotly.express as px
-#from .models import Programa, Discente, GrauCurso, Curso
-
-
-#def gerar_grafico(programa_id, grau_nome, titulo_extra=""):
-#    """
-#    Gera um gráfico de tempo médio de titulação para um determinado grau.
-#    Retorna HTML do gráfico ou None se não houver dados.
-#    """
-#    grau = GrauCurso.objects.filter(nm_grau_curso__iexact=grau_nome).first()
-#    if not grau:
-#        return None
-#
-#
-#
-#    qs = (
-#        Discente.objects
-#        .filter(
-#            programa_id=programa_id,
-#            grau_academico=grau,
-#            situacao__nm_situacao_discente__icontains="TITULADO",
-#        )
-#        .exclude(qt_mes_titulacao=0)  # opcional: remove valores 0
-#        .values("ano__ano_valor")
-#        .annotate(media_qt_mes=Avg("qt_mes_titulacao"))
-#        .order_by("ano__ano_valor")
-#    )
-#
-#    df = pd.DataFrame(list(qs))
-#    if df.empty:
-#        return None
-#
-#    df.rename(columns={"ano__ano_valor": "Ano", "media_qt_mes": "Média"}, inplace=True)
-#
-#    fig = px.line(
-#        df,
-#        x="Ano",
-#        y="Média",
-#        markers=True,
-#        title=f"Média de meses para titulação ({grau_nome}{titulo_extra})",
-#    )
-#    fig.update_traces(connectgaps=True)
-#    fig.update_layout(
-#        autosize=True,
-#        margin=dict(l=40, r=40, t=60, b=40),
-#        xaxis_title="Ano",
-#        yaxis_title="Média de meses para titulação",
-#        xaxis=dict(type="category"),
-#    )
-#    return fig.to_html(full_html=False, include_plotlyjs="cdn", config={"responsive": True})
-#
-#
-
 def ppg_detalhe(request, programa_id):
 
     abas = [
@@ -309,10 +257,17 @@ def ppg_detalhe(request, programa_id):
         "abas": abas,
         "programa": programa,
         "cursos": cursos,
-        'discentes_ano_plot': p.discentes_por_ano(**params),
-        'docentes_ano_plot': p.docentes_por_ano(**params),
+
+        ## Plots da primeira aba
         'conceito_programa_ano_plot': p.conceito_programa_por_ano(**params),
-        'media_titulacao_ano_plot': p.media_titulacao_por_ano(**params),
+
+        ## Plots das outras abas:
+        'discentes_ano_plot': None,
+        'docentes_ano_plot': None,
+        'media_titulacao_ano_plot': None,
+        #'discentes_ano_plot': p.discentes_por_ano(**params),
+        #'docentes_ano_plot': p.docentes_por_ano(**params),
+        #'media_titulacao_ano_plot': p.media_titulacao_por_ano(**params),
     }
 
     return render(request, "sucupira/posgrad/ppg_detalhe.html", context)
@@ -321,32 +276,6 @@ def ppg_detalhe(request, programa_id):
 def grafico_discentes_por_ano_ppg(request, programa_id):
     """
     View acionada pelo HTMX para atualizar o gráfico de discentes.
-    """
-    plotter = PlotsPpgDetalhe(programa_id=programa_id)
-
-    # Coleta todos os parâmetros da URL em um único dicionário.
-    # A classe PlotsPessoal saberá como usar cada um.
-    params = request.GET.dict()
-
-    # Converte os anos para inteiros, com valores padrão seguros.
-    try:
-        params['ano_inicial'] = int(params.get('ano_inicial', 2013))
-        params['ano_final'] = int(params.get('ano_final', 2024))
-    except (ValueError, TypeError):
-        params['ano_inicial'] = 2013
-        params['ano_final'] = 2024
-    
-    # Gera o gráfico passando todos os parâmetros de uma vez.
-    # Os argumentos da assinatura do método (ano_inicial, agrupamento, etc.)
-    # serão extraídos, e o restante (situacao, grau_curso) será capturado
-    # pelo **kwargs dentro do método.
-    graf = plotter.discentes_por_ano(**params)
-    
-    return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
-
-def grafico_media_titulação_por_ano_ppg(request, programa_id):
-    """
-    View acionada pelo HTMX para atualizar o gráfico de média de tempo de titulação
     """
     plotter = PlotsPpgDetalhe(programa_id=programa_id)
 
@@ -436,4 +365,5 @@ def grafico_media_titulacao_por_ano_ppg(request, programa_id):
     # A chamada para gerar o gráfico é idêntica, apenas mudando o método.
     graf = plotter.media_titulacao_por_ano(**params)
     
-    return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
+    return HttpResponse(graf)
+    #return render(request, "common/partials/_plot_reativo.html", {'graf': graf})

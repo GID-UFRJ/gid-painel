@@ -1,0 +1,10 @@
+{# common/templates/common/partials/filtros/_filtro_bolsa_produtividade.html #}
+<div class="col-md-3">
+    <label for="{{ grafico_id }}-bolsa_produtividade" class="form-label">Bolsa Produtividade</label>
+    <select id="{{ grafico_id }}-bolsa_produtividade" name="bolsa_produtividade" class="form-select">
+        <option value="total" selected>Todas</option>
+        {% for b in bolsas %}
+        <option value="{{ b.cd_cat_bolsa_produtividade }}">{{ b.cd_cat_bolsa_produtividade }}</option>
+        {% endfor %}
+    </select>
+</div>

@@ -1,0 +1,16 @@
+{# common/templates/common/partials/filtros/_filtro_ano_unico.html #}
+<div class="col-md-3">
+    <label for="{{ grafico_id }}-ano" class="form-label">Selecione o Ano</label>
+    <select id="{{ grafico_id }}-ano" name="ano" class="form-select">
+        {% for ano_obj in anos_disponiveis %}
+            <option 
+                value="{{ ano_obj.ano_valor }}" 
+                {# Lógica para manter o ano selecionado após a atualização do HTMX #}
+                {% if request.GET.ano|default:"2024"|stringformat:"s" == ano_obj.ano_valor|stringformat:"s" %}
+                    selected
+                {% endif %}>
+                {{ ano_obj.ano_valor }}
+            </option>
+        {% endfor %}
+    </select>
+</div>

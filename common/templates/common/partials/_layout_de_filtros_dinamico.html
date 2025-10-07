@@ -1,0 +1,12 @@
+{# common/partials/_layout_de_filtros_dinamico.html #}
+
+{% extends "common/partials/_grafico_com_filtros.html" %}
+
+{% block filtros %}
+<div class="row g-3 align-items-end">
+    {# Este loop irá renderizar cada filtro que a templatetag selecionou, na ordem definida #}
+    {% for filtro_template in lista_de_filtros %}
+        {% include filtro_template %}
+    {% endfor %}
+</div>
+{% endblock %}

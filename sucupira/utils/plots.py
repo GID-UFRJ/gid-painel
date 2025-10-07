@@ -293,10 +293,15 @@ class PlotsPpgDetalhe(BasePlots):
             pronto_para_plot=False
         )
 
-        fig.update_traces(texttemplate="%{y:.1f}")
+        # VERIFICANDO O TIPO DO RETORNO!
+        #    A biblioteca Plotly usa 'Figure' como nome da classe do objeto do gráfico.
+        if 'Figure' in str(type(fig)):
+            fig.update_traces(texttemplate="%{y:.1f}")
 
-        return  fig.to_html(
-                full_html=False,
-                include_plotlyjs="cdn",
-                config={"responsive": True},
-            )
+            return  fig.to_html(
+                    full_html=False,
+                    include_plotlyjs="cdn",
+                    config={"responsive": True},
+                )
+
+        return fig

@@ -32,10 +32,23 @@
 
         <!-- Container do gráfico -->
         <div id="{{ grafico_id }}">
-            {% if grafico_html %}
-                {{ grafico_html|safe }}
-            {% endif %}
-        </div>
+        {% if grafico_html %}
+            {# Para a 1ª aba, o gráfico inicial é renderizado aqui #}
+            {{ grafico_html|safe }}
+        {% else %}
+            {# Para as abas escondidas, este div buscará seu próprio conteúdo ao se tornar visível #}
+            <div hx-get="{{ url_grafico|safe }}" 
+                 hx-trigger="intersect once"
+                 hx-swap="innerHTML"
+                 hx-indicator="#{{ spinner_id }}">
+                <div class="text-center p-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando gráfico...</span>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
     </div>
     {% endblock grafico_container %}
 

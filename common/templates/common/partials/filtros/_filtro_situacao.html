@@ -1,0 +1,12 @@
+{# common/templates/common/partials/filtros/_filtro_situacao.html #}
+{% load common_filters %}
+
+<div class="col-md-3">
+    <label for="{{ grafico_id }}-situacao" class="form-label">Situação</label>
+    <select id="{{ grafico_id }}-situacao" name="situacao" class="form-select">
+        <option value="total" selected>Todas</option>
+        {% for s in situacoes %}
+        <option value="{{ s.nm_situacao_discente }}">{{ s.nm_situacao_discente|capitalizar_frase }}</option>
+        {% endfor %}
+    </select>
+</div>
