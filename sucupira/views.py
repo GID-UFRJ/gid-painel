@@ -39,9 +39,12 @@ def pessoal_ppg(request):
         # Gráficos da primeira aba (visível): gerado agora
         'discentes_ano_plot': p.discentes_por_ano(),
         'discentes_sunburst_plot': p.discentes_por_area_sunburst(**request.GET.dict()),
+        'top_paises_discentes_plot': p.top_paises_discentes(**request.GET.dict()),
         # Gráficos das abas escondidas: serão carregados depois via HTMX
         'docentes_sunburst_plot': None,
         'docentes_ano_plot': None,
+        'top_paises_docentes_plot': None,
+        #'top_paises_docentes_plot': p.top_paises_docentes(**request.GET.dict()),
         #'docentes_sunburst_plot': p.docentes_por_area_sunburst(**request.GET.dict()),
         #'docentes_ano_plot': p.docentes_por_ano(),
     }
@@ -97,6 +100,16 @@ def grafico_docentes_por_ano(request):
     graf = plotter.docentes_por_ano(**params)
     
     return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
+
+def grafico_top_paises_discentes(request):
+    p = PlotsPessoal()
+    return HttpResponse(p.top_paises_discentes(**request.GET.dict()))
+
+def grafico_top_paises_docentes(request):
+    p = PlotsPessoal()
+    return HttpResponse(p.top_paises_docentes(**request.GET.dict()))
+
+
 
 def grafico_discentes_sunburst(request):
     """

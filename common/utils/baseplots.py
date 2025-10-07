@@ -295,3 +295,63 @@ class BasePlots:
             fig.update_layout(margin=dict(t=50, l=25, r=25, b=25))
 
         return fig.to_html(full_html=False, include_plotlyjs="cdn", config={"responsive": True})
+
+
+    # ==========================================================================
+    # NOVO MÉTODO PARA GRÁFICOS DE RANKING (TOP N)
+    # ==========================================================================
+    def _gerar_grafico_ranking(
+        self,
+        tipo_entidade: str,
+        tipo_grafico: str,
+        filtros_selecionados: dict,
+        titulo_override: str | None = None,
+        **kwargs,
+    ):
+        """
+        Gera um gráfico de barras ordenado (ranking) para "Top N".
+        """
+        queryset, mapeamento, filtros_finais = self._get_base_queryset(tipo_entidade, filtros_selecionados)
+
+        # --- 1. Extrair configurações de ranking do mapeamento ---
+        campo_categoria = mapeamento.get("ranking_campo_categoria")
+        campo_valor = mapeamento.get("ranking_campo_valor", "id")
+        agregacao_str = mapeamento.get("ranking_agregacao", "count")
+        limite_padrao = mapeamento.get("ranking_limite_padrao", 10)
+        
+        if not campo_categoria:
+            raise KeyError(f"Mapeamento '{tipo_entidade}' precisa da chave 'ranking_campo_categoria'.")
+
+        # --- 2. Montar e executar a query de ranking ---
+        distinct = 'distinct' in agregacao_str.lower()
+        agregacao_base = agregacao_str.split('_')[0]
+        agg_map = {"count": Count(campo_valor, distinct=distinct), "sum": Sum(campo_valor)}
+        agg_func = agg_map.get(agregacao_base)
+
+        # Pega o limite do filtro da URL, ou usa o padrão do mapeamento
+        limite = int(filtros_finais.get('limite', limite_padrao))
+
+        dados = queryset.values(campo_categoria).annotate(
+            total=agg_func
+        ).order_by('-total')[:limite] # Ordena pelo total e pega os N primeiros
+
+        # --- 3. Preparar o DataFrame ---
+        df = pd.DataFrame(list(dados))
+        if df.empty:
+            return "<p class='text-center text-muted mt-4'>Nenhum dado encontrado.</p>"
+        
+        # Para gráficos de ranking, a ordem importa. Vamos inverter para que o maior fique no topo.
+        df = df.iloc[::-1]
+
+        # --- 4. Gerar o Gráfico ---
+        # Gráficos de barra horizontais são melhores para rankings com rótulos longos
+        params = {
+            "x": "total",
+            "y": campo_categoria,
+            "orientation": 'h', # <-- Gráfico deitado
+            "title": titulo_override or mapeamento.get("titulo_base", ""),
+            "text": "total", # Para exibir os valores nas barras
+        }
+
+        # Usamos _gerar_grafico, mas ele precisa de um pequeno ajuste para aceitar 'orientation'
+        return self._gerar_grafico(df, tipo_grafico, params, **kwargs)

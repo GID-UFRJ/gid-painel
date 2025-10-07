@@ -141,6 +141,12 @@ class PlotsPessoal(BasePlots):
             tipo_grafico="sunburst",
             filtros_selecionados=kwargs
         )
+    
+    def top_paises_discentes(self, **kwargs):
+        return self._gerar_grafico_ranking("top_paises_discentes", "barra", kwargs)
+    
+    def top_paises_docentes(self, **kwargs):
+        return self._gerar_grafico_ranking("top_paises_docentes", "barra", kwargs)
 
 # sucupira/utils/plots.py (ou onde sua classe está)
 

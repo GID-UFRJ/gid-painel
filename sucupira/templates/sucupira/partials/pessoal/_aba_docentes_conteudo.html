@@ -8,3 +8,6 @@
 
 {% url 'pessoal:grafico_docentes_sunburst' as url_docentes_sunburst %}
 {% render_filtros_pessoal "sunburst" url_docentes_sunburst "docentes-sunburst" "spinner-docentes-sunburst" docentes_sunburst_plot %}
+
+        {% url 'pessoal:grafico_top_paises_docentes' as url_top_docentes %}
+        {% render_filtros_pessoal "top_paises_docentes" url_top_docentes "top-paises-docentes" "spinner-top-paises-docentes" top_paises_docentes_plot %}

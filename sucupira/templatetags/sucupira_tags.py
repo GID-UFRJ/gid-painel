@@ -58,6 +58,12 @@ def render_filtros_pessoal(context, tipo, url_grafico, grafico_id, spinner_id, g
         lista_de_filtros = [ f"{PATH_FILTROS_ATOMicos}_filtro_ano_unico.html" ]
         ctx.update({"anos_disponiveis": Ano.objects.all().order_by('-ano_valor')})
 
+    elif tipo == "top_paises_discentes":
+        lista_de_filtros = [ f"{PATH_FILTROS_ATOMicos}_filtro_limite.html" ]
+    
+    elif tipo == "top_paises_docentes":
+        lista_de_filtros = [ f"{PATH_FILTROS_ATOMicos}_filtro_limite.html" ]
+
     else:
         raise ValueError(f"Tipo de filtro inválido para 'pessoal': {tipo}")
 

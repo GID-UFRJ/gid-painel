@@ -9,3 +9,6 @@
 {% url 'pessoal:grafico_discentes_sunburst' as url_discentes_sunburst %}
 {% render_filtros_pessoal "sunburst" url_discentes_sunburst "discentes-sunburst" "spinner-discentes-sunburst" discentes_sunburst_plot %}
 
+
+        {% url 'pessoal:grafico_top_paises_discentes' as url_top_discentes %}
+        {% render_filtros_pessoal "top_paises_discentes" url_top_discentes "top-paises-discentes" "spinner-top-paises-discentes" top_paises_discentes_plot %}

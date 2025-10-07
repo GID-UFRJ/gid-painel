@@ -230,6 +230,32 @@ docentes_por_area_sunburst = {
     },
 }
 
+top_paises_discentes = {
+    "modelo": Discente,
+    "titulo_base": "Top 10 Países de Procedência - Discentes",
+    
+    # --- Configurações de Ranking ---
+    "ranking_campo_categoria": "pessoa__pais_nacionalidade__pais",
+    "ranking_campo_valor": "pessoa_id",
+    "ranking_agregacao": "count_distinct",
+    "ranking_limite_padrao": 10,
+
+    # --- Filtros ---
+    "filtros": {
+        "limite": None, # 'limite' não é um campo do modelo, é um parâmetro de controle
+        "ano": "ano__ano_valor", # Podemos adicionar filtros extras se quisermos
+    },
+}
+
+top_paises_docentes = {
+    "modelo": Docente,
+    "titulo_base": "Top 10 Países de Procedência - Docentes",
+    "ranking_campo_categoria": "pessoa__pais_nacionalidade__pais",
+    "ranking_campo_valor": "pessoa_id",
+    "ranking_agregacao": "count_distinct",
+    "ranking_limite_padrao": 10,
+    "filtros": { "limite": None },
+}
 
 
 # =============================================================================
@@ -241,12 +267,15 @@ MAPEAMENTOS = {
     "discentes_sunburst": discentes_por_area_sunburst,
     "docentes_geral": docentes_geral_por_ano,
     "docentes_sunburst": docentes_por_area_sunburst,
+    "top_paises_discentes": top_paises_discentes,
+    "top_paises_docentes": top_paises_docentes,
 
     # Gráficos Específicos de um PPG
     "discentes_ppg": discentes_por_ano_ppg,
     "media_titulacao": media_titulacao_por_ano_ppg,
     "docentes_ppg": docentes_por_ano_ppg,
     "conceito_ppg": conceito_programa_por_ano,
+
 
 }
 
