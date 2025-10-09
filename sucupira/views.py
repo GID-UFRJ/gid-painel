@@ -1,6 +1,6 @@
 from collections import defaultdict
+from django.http import HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404
-from django.shortcuts import HttpResponse
 from .utils.plots import PlotsPessoal, PlotsPpgDetalhe
 from .models import Programa, DiscenteSituacao, ProgramaGrandeArea, GrauCurso, AnoPrograma, Curso, Discente
 from django.db.models import OuterRef, Subquery
@@ -33,133 +33,30 @@ def pessoal_ppg(request):
 
     return render(request, r'sucupira/pessoal/pessoal_ppg.html', {
         "abas": abas,
-
         'n_titulados_cards': p.cards_total_alunos_titulados_por_grau,
         'docentes_card': p.card_total_docentes_ultimo_ano,
-        # Gráficos da primeira aba (visível): gerado agora
-        'discentes_ano_plot': p.discentes_por_ano(),
-        'discentes_sunburst_plot': p.discentes_por_area_sunburst(**request.GET.dict()),
-        'top_paises_discentes_plot': p.top_paises_discentes(**request.GET.dict()),
-        # Gráficos das abas escondidas: serão carregados depois via HTMX
-        'docentes_sunburst_plot': None,
-        'docentes_ano_plot': None,
-        'top_paises_docentes_plot': None,
-        #'top_paises_docentes_plot': p.top_paises_docentes(**request.GET.dict()),
-        #'docentes_sunburst_plot': p.docentes_por_area_sunburst(**request.GET.dict()),
-        #'docentes_ano_plot': p.docentes_por_ano(),
     }
 )
 
-def grafico_discentes_por_ano(request):
+def grafico_generico_pessoal(request, nome_plot: str):
     """
-    View acionada pelo HTMX para atualizar o gráfico de discentes.
-    Refatorada para funcionar com o novo modelo de PlotsPessoal.
-    """
-    plotter = PlotsPessoal()
-
-    # Coleta todos os parâmetros da URL em um único dicionário.
-    # A classe PlotsPessoal saberá como usar cada um.
-    params = request.GET.dict()
-
-    # Converte os anos para inteiros, com valores padrão seguros.
-    try:
-        params['ano_inicial'] = int(params.get('ano_inicial', 2013))
-        params['ano_final'] = int(params.get('ano_final', 2024))
-    except (ValueError, TypeError):
-        params['ano_inicial'] = 2013
-        params['ano_final'] = 2024
-    
-    # Gera o gráfico passando todos os parâmetros de uma vez.
-    # Os argumentos da assinatura do método (ano_inicial, agrupamento, etc.)
-    # serão extraídos, e o restante (situacao, grau_curso) será capturado
-    # pelo **kwargs dentro do método.
-    graf = plotter.discentes_por_ano(**params)
-    
-    return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
-
-
-def grafico_docentes_por_ano(request):
-    """
-    View acionada pelo HTMX para atualizar o gráfico de docentes.
-    Refatorada para funcionar com o novo modelo de PlotsPessoal.
+    View genérica para todos os gráficos da seção Pessoal.
+    Chama dinamicamente o método correspondente em PlotsPessoal.
     """
     plotter = PlotsPessoal()
-
-    # Coleta todos os parâmetros da URL.
-    params = request.GET.dict()
-
-    # Garante que os anos sejam inteiros.
-    try:
-        params['ano_inicial'] = int(params.get('ano_inicial', 2013))
-        params['ano_final'] = int(params.get('ano_final', 2024))
-    except (ValueError, TypeError):
-        params['ano_inicial'] = 2013
-        params['ano_final'] = 2024
-
-    # A chamada para gerar o gráfico é idêntica, apenas mudando o método.
-    graf = plotter.docentes_por_ano(**params)
     
-    return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
+    # Verifica se o método solicitado existe na classe (por segurança)
+    if not hasattr(plotter, nome_plot):
+        raise Http404("Gráfico não encontrado.")
 
-def grafico_top_paises_discentes(request):
-    p = PlotsPessoal()
-    return HttpResponse(p.top_paises_discentes(**request.GET.dict()))
-
-def grafico_top_paises_docentes(request):
-    p = PlotsPessoal()
-    return HttpResponse(p.top_paises_docentes(**request.GET.dict()))
-
-
-
-def grafico_discentes_sunburst(request):
-    """
-    View acionada pelo HTMX para atualizar o gráfico de discentes.
-    Refatorada para funcionar com o novo modelo de PlotsPessoal.
-    """
-    plotter = PlotsPessoal()
-
-    # Coleta todos os parâmetros da URL em um único dicionário.
-    # A classe PlotsPessoal saberá como usar cada um.
-    params = request.GET.dict()
-
-    # Converte os anos para inteiros, com valores padrão seguros.
-    try:
-        params['ano'] = int(params.get('ano', 2013))
-    except (ValueError, TypeError):
-        params['ano'] = 2013
+    # Pega o método da classe usando o nome fornecido na URL
+    metodo_a_chamar = getattr(plotter, nome_plot)
     
-    # Gera o gráfico passando todos os parâmetros de uma vez.
-    # Os argumentos da assinatura do método (ano_inicial, agrupamento, etc.)
-    # serão extraídos, e o restante (situacao, grau_curso) será capturado
-    # pelo **kwargs dentro do método.
-    graf = plotter.discentes_por_area_sunburst(**params)
+    # Executa o método, passando os parâmetros da URL
+    grafico_html = metodo_a_chamar(**request.GET.dict())
     
-    return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
+    return HttpResponse(grafico_html)
 
-def grafico_docentes_sunburst(request):
-    """
-    View acionada pelo HTMX para atualizar o gráfico de discentes.
-    Refatorada para funcionar com o novo modelo de PlotsPessoal.
-    """
-    plotter = PlotsPessoal()
-
-    # Coleta todos os parâmetros da URL em um único dicionário.
-    # A classe PlotsPessoal saberá como usar cada um.
-    params = request.GET.dict()
-
-    # Converte os anos para inteiros, com valores padrão seguros.
-    try:
-        params['ano'] = int(params.get('ano', 2013))
-    except (ValueError, TypeError):
-        params['ano'] = 2013
-    
-    # Gera o gráfico passando todos os parâmetros de uma vez.
-    # Os argumentos da assinatura do método (ano_inicial, agrupamento, etc.)
-    # serão extraídos, e o restante (situacao, grau_curso) será capturado
-    # pelo **kwargs dentro do método.
-    graf = plotter.docentes_por_area_sunburst(**params)
-    
-    return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
 
 def posgrad_ufrj(request):
     return HttpResponse('Página em construção')
@@ -197,7 +94,6 @@ def ppgs(request):
         'programas_agrupados': programas_agrupados
     }
     return render(request, 'sucupira/posgrad/ppgs.html', context)
-
 
 
 def ppg_detalhe(request, programa_id):
@@ -285,98 +181,17 @@ def ppg_detalhe(request, programa_id):
 
     return render(request, "sucupira/posgrad/ppg_detalhe.html", context)
 
-
-def grafico_discentes_por_ano_ppg(request, programa_id):
+def grafico_generico_ppg(request, programa_id: int, nome_plot: str):
     """
-    View acionada pelo HTMX para atualizar o gráfico de discentes.
-    """
-    plotter = PlotsPpgDetalhe(programa_id=programa_id)
-
-    # Coleta todos os parâmetros da URL em um único dicionário.
-    # A classe PlotsPessoal saberá como usar cada um.
-    params = request.GET.dict()
-
-    # Converte os anos para inteiros, com valores padrão seguros.
-    try:
-        params['ano_inicial'] = int(params.get('ano_inicial', 2013))
-        params['ano_final'] = int(params.get('ano_final', 2024))
-    except (ValueError, TypeError):
-        params['ano_inicial'] = 2013
-        params['ano_final'] = 2024
-    
-    # Gera o gráfico passando todos os parâmetros de uma vez.
-    # Os argumentos da assinatura do método (ano_inicial, agrupamento, etc.)
-    # serão extraídos, e o restante (situacao, grau_curso) será capturado
-    # pelo **kwargs dentro do método.
-    graf = plotter.discentes_por_ano(**params)
-    
-    return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
-
-
-def grafico_docentes_por_ano_ppg(request, programa_id):
-    """
-    View acionada pelo HTMX para atualizar o gráfico de docentes.
+    View genérica para todos os gráficos da seção PPG Detalhe.
+    Chama dinamicamente o método correspondente em PlotsPpgDetalhe.
     """
     plotter = PlotsPpgDetalhe(programa_id=programa_id)
 
-    # Coleta todos os parâmetros da URL.
-    params = request.GET.dict()
+    if not hasattr(plotter, nome_plot):
+        raise Http404("Gráfico não encontrado.")
 
-    # Garante que os anos sejam inteiros.
-    try:
-        params['ano_inicial'] = int(params.get('ano_inicial', 2013))
-        params['ano_final'] = int(params.get('ano_final', 2024))
-    except (ValueError, TypeError):
-        params['ano_inicial'] = 2013
-        params['ano_final'] = 2024
-
-    # A chamada para gerar o gráfico é idêntica, apenas mudando o método.
-    graf = plotter.docentes_por_ano(**params)
+    metodo_a_chamar = getattr(plotter, nome_plot)
+    grafico_html = metodo_a_chamar(**request.GET.dict())
     
-    return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
-
-def grafico_conceito_programa_por_ano_ppg(request, programa_id):
-    """
-    View acionada pelo HTMX para atualizar o gráfico de conceito CAPES.
-    """
-    plotter = PlotsPpgDetalhe(programa_id=programa_id)
-
-    # Coleta todos os parâmetros da URL.
-    params = request.GET.dict()
-
-    # Garante que os anos sejam inteiros.
-    try:
-        params['ano_inicial'] = int(params.get('ano_inicial', 2013))
-        params['ano_final'] = int(params.get('ano_final', 2024))
-    except (ValueError, TypeError):
-        params['ano_inicial'] = 2013
-        params['ano_final'] = 2024
-
-    # A chamada para gerar o gráfico é idêntica, apenas mudando o método.
-    graf = plotter.conceito_programa_por_ano(**params)
-    
-    return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
-
-
-def grafico_media_titulacao_por_ano_ppg(request, programa_id):
-    """
-    View acionada pelo HTMX para atualizar o gráfico de docentes.
-    """
-    plotter = PlotsPpgDetalhe(programa_id=programa_id)
-
-    # Coleta todos os parâmetros da URL.
-    params = request.GET.dict()
-
-    # Garante que os anos sejam inteiros.
-    try:
-        params['ano_inicial'] = int(params.get('ano_inicial', 2013))
-        params['ano_final'] = int(params.get('ano_final', 2024))
-    except (ValueError, TypeError):
-        params['ano_inicial'] = 2013
-        params['ano_final'] = 2024
-
-    # A chamada para gerar o gráfico é idêntica, apenas mudando o método.
-    graf = plotter.media_titulacao_por_ano(**params)
-    
-    return HttpResponse(graf)
-    #return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
+    return HttpResponse(grafico_html)

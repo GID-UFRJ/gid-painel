@@ -29,6 +29,6 @@
     </div>
 </div>
 
-
-{% url 'posgrad:grafico_conceito_programa_por_ano_ppg' programa.id as url_conceito_programa_ano %}
+{# MODIFICADO: Aponta para a URL genérica com programa_id e nome_plot='conceito_programa_por_ano' #}
+{% url 'posgrad:grafico_generico_ppg' programa_id=programa.id nome_plot='conceito_programa_por_ano' as url_conceito_programa_ano %}
 {% render_filtros_ppg_detalhe "conceito_programa" url_conceito_programa_ano "programa-ano" "spinner-programa-ano" conceito_programa_ano_plot %}

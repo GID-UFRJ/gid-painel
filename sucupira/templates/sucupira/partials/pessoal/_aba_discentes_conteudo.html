@@ -1,14 +1,19 @@
 {# sucupira/templates/sucupira/partials/pessoal/_aba_discentes_conteudo.html #}
 
-{% load sucupira_tags %} 
+{% load sucupira_tags %}
 
-{% url 'pessoal:grafico_discentes_por_ano' as url_discentes_ano %}
+{# MODIFICADO: Aponta para a URL genérica com nome_plot='discentes_por_ano' #}
+{% url 'pessoal:grafico_generico_pessoal' nome_plot='discentes_por_ano' as url_discentes_ano %}
 {% render_filtros_pessoal "discentes" url_discentes_ano "discentes-ano" "spinner-discentes-ano" discentes_ano_plot %}
 
+<hr class="my-5">
 
-{% url 'pessoal:grafico_discentes_sunburst' as url_discentes_sunburst %}
+{# MODIFICADO: Aponta para a URL genérica com nome_plot='discentes_por_area_sunburst' #}
+{% url 'pessoal:grafico_generico_pessoal' nome_plot='discentes_por_area_sunburst' as url_discentes_sunburst %}
 {% render_filtros_pessoal "sunburst" url_discentes_sunburst "discentes-sunburst" "spinner-discentes-sunburst" discentes_sunburst_plot %}
 
+<hr class="my-5">
 
-        {% url 'pessoal:grafico_top_paises_discentes' as url_top_discentes %}
-        {% render_filtros_pessoal "top_paises_discentes" url_top_discentes "top-paises-discentes" "spinner-top-paises-discentes" top_paises_discentes_plot %}
+{# MODIFICADO: Aponta para a URL genérica com nome_plot='top_paises_discentes' #}
+{% url 'pessoal:grafico_generico_pessoal' nome_plot='top_paises_discentes' as url_top_discentes %}
+{% render_filtros_pessoal "top_paises_discentes" url_top_discentes "top-paises-discentes" "spinner-top-paises-discentes" top_paises_discentes_plot %}
