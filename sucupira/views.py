@@ -171,12 +171,12 @@ def ppg_detalhe(request, programa_id):
         'conceito_programa_ano_plot': p.conceito_programa_por_ano(**params),
 
         ## Plots das outras abas:
-        'discentes_ano_plot': None,
-        'docentes_ano_plot': None,
-        'media_titulacao_ano_plot': None,
-        #'discentes_ano_plot': p.discentes_por_ano(**params),
-        #'docentes_ano_plot': p.docentes_por_ano(**params),
-        #'media_titulacao_ano_plot': p.media_titulacao_por_ano(**params),
+        #'discentes_ano_plot': None,
+        #'docentes_ano_plot': None,
+        #'media_titulacao_ano_plot': None,
+        'discentes_ano_plot': p.discentes_por_ano(**params),
+        'docentes_ano_plot': p.docentes_por_ano(**params),
+        'media_titulacao_ano_plot': p.media_titulacao_por_ano(**params),
     }
 
     return render(request, "sucupira/posgrad/ppg_detalhe.html", context)
