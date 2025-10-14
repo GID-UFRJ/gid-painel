@@ -25,6 +25,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy # Espera o DB estar saudável
+      redis:
+        condition: service_healthy # Espera o Redis estar saudável
     restart: "on-failure" # Adicione para garantir que o serviço reinicie se cair
 
   postgres:
@@ -42,6 +44,16 @@ services:
       timeout: 5s
       retries: 5
     restart: "on-failure"
+
+  redis:
+    image: redis:7-alpine  # Usamos uma imagem leve
+    hostname: redis        # O nome do host que o Django usará para se conectar
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"] # Verifica se o Redis está respondendo
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: "unless-stopped"
 
   init-db:
     # Inicializa a db, criando tabelas e fazendo população inicial dos dados

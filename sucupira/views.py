@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from collections import defaultdict
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404
@@ -31,21 +32,31 @@ def pessoal_ppg(request):
         },
     ]
 
-    return render(request, r'sucupira/pessoal/pessoal_ppg.html', {
+    plots_cache_key = 'pessoal_ppg_initial_plots'
+    contexto_plots = cache.get(plots_cache_key)
+
+    if contexto_plots is None:
+        contexto_plots = {
+            ##Gráficos interativos iniciais
+            #Aba discentes
+            'discentes_ano_plot': p.discentes_por_ano(),
+            'discentes_sunburst_plot': p.discentes_por_area_sunburst(),
+            'top_paises_discentes_plot': p.top_paises_discentes(),
+            #Aba docentes
+            'docentes_ano_plot': p.docentes_por_ano(),
+            'docentes_sunburst_plot': p.docentes_por_area_sunburst(),
+            'top_paises_docentes_plot': p.top_paises_docentes(),
+        }
+        cache.set(plots_cache_key, contexto_plots, timeout=3600)
+
+    context = {
         "abas": abas,
-        'n_titulados_cards': p.cards_total_alunos_titulados_por_grau,
-        'docentes_card': p.card_total_docentes_ultimo_ano,
-        ##Gráficos interativos iniciais
-        #Aba discentes
-        'discentes_ano_plot': p.discentes_por_ano,
-        'discentes_sunburst_plot': p.discentes_por_area_sunburst,
-        'top_paises_discentes_plot': p.top_paises_discentes,
-        #Aba docentes
-        'docentes_ano_plot': p.docentes_por_ano,
-        'docentes_sunburst_plot': p.docentes_por_area_sunburst,
-        'top_paises_docentes_plot': p.top_paises_docentes,
+        'n_titulados_cards': p.cards_total_alunos_titulados_por_grau(),
+        'docentes_card': p.card_total_docentes_ultimo_ano(),
     }
-)
+    context.update(contexto_plots)
+
+    return render(request, r'sucupira/pessoal/pessoal_ppg.html', context)
 
 def grafico_generico_pessoal(request, nome_plot: str):
     """
@@ -131,6 +142,26 @@ def ppg_detalhe(request, programa_id):
         },
     ]
 
+    p = PlotsPpgDetalhe(programa_id=programa_id)
+
+
+    # A chave do cache DEVE ser única para cada programa
+    plots_cache_key = f'ppg_detalhe_context_{programa_id}'
+    contexto_plots = cache.get(plots_cache_key)
+
+    # Se os plots para ESTE programa não estiverem no cache...
+    if contexto_plots is None:
+        # ...geramos apenas os gráficos para o estado inicial
+        contexto_plots = {
+            'conceito_programa_ano_plot': p.conceito_programa_por_ano(),
+            'discentes_ano_plot': p.discentes_por_ano(),
+            'docentes_ano_plot': p.docentes_por_ano(),
+            'media_titulacao_ano_plot': p.media_titulacao_por_ano(),
+            # Adicione outros plots iniciais da página de detalhes aqui, se houver
+        }
+        # Salvamos o dicionário de plots para ESTE programa no cache
+        cache.set(plots_cache_key, contexto_plots, timeout=3600)
+
     # Subquery para o último AnoPrograma deste programa
     ultimo_ano_qs = AnoPrograma.objects.filter(
         programa_id=OuterRef('pk')
@@ -152,7 +183,6 @@ def ppg_detalhe(request, programa_id):
         pk=programa_id
     )
 
-    p = PlotsPpgDetalhe(programa_id=programa_id)
 
     # Obter cursos do programa
     cursos = (
@@ -176,17 +206,8 @@ def ppg_detalhe(request, programa_id):
         "programa": programa,
         "cursos": cursos,
 
-        ## Plots da primeira aba
-        'conceito_programa_ano_plot': p.conceito_programa_por_ano(**params),
-
-        ## Plots das outras abas:
-        #'discentes_ano_plot': None,
-        #'docentes_ano_plot': None,
-        #'media_titulacao_ano_plot': None,
-        'discentes_ano_plot': p.discentes_por_ano(**params),
-        'docentes_ano_plot': p.docentes_por_ano(**params),
-        'media_titulacao_ano_plot': p.media_titulacao_por_ano(**params),
     }
+    context.update(contexto_plots)
 
     return render(request, "sucupira/posgrad/ppg_detalhe.html", context)
 
