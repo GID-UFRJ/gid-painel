@@ -1,10 +1,10 @@
-from django.core.cache import cache
 from collections import defaultdict
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404
 from .utils.plots import PlotsPessoal, PlotsPpgDetalhe
 from .models import Programa, DiscenteSituacao, ProgramaGrandeArea, GrauCurso, AnoPrograma, Curso, Discente
 from django.db.models import OuterRef, Subquery
+from common.utils.cache import cache_context_data
 
 # Create your views here.
 
@@ -12,50 +12,79 @@ def index(request): #index unificado
     namespace = request.resolver_match.namespace # pega o namespace atual (vem do include no urls.py principal)
     return render(request, f"sucupira/{namespace}/index.html")
 
+# ==============================================================================
+# VIEW PARA A PÁGINA "PESSOAL PPG"
+# ==============================================================================
 def pessoal_ppg(request):
-    p = PlotsPessoal()
 
-    abas = [
-        {
-            "id": "discentes", 
-            "label": "Discentes", 
-            "icone": "fas fa-user-graduate", 
-            "titulo": "Análise de Discentes",
-            "template_name": "sucupira/partials/pessoal/_aba_discentes_conteudo.html"  # Caminho para o conteúdo
-        },
-        {
-            "id": "docentes", 
-            "label": "Docentes", 
-            "icone": "fas fa-chalkboard-teacher", 
-            "titulo": "Análise de Docentes",
-            "template_name": "sucupira/partials/pessoal/_aba_docentes_conteudo.html"   # Caminho para o conteúdo
-        },
-    ]
+    # A função decorada abaixo lida com a criação de todo o contexto da página.
+    # O decorador irá interceptar a chamada, verificar o cache e, se necessário,
+    # executar esta função para gerar os dados.
+    @cache_context_data(key_prefix='pessoal_ppg')
+    def get_cached_context():
+        """
+        Esta função interna contém toda a lógica "cara" que queremos cachear.
+        Ela é responsável por gerar o contexto completo para a página pessoal_ppg.
+        """
+        
+        # Instanciamos a classe de plots, que usaremos para gerar cards e gráficos.
+        p = PlotsPessoal()
 
-    plots_cache_key = 'pessoal_ppg_initial_plots'
-    contexto_plots = cache.get(plots_cache_key)
+        # Definição da estrutura das abas, mantida dentro da função por enquanto.
+        abas = [
+            {
+                "id": "discentes", 
+                "label": "Discentes", 
+                "icone": "fas fa-user-graduate", 
+                "titulo": "Análise de Discentes",
+                "template_name": "sucupira/partials/pessoal/_aba_discentes_conteudo.html"
+            },
+            {
+                "id": "docentes", 
+                "label": "Docentes", 
+                "icone": "fas fa-chalkboard-teacher", 
+                "titulo": "Análise de Docentes",
+                "template_name": "sucupira/partials/pessoal/_aba_docentes_conteudo.html"
+            },
+        ]
 
-    if contexto_plots is None:
+        # ETAPA 1: Gerar os dados dos cards (KPIs).
+        # Agrupamos todas as chamadas relacionadas aos cards em um dicionário próprio
+        # para manter o código organizado.
+        contexto_cards = {
+            'n_titulados_cards': p.cards_total_alunos_titulados_por_grau(),
+            'docentes_card': p.card_total_docentes_ultimo_ano(),
+        }
+
+        # ETAPA 2: Gerar os dados dos plots (a parte mais pesada e demorada).
+        # Agrupamos todas as chamadas de plotagem em seu próprio dicionário.
         contexto_plots = {
-            ##Gráficos interativos iniciais
-            #Aba discentes
             'discentes_ano_plot': p.discentes_por_ano(),
             'discentes_sunburst_plot': p.discentes_por_area_sunburst(),
             'top_paises_discentes_plot': p.top_paises_discentes(),
-            #Aba docentes
             'docentes_ano_plot': p.docentes_por_ano(),
             'docentes_sunburst_plot': p.docentes_por_area_sunburst(),
             'top_paises_docentes_plot': p.top_paises_docentes(),
         }
-        cache.set(plots_cache_key, contexto_plots, timeout=3600)
+        
+        # ETAPA 3: Montar o contexto final, combinando todas as partes.
+        # Esta é a estrutura final que será enviada para o template (e para o cache).
+        context = {
+            "abas": abas,
+            
+            # O operador `**` (desempacotamento de dicionário) "funde" os dicionários
+            # de cards e plots diretamente no contexto final. É uma forma limpa
+            # e moderna de combinar múltiplos dicionários.
+            **contexto_cards,
+            **contexto_plots,
+        }
+        
+        return context
 
-    context = {
-        "abas": abas,
-        'n_titulados_cards': p.cards_total_alunos_titulados_por_grau(),
-        'docentes_card': p.card_total_docentes_ultimo_ano(),
-    }
-    context.update(contexto_plots)
-
+    # A lógica principal da view agora é muito simples:
+    # Apenas chama a função com cache e renderiza o template com o resultado.
+    context = get_cached_context()
+    
     return render(request, r'sucupira/pessoal/pessoal_ppg.html', context)
 
 def grafico_generico_pessoal(request, nome_plot: str):
@@ -83,133 +112,139 @@ def posgrad_ufrj(request):
 
 def ppgs(request):
     """
-    Lista todos os programas de pós-graduação mostrando os dados do último ano.
+    Lista todos os programas de pós-graduação, usando cache para otimizar a performance.
     """
 
-    # Subquery para buscar o último AnoPrograma de cada programa
-    ultimo_ano_qs = AnoPrograma.objects.filter(
-        programa=OuterRef('pk')
-    ).order_by('-ano__ano_valor')  # ordena do mais recente
+    # Aplicamos o decorador à nossa função interna.
+    # Damos a ele um prefixo de chave único para não colidir com outros caches.
+    @cache_context_data(key_prefix='ppgs_list') 
+    def get_cached_context():
+        """
+        Esta função contém toda a lógica pesada de buscar e agrupar os programas.
+        Ela só será executada se o resultado não estiver no cache.
+        """
+        
+        # --- TODA A SUA LÓGICA ORIGINAL VAI AQUI DENTRO ---
 
-    # Anotando os campos que queremos do último ano
-    programas = Programa.objects.annotate(
-        nm_programa_ies=Subquery(ultimo_ano_qs.values('nm_programa_ies__nm_programa_ies')[:1]), 
-        grande_area_nome=Subquery(ultimo_ano_qs.values('grande_area__nm_grande_area_conhecimento')[:1]),
-        #ultimo_ano=Subquery(ultimo_ano_qs.values('ano__ano_valor')[:1]),
-        #area_avaliacao_nome=Subquery(ultimo_ano_qs.values('area_avaliacao__nm_area_avaliacao')[:1]),
-        #conceito_atual=Subquery(ultimo_ano_qs.values('cd_conceito_programa__cd_conceito_programa')[:1]),
-        #situacao_atual=Subquery(ultimo_ano_qs.values('situacao__ds_situacao_programa')[:1]),
-    ).order_by('grande_area_nome', 'nm_programa_ies')
+        # Subquery para buscar o último AnoPrograma de cada programa
+        ultimo_ano_qs = AnoPrograma.objects.filter(
+            programa=OuterRef('pk')
+        ).order_by('-ano__ano_valor')
 
-    # Agrupar por grande área
-    agrupados = defaultdict(list)
-    for programa in programas:
-        chave = programa.grande_area_nome or "Sem Grande Área"
-        agrupados[chave].append(programa)
+        # Anotando os campos que queremos do último ano
+        programas = Programa.objects.annotate(
+            nm_programa_ies=Subquery(ultimo_ano_qs.values('nm_programa_ies__nm_programa_ies')[:1]), 
+            grande_area_nome=Subquery(ultimo_ano_qs.values('grande_area__nm_grande_area_conhecimento')[:1]),
+        ).order_by('grande_area_nome', 'nm_programa_ies')
 
-    # Transformar em dict ordenado por chave (Grande Área)
-    programas_agrupados = dict(sorted(agrupados.items()))
+        # Agrupar por grande área
+        agrupados = defaultdict(list)
+        for programa in programas:
+            chave = programa.grande_area_nome or "Sem Grande Área"
+            agrupados[chave].append(programa)
 
-    context = {
-        'programas_agrupados': programas_agrupados
-    }
+        # Transformar em dict ordenado por chave (Grande Área)
+        programas_agrupados = dict(sorted(agrupados.items()))
+
+        # A função retorna o dicionário de contexto completo que será cacheado.
+        context = {
+            'programas_agrupados': programas_agrupados
+        }
+        return context
+
+    # A lógica principal da view é apenas chamar a função com cache.
+    context = get_cached_context()
+    
     return render(request, 'sucupira/posgrad/ppgs.html', context)
 
 
+
+# ==============================================================================
+# VIEW PARA A PÁGINA "DETALHE DO PPG"
+# ==============================================================================
 def ppg_detalhe(request, programa_id):
 
-    abas = [
-        {
-            "id": "programa", 
-            "label": "Programa", 
-            "icone": "fas fa-graduation-cap", 
-            "titulo": "Análise do Programa",
-            "template_name": "sucupira/partials/posgrad/ppg_detalhe/_aba_programa_conteudo.html"   # Caminho para o conteúdo
-        },
-        {
-            "id": "discentes", 
-            "label": "Discentes", 
-            "icone": "fas fa-user-graduate", 
-            "titulo": "Análise de Discentes",
-            "template_name": "sucupira/partials/posgrad/ppg_detalhe/_aba_discentes_conteudo.html"  # Caminho para o conteúdo
-        },
-        {
-            "id": "docentes", 
-            "label": "Docentes", 
-            "icone": "fas fa-chalkboard-teacher", 
-            "titulo": "Análise de Docentes",
-            "template_name": "sucupira/partials/posgrad/ppg_detalhe/_aba_docentes_conteudo.html"   # Caminho para o conteúdo
-        },
-    ]
-
-    p = PlotsPpgDetalhe(programa_id=programa_id)
-
-
-    # A chave do cache DEVE ser única para cada programa
-    plots_cache_key = f'ppg_detalhe_context_{programa_id}'
-    contexto_plots = cache.get(plots_cache_key)
-
-    # Se os plots para ESTE programa não estiverem no cache...
-    if contexto_plots is None:
-        # ...geramos apenas os gráficos para o estado inicial
+    # O decorador usará o valor de 'prog_id' para criar uma chave de cache única
+    # para cada programa, garantindo que os dados não se misturem.
+    @cache_context_data(key_prefix='ppg_detalhe')
+    def get_cached_context(prog_id):
+        """
+        Gera e cacheia o contexto para a página de detalhes de um programa específico.
+        """
+        
+        # Definição da estrutura das abas, mantida dentro da função.
+        abas = [
+            {
+                "id": "programa", 
+                "label": "Programa", 
+                "icone": "fas fa-graduation-cap", 
+                "titulo": "Análise do Programa",
+                "template_name": "sucupira/partials/posgrad/ppg_detalhe/_aba_programa_conteudo.html"
+            },
+            {
+                "id": "discentes", 
+                "label": "Discentes", 
+                "icone": "fas fa-user-graduate", 
+                "titulo": "Análise de Discentes",
+                "template_name": "sucupira/partials/posgrad/ppg_detalhe/_aba_discentes_conteudo.html"
+            },
+            {
+                "id": "docentes", 
+                "label": "Docentes", 
+                "icone": "fas fa-chalkboard-teacher", 
+                "titulo": "Análise de Docentes",
+                "template_name": "sucupira/partials/posgrad/ppg_detalhe/_aba_docentes_conteudo.html"
+            },
+        ]
+        
+        # ETAPA 1: Fazer as consultas pesadas ao banco de dados.
+        # Deve-se de usar 'prog_id', o argumento da função interna.
+        p = PlotsPpgDetalhe(programa_id=prog_id)
+        
+        ultimo_ano_qs = AnoPrograma.objects.filter(programa_id=OuterRef('pk')).order_by('-ano__ano_valor')
+        programa = get_object_or_404(
+            Programa.objects.annotate(
+                ultimo_ano=Subquery(ultimo_ano_qs.values('ano__ano_valor')[:1]),
+                grande_area_nome=Subquery(ultimo_ano_qs.values('grande_area__nm_grande_area_conhecimento')[:1]),
+                area_avaliacao_nome=Subquery(ultimo_ano_qs.values('area_avaliacao__nm_area_avaliacao')[:1]),
+                area_avaliacao_codigo=Subquery(ultimo_ano_qs.values('area_avaliacao__cd_area_avaliacao')[:1]),
+                conceito_atual=Subquery(ultimo_ano_qs.values('cd_conceito_programa__cd_conceito_programa')[:1]),
+                situacao_atual=Subquery(ultimo_ano_qs.values('situacao__ds_situacao_programa')[:1]),
+                modalidade_atual=Subquery(ultimo_ano_qs.values('nm_modalidade_programa__nm_modalidade_programa')[:1]),
+                nm_programa_ies=Subquery(ultimo_ano_qs.values('nm_programa_ies__nm_programa_ies')[:1])
+                # ... outras anotações para buscar os dados mais recentes do programa ...
+            ),
+            pk=prog_id
+        )
+        cursos = Curso.objects.filter(programa_id=prog_id).select_related("grau_curso").order_by("grau_curso__nm_grau_curso")
+        
+        # ETAPA 2: Gerar os plots iniciais para esta página.
         contexto_plots = {
             'conceito_programa_ano_plot': p.conceito_programa_por_ano(),
             'discentes_ano_plot': p.discentes_por_ano(),
             'docentes_ano_plot': p.docentes_por_ano(),
             'media_titulacao_ano_plot': p.media_titulacao_por_ano(),
-            # Adicione outros plots iniciais da página de detalhes aqui, se houver
+            # Adicione outros plots que devem ser pré-renderizados aqui.
         }
-        # Salvamos o dicionário de plots para ESTE programa no cache
-        cache.set(plots_cache_key, contexto_plots, timeout=3600)
 
-    # Subquery para o último AnoPrograma deste programa
-    ultimo_ano_qs = AnoPrograma.objects.filter(
-        programa_id=OuterRef('pk')
-    ).order_by('-ano__ano_valor')
+        # ETAPA 3: Montar o contexto final.
+        context = {
+            "abas": abas,
+            "programa": programa,
+            "cursos": cursos,
+            
+            # Desempacota o dicionário de plots no contexto final.
+            **contexto_plots,
+        }
+        
+        return context
 
-
-    # Obter o programa anotado com os campos do último ano
-    programa = get_object_or_404(
-        Programa.objects.annotate(
-            ultimo_ano=Subquery(ultimo_ano_qs.values('ano__ano_valor')[:1]),
-            grande_area_nome=Subquery(ultimo_ano_qs.values('grande_area__nm_grande_area_conhecimento')[:1]),
-            area_avaliacao_nome=Subquery(ultimo_ano_qs.values('area_avaliacao__nm_area_avaliacao')[:1]),
-            area_avaliacao_codigo=Subquery(ultimo_ano_qs.values('area_avaliacao__cd_area_avaliacao')[:1]),
-            conceito_atual=Subquery(ultimo_ano_qs.values('cd_conceito_programa__cd_conceito_programa')[:1]),
-            situacao_atual=Subquery(ultimo_ano_qs.values('situacao__ds_situacao_programa')[:1]),
-            modalidade_atual=Subquery(ultimo_ano_qs.values('nm_modalidade_programa__nm_modalidade_programa')[:1]),
-            nm_programa_ies=Subquery(ultimo_ano_qs.values('nm_programa_ies__nm_programa_ies')[:1])
-        ),
-        pk=programa_id
-    )
-
-
-    # Obter cursos do programa
-    cursos = (
-        Curso.objects
-        .filter(programa_id=programa_id)
-        .select_related("grau_curso")
-        .order_by("grau_curso__nm_grau_curso")
-    )
-
-    params = request.GET.dict()
-
-    try:
-        params['ano_inicial'] = int(params.get('ano_inicial', 2013))
-        params['ano_final'] = int(params.get('ano_final', 2023))
-    except (ValueError, TypeError):
-        params['ano_inicial'] = 2013
-        params['ano_final'] = 2023
-
-    context = {
-        "abas": abas,
-        "programa": programa,
-        "cursos": cursos,
-
-    }
-    context.update(contexto_plots)
-
+    # Chamamos a função decorada, passando o 'programa_id' da URL.
+    # O decorador usará este valor para criar sua chave de cache única.
+    context = get_cached_context(prog_id=programa_id)
+    
     return render(request, "sucupira/posgrad/ppg_detalhe.html", context)
+
 
 def grafico_generico_ppg(request, programa_id: int, nome_plot: str):
     """
