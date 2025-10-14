@@ -35,6 +35,15 @@ def pessoal_ppg(request):
         "abas": abas,
         'n_titulados_cards': p.cards_total_alunos_titulados_por_grau,
         'docentes_card': p.card_total_docentes_ultimo_ano,
+        ##Gráficos interativos iniciais
+        #Aba discentes
+        'discentes_ano_plot': p.discentes_por_ano,
+        'discentes_sunburst_plot': p.discentes_por_area_sunburst,
+        'top_paises_discentes_plot': p.top_paises_discentes,
+        #Aba docentes
+        'docentes_ano_plot': p.docentes_por_ano,
+        'docentes_sunburst_plot': p.docentes_por_area_sunburst,
+        'top_paises_docentes_plot': p.top_paises_docentes,
     }
 )
 

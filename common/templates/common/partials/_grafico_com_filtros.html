@@ -1,55 +1,44 @@
-{# common/partials/_grafico_com_filtros.html #}
+{# em common/partials/_grafico_com_filtros.html (VERSÃO REFORÇADA) #}
 
 <div class="container mt-4">
 
-    <!-- Filtros -->
     <form x-data="{}"
           x-init="$el.reset()"
           hx-get="{{ url_grafico|safe }}"
           hx-target="#{{ grafico_id }}"
           hx-trigger="change delay:300ms"
           hx-indicator="#{{ spinner_id }}"
-          hx-include="closest form"
-          {% if extra_attrs %} {{ extra_attrs|safe }} {% endif %}>
+          hx-include="closest form">
 
         {% block filtros %}
-        {# Este block será sobrescrito pelos templates filhos com os inputs/selects de filtros #}
         {% endblock filtros %}
-
     </form>
 
-    {% block grafico_container %}
-    <!-- Gráfico com spinner overlay -->
-    <div class="grafico position-relative" hx-swap="outerHTML" hx-preserve="true">
-        <!-- Spinner overlay com ID único -->
-        <div id="{{ spinner_id }}" class="htmx-indicator position-absolute top-50 start-50 translate-middle
-                    d-flex justify-content-center align-items-center"
-             style="z-index: 10; width: 100%; height: 100%; background: rgba(255,255,255,0.6); pointer-events: none;">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Carregando...</span>
-            </div>
+    <div class="grafico position-relative">
+        <div id="{{ spinner_id }}" class="htmx-indicator position-absolute ...">
+            ...
         </div>
 
-        <!-- Container do gráfico -->
         <div id="{{ grafico_id }}">
+        
         {% if grafico_html %}
-            {# Para a 1ª aba, o gráfico inicial é renderizado aqui #}
+            {# CAMINHO FELIZ: Se a view forneceu o HTML, renderize-o. #}
             {{ grafico_html|safe }}
         {% else %}
-            {# Para as abas escondidas, este div buscará seu próprio conteúdo ao se tornar visível #}
-            <div hx-get="{{ url_grafico|safe }}" 
-                 hx-trigger="intersect once"
-                 hx-swap="innerHTML"
-                 hx-indicator="#{{ spinner_id }}">
-                <div class="text-center p-5">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Carregando gráfico...</span>
-                    </div>
-                </div>
+            {# CAMINHO DE ERRO: Se a view NÃO forneceu, mostre um erro claro. #}
+            <div class="alert alert-danger border-danger p-3">
+                <h5 class="fw-bold"><i class="fas fa-exclamation-triangle me-2"></i>Erro de Implementação</h5>
+                <p class="mb-1">
+                    O componente de gráfico (ID: <code>{{ grafico_id }}</code>) foi renderizado sem o conteúdo inicial.
+                </p>
+                <hr>
+                <p class="mb-0 small">
+                    <strong>Ação Necessária:</strong> A view do Django que renderiza esta página <strong>deve</strong>
+                    pré-renderizar o gráfico e passá-lo para o template na variável de contexto correspondente.
+                    Isso é necessário para garantir a performance e evitar bugs de carregamento.
+                </p>
             </div>
         {% endif %}
+        </div>
     </div>
-    </div>
-    {% endblock grafico_container %}
-
 </div>
