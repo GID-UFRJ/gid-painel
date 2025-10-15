@@ -8,5 +8,16 @@
     {% for filtro_template in lista_de_filtros %}
         {% include filtro_template %}
     {% endfor %}
+
+    <div class="d-flex justify-content-end mt-3">
+        <a x-bind:href="downloadUrl"
+           class="btn btn-success" 
+           title="Baixar dados como CSV">
+            <i class="fas fa-file-csv me-2"></i> Baixar CSV
+        </a>
+    </div>
 </div>
+
+
+
 {% endblock %}

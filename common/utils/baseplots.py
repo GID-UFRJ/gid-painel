@@ -1,58 +1,173 @@
-# common/utils/baseplots.py - VERSÃO CORRIGIDA
+# common/utils/baseplots.py
 
-import re
-import unicodedata
-from django.db.models import Count, Sum, Avg
 import pandas as pd
 import plotly.express as px
-from pandas.api.types import CategoricalDtype
+import unicodedata
+import re
+from django.db.models import Count, Sum, Avg
+
+
+# Importamos as "ferramentas" da nossa "caixa de ferramentas" (o pacote plots_tipos)
+# Certifique-se de que o __init__.py em plots_tipos está exportando essas classes.
+from .plots_tipos import AggregatedPlotStrategy, HierarchicalPlotStrategy, TopNStrategy, DirectPlotStrategy
+
 
 class BasePlots:
-    # ... (propriedades e métodos _get_mapeamento, _get_base_queryset, _formatar_alias_de_coluna sem alterações) ...
+    """
+    O ORQUESTRADOR DE PLOTAGEM (O "ARTESÃO")
+
+    Esta classe orquestra a geração de gráficos e a extração de dados.
+    Ela escolhe a "estratégia" (ferramenta) correta com base na configuração
+    do mapeamento e delega o trabalho pesado, além de fornecer métodos auxiliares comuns.
+    """
+    # ==========================================================
+    # PROPRIEDADES DE CONFIGURAÇÃO
+    # ==========================================================
+    
+    # O "catálogo de ferramentas": mapeia o nome da estratégia para a sua classe.
+    STRATEGY_MAPPING = {
+        'aggregated': AggregatedPlotStrategy,
+        'hierarchical': HierarchicalPlotStrategy,
+        'topn': TopNStrategy,
+        'direct': DirectPlotStrategy, # <-- REGISTRE A NOVA ESTRATÉGIA
+    }
+
+    CATEGORY_ORDERS = {
+        'sexo': ['M', 'F', 'D'],
+        'faixa_etaria': [
+            '19 OU MENOS',
+            '20 A 24 ANOS',
+            '25 A 29 ANOS',
+            '30 A 34 ANOS',
+            '35 A 39 ANOS',
+            '40 A 44 ANOS',
+            '45 A 49 ANOS',
+            '50 A 54 ANOS',
+            '55 A 59 ANOS',
+            '60 A 64 ANOS',
+            '65 A 69 ANOS',
+            '70 OU MAIS'
+        ]
+    }
+
+    # Funções de plotagem do Plotly.
+    PLOT_FUNCS = {
+        "barra": px.bar, "linha": px.line, "pizza": px.pie,
+        "sunburst": px.sunburst, "treemap": px.treemap,
+    }
+    PLOT_CONFIGS = {"barra": {"text_auto": True, "barmode": "group"}, "linha": {"markers": True}}
+
+    # As classes filhas (PlotsPessoal, etc.) devem fornecer este mapa de receitas.
     @property
     def MAPEAMENTOS(self):
-        raise NotImplementedError("Subclasses devem implementar o atributo MAPEAMENTOS")
-    CATEGORY_ORDERS = {"sexo": ["M", "F", "D"],}
-    PLOT_FUNCS = {
-        "barra": px.bar,
-        "linha": px.line,
-        "pizza": px.pie,
-        "sunburst": px.sunburst, 
-        "treemap": px.treemap,   
-    }
-    PLOT_CONFIGS = {"barra": {"text_auto": True, "barmode": "group"},"linha": {"markers": True},}
+        raise NotImplementedError("Subclasses devem implementar o atributo MAPEAMENTOS.")
+
+    # ==========================================================
+    # MÉTODOS ORQUESTRADORES (A LÓGICA PRINCIPAL)
+    # ==========================================================
+
+    def _get_mapeamento_by_public_name(self, nome_plot: str) -> dict | None:
+        """
+        Busca a "receita" de mapeamento correta iterando sobre todos os mapeamentos
+        e comparando o valor da chave 'nome_plot'.
+        """
+        for tipo_entidade, mapeamento in self.MAPEAMENTOS.items():
+            if mapeamento.get('nome_plot') == nome_plot:
+                # Adicionamos o 'tipo_entidade' (a chave interna do dicionário) ao
+                # mapeamento para que a estratégia possa usá-lo.
+                mapeamento['__tipo_entidade__'] = tipo_entidade
+                return mapeamento
+        return None
+
+    def _get_strategy_for_plot(self, nome_plot: str, filtros: dict) -> object:
+        """
+        O cérebro do orquestrador.
+        Escolhe e instancia a estratégia correta para um determinado plot.
+        """
+        # 1. Encontra a "receita" correta usando o 'nome_plot' da URL.
+        mapeamento = self._get_mapeamento_by_public_name(nome_plot)
+        if not mapeamento:
+            raise ValueError(f"Nenhum mapeamento encontrado com nome_plot='{nome_plot}'.")
+        
+        # 2. Descobre qual estratégia usar a partir da receita (ou usa 'aggregated' como padrão).
+        strategy_name = mapeamento.get('estrategia_plot', 'aggregated')
+        StrategyClass = self.STRATEGY_MAPPING.get(strategy_name)
+
+        if not StrategyClass:
+            raise ValueError(f"Estratégia de plot '{strategy_name}' desconhecida ou não registrada no STRATEGY_MAPPING.")
+            
+        # 3. Retorna a "ferramenta" (estratégia) pronta para ser usada.
+        return StrategyClass(mapeamento, filtros, self)
+
+
+    # ==========================================================
+    # INTERFACE PÚBLICA (USADA PELAS VIEWS)
+    # ==========================================================
+
+    def generate_plot_html(self, nome_plot: str, filtros_selecionados: dict, **kwargs) -> str:
+        """
+        Ponto de entrada único para gerar o HTML de um gráfico.
+        """
+        strategy = self._get_strategy_for_plot(nome_plot, filtros_selecionados)
+        df = strategy.get_dataframe()
+        tipo_grafico = filtros_selecionados.get(
+            'tipo_grafico',  # Prioridade 1: A escolha explícita do usuário nos filtros da URL.
+            strategy.mapeamento.get(
+                'tipo_grafico',  # Prioridade 2: O tipo fixo definido na receita (ex: "sunburst").
+                strategy.mapeamento.get(
+                    'tipo_grafico_padrao',  # Prioridade 3: O padrão para gráficos flexíveis (ex: "linha").
+                    'barra'  # Prioridade 4: O fallback final se nada for definido.
+                )
+            )
+        )
+        return strategy.generate_plot(df, tipo_grafico=tipo_grafico, **kwargs)
+
+    def get_dataframe_for_plot(self, nome_plot: str, filtros: dict) -> pd.DataFrame:
+        """
+        Ponto de entrada único para obter os dados para download (CSV).
+        """
+        strategy = self._get_strategy_for_plot(nome_plot, filtros)
+        return strategy.get_dataframe()
+
+
+    # ==========================================================
+    # MÉTODOS AUXILIARES INTERNOS (USADOS PELAS ESTRATÉGIAS)
+    # ==========================================================
+
     def _get_mapeamento(self, tipo_entidade: str):
+        """Método auxiliar para buscar uma receita específica."""
         mapeamento = self.MAPEAMENTOS.get(tipo_entidade)
         if not mapeamento:
             raise ValueError(f"Tipo de entidade '{tipo_entidade}' não encontrado nos MAPEAMENTOS.")
+        mapeamento['__tipo_entidade__'] = tipo_entidade
         return mapeamento
+
     def _get_base_queryset(self, tipo_entidade: str, filtros_usuario: dict):
+        """
+        [CORPO COMPLETO] Constrói o queryset base do Django, aplicando filtros.
+        Este método é usado pelas estratégias para obter a query inicial.
+        """
         mapeamento = self._get_mapeamento(tipo_entidade)
         modelo = mapeamento["modelo"]
-        mapa_filtros = mapeamento["filtros"]
+        mapa_filtros_config = mapeamento["filtros"]
+
         filtros_finais = mapeamento.get("filtros_padrao", {}).copy()
         filtros_finais.update(filtros_usuario)
+
         queryset = modelo.objects.all()
-        for chave, valor in filtros_finais.items():
+
+        for chave_filtro, valor in filtros_finais.items():
             if valor is None or (isinstance(valor, str) and valor.lower() in ["total", ""]):
                 continue
-            campo_real = mapa_filtros.get(chave)
+            
+            campo_real = mapa_filtros_config.get(chave_filtro)
             if campo_real:
                 queryset = queryset.filter(**{campo_real: valor})
-        order_by_fields = mapeamento.get('queryset_order_by')
-        if order_by_fields:
-            if isinstance(order_by_fields, str):
-                order_by_fields = [order_by_fields]
-            queryset = queryset.order_by(*order_by_fields)
-        distinct_on_fields = mapeamento.get('queryset_distinct_on')
-        if distinct_on_fields:
-            if not order_by_fields:
-                print(f"AVISO: Usando 'queryset_distinct_on' para '{tipo_entidade}' sem 'queryset_order_by' pode gerar resultados imprevisíveis.")
-            if isinstance(distinct_on_fields, str):
-                distinct_on_fields = [distinct_on_fields]
-            queryset = queryset.distinct(*distinct_on_fields)
+        
         return queryset, mapeamento, filtros_finais
+
     def _formatar_alias_de_coluna(self, nome_exibicao: str) -> str:
+        """[CORPO COMPLETO] Cria um nome seguro para usar como alias em anotações SQL."""
         s = unicodedata.normalize('NFD', nome_exibicao)
         s_ascii = s.encode('ascii', 'ignore')
         s = s_ascii.decode('utf-8')
@@ -61,150 +176,20 @@ class BasePlots:
         s = re.sub(r'[^\w_]', '', s)
         return s
 
-    def _gerar_grafico_agregado(
-        self,
-        tipo_entidade: str,
-        tipo_grafico: str,
-        filtros_selecionados: dict,
-        agrupamento: str | None = None,
-        titulo_override: str | None = None,
-        **kwargs,
-    ):
-        # ... (código de extração de configs, agregação e criação do DataFrame inicial sem alterações) ...
-        queryset, mapeamento, filtros_finais = self._get_base_queryset(tipo_entidade, filtros_selecionados)
-        eixo_x_campo = mapeamento["eixo_x_campo"]
-        eixo_x_nome = mapeamento["eixo_x_nome"]
-        eixo_x_tipo = mapeamento.get("eixo_x_tipo", "categorico")
-        eixo_y_campo = mapeamento.get("eixo_y_campo", "id")
-        eixo_y_nome = mapeamento.get("eixo_y_nome", "Total")
-        agregacao_str = mapeamento.get("eixo_y_agregacao", "count")
-        distinct = 'distinct' in agregacao_str.lower()
-        agregacao_base = agregacao_str.split('_')[0]
-        if distinct and agregacao_base != 'count':
-            raise ValueError(f"A agregação 'distinct' só é suportada para 'count', não para '{agregacao_base}'. Verifique o 'eixo_y_agregacao' no mapeamento '{tipo_entidade}'.")
-        agg_map = {"count": Count(eixo_y_campo, distinct=distinct), "sum": Sum(eixo_y_campo), "avg": Avg(eixo_y_campo)}
-        agg_func = agg_map.get(agregacao_base.lower())
-        if not agg_func:
-            raise ValueError(f"Agregação '{agregacao_base}' não suportada.")
-        campo_grupo = mapeamento.get("agrupamentos", {}).get(agrupamento)
-        valores_a_buscar = [eixo_x_campo]
-        if campo_grupo:
-            valores_a_buscar.append(campo_grupo)
-        alias_coluna_y = self._formatar_alias_de_coluna(eixo_y_nome)
-        dados = queryset.values(*valores_a_buscar).annotate(**{alias_coluna_y: agg_func}).order_by(eixo_x_campo)
-        df = pd.DataFrame(list(dados))
-        if df.empty:
-            return "<p class='text-center text-muted mt-4'>Nenhum dado encontrado para os filtros selecionados.</p>"
-        df.rename(columns={eixo_x_campo: eixo_x_nome, alias_coluna_y: eixo_y_nome}, inplace=True)
-
-        # Lógica de preenchimento e agrupamento
-        grupo_plotly = None
-        if campo_grupo:
-            grupo_plotly = agrupamento
-            df.rename(columns={campo_grupo: grupo_plotly}, inplace=True)
-            df[grupo_plotly] = df[grupo_plotly].fillna("Não informado")
-
-        if eixo_x_tipo == 'numerico_continuo':
-            try:
-                inicio = int(filtros_finais.get('ano_inicial', df[eixo_x_nome].min()))
-                fim = int(filtros_finais.get('ano_final', df[eixo_x_nome].max()))
-                if campo_grupo:
-                    df_pivot = df.pivot_table(index=eixo_x_nome, columns=grupo_plotly, values=eixo_y_nome, fill_value=0)
-                    df_pivot = df_pivot.reindex(range(inicio, fim + 1), fill_value=0)
-                    df = df_pivot.reset_index().melt(id_vars=eixo_x_nome, value_name=eixo_y_nome, var_name=grupo_plotly)
-                else:
-                    eixo_completo = pd.DataFrame({eixo_x_nome: range(inicio, fim + 1)})
-                    df = eixo_completo.merge(df, on=eixo_x_nome, how="left").fillna(0)
-            except (ValueError, TypeError):
-                pass
-        
-        # ======================================================================
-        # CÓDIGO DE ORDENAÇÃO DE CATEGORIA (REINSERIDO AQUI)
-        # ======================================================================
-        if campo_grupo:
-            sort_order = [eixo_x_nome, grupo_plotly]
-            if grupo_plotly in self.CATEGORY_ORDERS:
-                cat_dtype = CategoricalDtype(categories=self.CATEGORY_ORDERS[grupo_plotly], ordered=True)
-                df[grupo_plotly] = df[grupo_plotly].astype(cat_dtype)
-            df.sort_values(by=sort_order, inplace=True)
-        else:
-            df.sort_values(by=[eixo_x_nome], inplace=True)
-        # ======================================================================
-
-        # Constrói o título
-        titulo_base = titulo_override if titulo_override is not None else mapeamento['titulo_base']
-        titulo_final = f"{titulo_base} por {eixo_x_nome}"
-        if agrupamento:
-             titulo_final = f"{titulo_base} por {agrupamento.replace('_', ' ').capitalize()}"
-
-        params = {"x": eixo_x_nome, "y": eixo_y_nome, "color": grupo_plotly, "title": titulo_final}
-        return self._gerar_grafico(df, tipo_grafico, params, **kwargs)
-
-    # ... (os métodos _gerar_grafico_direto e _gerar_grafico permanecem os mesmos) ...
-    def _gerar_grafico_direto(self, tipo_entidade: str, tipo_grafico: str, filtros_selecionados: dict, titulo_override: str | None = None, **kwargs,):
-        queryset, mapeamento, filtros_finais = self._get_base_queryset(tipo_entidade, filtros_selecionados)
-        eixo_x_campo = mapeamento["eixo_x_campo"]
-        eixo_x_nome = mapeamento["eixo_x_nome"]
-        eixo_x_tipo = mapeamento.get("eixo_x_tipo", "categorico")
-        eixo_y_campo = mapeamento.get("eixo_y_campo")
-        eixo_y_nome = mapeamento.get("eixo_y_nome", "Valor")
-        if not eixo_y_campo:
-            raise KeyError(f"Mapeamento '{tipo_entidade}' precisa da chave 'eixo_y_campo'.")
-        dados = queryset.values(eixo_x_campo, eixo_y_campo).order_by(eixo_x_campo)
-        df = pd.DataFrame(list(dados))
-        if df.empty:
-            return "<p class='text-center text-muted mt-4'>Nenhum dado encontrado para os filtros selecionados.</p>"
-        df.rename(columns={eixo_x_campo: eixo_x_nome, eixo_y_campo: eixo_y_nome}, inplace=True)
-        if eixo_x_tipo == 'numerico_continuo':
-            try:
-                inicio = int(filtros_finais.get('ano_inicial', df[eixo_x_nome].min()))
-                fim = int(filtros_finais.get('ano_final', df[eixo_x_nome].max()))
-                eixo_completo = pd.DataFrame({eixo_x_nome: range(inicio, fim + 1)})
-                df = eixo_completo.merge(df, on=eixo_x_nome, how="left")
-            except (ValueError, TypeError):
-                pass
-        titulo_base = titulo_override if titulo_override is not None else mapeamento['titulo_base']
-        titulo_final = f"{titulo_base} por {eixo_x_nome}"
-        params = {"x": eixo_x_nome, "y": eixo_y_nome, "title": titulo_final}
-        return self._gerar_grafico(df, tipo_grafico, params, **kwargs)
-
-    def _gerar_grafico(
-        self,
-        df: pd.DataFrame,
-        tipo_grafico: str,
-        params: dict,
-        pronto_para_plot: bool = True,
-        **kwargs
-    ):
+    def _gerar_grafico(self, df: pd.DataFrame, tipo_grafico: str, params: dict, pronto_para_plot: bool = True, **kwargs):
         """
-        Gera um gráfico Plotly com base nas configurações e retorna
-        o HTML ou o objeto bruto, dependendo da flag 'pronto_para_plot'.
-
-        Parâmetros:
-        -----------
-        df : pd.DataFrame
-            Dados de entrada.
-        tipo_grafico : str
-            Tipo de gráfico (ex: 'barra', 'linha').
-        params : dict
-            Parâmetros específicos do gráfico (x, y, color, title, etc.).
-        pronto_para_plot : bool
-            Se True, retorna o HTML pronto para renderização.
-            Se False, retorna o objeto Plotly Figure para personalização.
+        [CORPO COMPLETO] O passo final: pega um DataFrame e os parâmetros e chama o Plotly.
+        Retorna o HTML ou o objeto Figure bruto.
         """
-
         func = self.PLOT_FUNCS.get(tipo_grafico)
         if not func:
             raise ValueError(f"Tipo de gráfico '{tipo_grafico}' não suportado.")
 
-        # Combina configurações padrão e parâmetros passados
         plot_args = self.PLOT_CONFIGS.get(tipo_grafico, {}).copy()
         plot_args.update({k: v for k, v in params.items() if v is not None})
 
-        # Cria a figura
         fig = func(df, **plot_args)
 
-        # Layout padrão
         fig.update_layout(
             autosize=True,
             margin=dict(l=40, r=40, t=60, b=40),
@@ -215,143 +200,14 @@ class BasePlots:
             xaxis=dict(type="category"),
         )
 
-        # Ajuste específico para gráficos de barra
         if tipo_grafico == "barra":
             fig.update_traces(textposition="outside")
 
-        # Se o gráfico for para renderização imediata, converte para HTML
-        if pronto_para_plot:
-            return fig.to_html(
-                full_html=False,
-                include_plotlyjs="cdn",
-                config={"responsive": True},
-            )
+        if not pronto_para_plot:
+            return fig
 
-        # Caso contrário, retorna o objeto Plotly para customizações
-        return fig
-
-    def _gerar_grafico_hierarquico(
-        self,
-        tipo_entidade: str,
-        tipo_grafico: str,
-        filtros_selecionados: dict,
-        titulo_override: str | None = None,
-        **kwargs,
-    ):
-        """
-        Gera um gráfico hierárquico (Sunburst, Treemap) a partir de um mapeamento.
-        """
-        queryset, mapeamento, filtros_finais = self._get_base_queryset(tipo_entidade, filtros_selecionados)
-
-        if not queryset.exists():
-            return "<p class='text-center text-muted mt-4'>Nenhum dado encontrado para os filtros selecionados.</p>"
-
-        # --- 1. Extrair configurações hierárquicas do mapeamento ---
-        path_config = mapeamento.get("grafico_hierarquico_path")
-        values_campo = mapeamento.get("grafico_hierarquico_values_campo")
-        values_nome = mapeamento.get("grafico_hierarquico_values_nome", "Total")
-        agregacao_str = mapeamento.get("grafico_hierarquico_agregacao", "count")
-
-        if not path_config or not values_campo:
-            raise KeyError(f"Mapeamento '{tipo_entidade}' precisa das chaves 'grafico_hierarquico_path' e 'grafico_hierarquico_values_campo'.")
-
-        # --- 2. Montar e executar a query de agregação ---
-        # Agruparemos por todos os campos no 'path'
-        campos_do_path = list(path_config.values())
-        
-        distinct = 'distinct' in agregacao_str.lower()
-        agregacao_base = agregacao_str.split('_')[0]
-        agg_map = {"count": Count(values_campo, distinct=distinct), "sum": Sum(values_campo), "avg": Avg(values_campo)}
-        agg_func = agg_map.get(agregacao_base)
-        
-        dados = queryset.values(*campos_do_path).annotate(total_agregado=agg_func).order_by()
-
-        # --- 3. Preparar o DataFrame ---
-        df = pd.DataFrame(list(dados))
-        
-        # Renomeia as colunas para nomes amigáveis que serão usados no gráfico
-        mapa_renomeacao = {v: k for k, v in path_config.items()}
-        df.rename(columns=mapa_renomeacao, inplace=True)
-        df.rename(columns={'total_agregado': values_nome}, inplace=True)
-
-        # --- 4. Gerar o Gráfico ---
-        titulo = titulo_override if titulo_override is not None else mapeamento.get("titulo_base", "")
-
-        # Parâmetros específicos para gráficos hierárquicos
-        params = {
-            "path": list(path_config.keys()), # Lista com os nomes amigáveis das colunas
-            "values": values_nome,
-            "title": titulo,
+        config = {
+            "responsive": True,
+            "displaylogo": False,
         }
-        
-        # O método _gerar_grafico não é adequado aqui, pois os parâmetros são muito diferentes.
-        # Chamamos diretamente o Plotly e o to_html.
-        func = self.PLOT_FUNCS.get(tipo_grafico)
-        fig = func(df, **params)
-        
-        # Customizações específicas para Sunburst
-        if tipo_grafico == 'sunburst':
-            fig.update_traces(textinfo="label+percent entry")
-            fig.update_layout(margin=dict(t=50, l=25, r=25, b=25))
-
-        return fig.to_html(full_html=False, include_plotlyjs="cdn", config={"responsive": True})
-
-
-    # ==========================================================================
-    # NOVO MÉTODO PARA GRÁFICOS DE RANKING (TOP N)
-    # ==========================================================================
-    def _gerar_grafico_ranking(
-        self,
-        tipo_entidade: str,
-        tipo_grafico: str,
-        filtros_selecionados: dict,
-        titulo_override: str | None = None,
-        **kwargs,
-    ):
-        """
-        Gera um gráfico de barras ordenado (ranking) para "Top N".
-        """
-        queryset, mapeamento, filtros_finais = self._get_base_queryset(tipo_entidade, filtros_selecionados)
-
-        # --- 1. Extrair configurações de ranking do mapeamento ---
-        campo_categoria = mapeamento.get("ranking_campo_categoria")
-        campo_valor = mapeamento.get("ranking_campo_valor", "id")
-        agregacao_str = mapeamento.get("ranking_agregacao", "count")
-        limite_padrao = mapeamento.get("ranking_limite_padrao", 10)
-        
-        if not campo_categoria:
-            raise KeyError(f"Mapeamento '{tipo_entidade}' precisa da chave 'ranking_campo_categoria'.")
-
-        # --- 2. Montar e executar a query de ranking ---
-        distinct = 'distinct' in agregacao_str.lower()
-        agregacao_base = agregacao_str.split('_')[0]
-        agg_map = {"count": Count(campo_valor, distinct=distinct), "sum": Sum(campo_valor)}
-        agg_func = agg_map.get(agregacao_base)
-
-        # Pega o limite do filtro da URL, ou usa o padrão do mapeamento
-        limite = int(filtros_finais.get('limite', limite_padrao))
-
-        dados = queryset.values(campo_categoria).annotate(
-            total=agg_func
-        ).order_by('-total')[:limite] # Ordena pelo total e pega os N primeiros
-
-        # --- 3. Preparar o DataFrame ---
-        df = pd.DataFrame(list(dados))
-        if df.empty:
-            return "<p class='text-center text-muted mt-4'>Nenhum dado encontrado.</p>"
-        
-        # Para gráficos de ranking, a ordem importa. Vamos inverter para que o maior fique no topo.
-        df = df.iloc[::-1]
-
-        # --- 4. Gerar o Gráfico ---
-        # Gráficos de barra horizontais são melhores para rankings com rótulos longos
-        params = {
-            "x": "total",
-            "y": campo_categoria,
-            "orientation": 'h', # <-- Gráfico deitado
-            "title": titulo_override or mapeamento.get("titulo_base", ""),
-            "text": "total", # Para exibir os valores nas barras
-        }
-
-        # Usamos _gerar_grafico, mas ele precisa de um pequeno ajuste para aceitar 'orientation'
-        return self._gerar_grafico(df, tipo_grafico, params, **kwargs)
+        return fig.to_html(full_html=False, include_plotlyjs="cdn", config=config)

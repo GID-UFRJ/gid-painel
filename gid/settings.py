@@ -100,22 +100,38 @@ DATABASES = {
 }
 
 
-# Cache (Redis)
 
-REDIS_HOST = config('REDIS_HOST', default='localhost')
-REDIS_PORT = config('REDIS_PORT', default='6379', cast=int)
+# Cache condicional (Redis)
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        # Usamos /1 para um banco de dados separado para o cache, o que é uma boa prática
-        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/1",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+# --- INÍCIO DA CONFIGURAÇÃO DE CACHE CONDICIONAL ---
+
+# Esta é a abordagem recomendada para gerenciar o cache entre desenvolvimento e produção.
+if DEBUG:
+    # Em modo de desenvolvimento (DEBUG=True), usamos o "DummyCache".
+    # Este é um cache falso que não armazena nada. Cada chamada a `cache.get()`
+    # sempre retornará `None`, forçando a sua função `get_cached_context` a ser
+    # executada a cada recarregamento de página. Perfeito para depuração.
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
         }
     }
-}
+else:
+    # Em modo de produção (DEBUG=False), usamos a configuração robusta com Redis.
+    REDIS_HOST = config('REDIS_HOST', default='localhost')
+    REDIS_PORT = config('REDIS_PORT', default='6379', cast=int)
+    
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/1",
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            }
+        }
+    }
 
+# --- FIM DA CONFIGURAÇÃO DE CACHE CONDICIONAL ---
 
 
 # Password validation
