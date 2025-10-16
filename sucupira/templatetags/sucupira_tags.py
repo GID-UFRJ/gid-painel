@@ -15,11 +15,18 @@ PATH_FILTROS_ATOMicos = "common/partials/filtros/"
 # TAG PARA A SEÇÃO "PESSOAL" (GERAL)
 # =============================================================================
 @register.inclusion_tag("common/partials/_layout_de_filtros_dinamico.html", takes_context=True)
-def render_filtros_pessoal(context, tipo, url_grafico, grafico_id, spinner_id, grafico_html):
+def render_filtros_pessoal(context, tipo, url_grafico, grafico_id, spinner_id, grafico_html, plotter_name, nome_plot):
     """
     Monta o formulário de filtros para a seção "Pessoal" compondo filtros atômicos.
     """
-    ctx = { "url_grafico": url_grafico, "grafico_id": grafico_id, "spinner_id": spinner_id, "grafico_html": grafico_html }
+    ctx = { "url_grafico": url_grafico, 
+           "grafico_id": grafico_id, 
+           "spinner_id": spinner_id, 
+           "grafico_html": grafico_html,
+           "plotter_name": plotter_name,
+           "nome_plot": nome_plot,
+           "programa_id": None,
+             }
     
     lista_de_filtros = []
 
@@ -75,11 +82,15 @@ def render_filtros_pessoal(context, tipo, url_grafico, grafico_id, spinner_id, g
 # TAG PARA A SEÇÃO "PPG DETALHE"
 # =============================================================================
 @register.inclusion_tag("common/partials/_layout_de_filtros_dinamico.html", takes_context=True)
-def render_filtros_ppg_detalhe(context, tipo, url_grafico, grafico_id, spinner_id, grafico_html):
+def render_filtros_ppg_detalhe(context, tipo, url_grafico, grafico_id, spinner_id, grafico_html, plotter_name, nome_plot, programa_id):
     """
     Monta o formulário de filtros para a seção "PPG Detalhe" compondo filtros atômicos.
     """
-    ctx = { "url_grafico": url_grafico, "grafico_id": grafico_id, "spinner_id": spinner_id, "grafico_html": grafico_html }
+    ctx = { "url_grafico": url_grafico, "grafico_id": grafico_id, "spinner_id": spinner_id, "grafico_html": grafico_html,
+           "plotter_name": plotter_name, 
+            "nome_plot": nome_plot, 
+            "programa_id": programa_id
+       }  
     
     lista_de_filtros = []
 

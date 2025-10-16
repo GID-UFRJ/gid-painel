@@ -2,18 +2,18 @@
 
 {% load sucupira_tags %}
 
-{# MODIFICADO: Aponta para a URL genérica com nome_plot='discentes_por_ano' #}
-{% url 'pessoal:grafico_generico_pessoal' nome_plot='discentes_por_ano' as url_discentes_ano %}
-{% render_filtros_pessoal "discentes" url_discentes_ano "discentes-ano" "spinner-discentes-ano" discentes_ano_plot %}
+{# Gráfico 1: Discentes por Ano #}
+{% url 'sucupira:grafico_generico_pessoal' nome_plot='discentes_por_ano' as url_discentes_ano %}
+{% render_filtros_pessoal "discentes" url_grafico=url_discentes_ano grafico_id="discentes-ano" spinner_id="spinner-discentes-ano" grafico_html=discentes_ano_plot plotter_name="pessoal" nome_plot="discentes_por_ano" %}
 
 <hr class="my-5">
 
-{# MODIFICADO: Aponta para a URL genérica com nome_plot='discentes_por_area_sunburst' #}
-{% url 'pessoal:grafico_generico_pessoal' nome_plot='discentes_por_area_sunburst' as url_discentes_sunburst %}
-{% render_filtros_pessoal "sunburst" url_discentes_sunburst "discentes-sunburst" "spinner-discentes-sunburst" discentes_sunburst_plot %}
+{# Gráfico 2: Discentes por Área (Sunburst) #}
+{% url 'sucupira:grafico_generico_pessoal' nome_plot='discentes_por_area_sunburst' as url_discentes_sunburst %}
+{% render_filtros_pessoal "sunburst" url_grafico=url_discentes_sunburst grafico_id="discentes-sunburst" spinner_id="spinner-discentes-sunburst" grafico_html=discentes_sunburst_plot plotter_name="pessoal" nome_plot="discentes_por_area_sunburst" %}
 
 <hr class="my-5">
 
-{# MODIFICADO: Aponta para a URL genérica com nome_plot='top_paises_discentes' #}
-{% url 'pessoal:grafico_generico_pessoal' nome_plot='top_paises_discentes' as url_top_discentes %}
-{% render_filtros_pessoal "top_paises_discentes" url_top_discentes "top-paises-discentes" "spinner-top-paises-discentes" top_paises_discentes_plot %}
+{# Gráfico 3: Top Países de Discentes #}
+{% url 'sucupira:grafico_generico_pessoal' nome_plot='top_paises_discentes' as url_top_discentes %}
+{% render_filtros_pessoal "top_paises_discentes" url_grafico=url_top_discentes grafico_id="top-paises-discentes" spinner_id="spinner-top-paises-discentes" grafico_html=top_paises_discentes_plot plotter_name="pessoal" nome_plot="top_paises_discentes" %}

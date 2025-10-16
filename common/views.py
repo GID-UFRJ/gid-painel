@@ -14,44 +14,45 @@ PLOTTER_MAPPING = {
 
 def download_csv_generic(request, plotter_name: str, **kwargs):
     """
-    UMA VIEW PARA GOVERNAR TODOS OS DOWNLOADS.
-
-    Gera e serve um arquivo CSV com base no 'plotter_name' e nos filtros da URL.
-    Usa 'kwargs' para capturar argumentos extras como 'programa_id'.
+    [VERSÃO FINAL E CORRIGIDA]
+    Gera e serve um arquivo CSV, garantindo que os parâmetros da URL
+    (como programa_id) sejam incluídos nos filtros.
     """
-    
-    # 1. Encontra a classe de plotter correta usando o mapa.
     PlotterClass = PLOTTER_MAPPING.get(plotter_name)
     if not PlotterClass:
         raise Http404(f"Plotter '{plotter_name}' não encontrado.")
 
-    # 2. Instancia a classe, passando argumentos extras (como programa_id) se necessário.
-    try:
-        plotter = PlotterClass(**kwargs)
-    except TypeError:
-        # Lida com o caso de uma classe não esperar argumentos (como PlotsPessoal).
-        plotter = PlotterClass()
-        
-    # Extrai o nome do plot da URL (o último argumento capturado)
-    # Esta é uma forma robusta de garantir que sempre pegamos o nome do plot.
-    nome_plot = kwargs.get('nome_plot')
+    # --- INÍCIO DA CORREÇÃO ---
+
+    # 1. Extraímos o 'nome_plot' de kwargs, pois ele não é um filtro.
+    #    O .pop() o remove do dicionário kwargs.
+    nome_plot = kwargs.pop('nome_plot', None)
     if not nome_plot:
-         # Fallback para URLs mais antigas, se necessário, mas o padrão novo é melhor.
-         # Este erro indica um problema na configuração da URL.
         raise Http404("O 'nome_plot' não foi fornecido na URL.")
 
-    # 3. Usa o método público da BasePlots para obter o DataFrame já filtrado.
-    df = plotter.get_dataframe_for_plot(nome_plot, request.GET.dict())
+    # 2. Instanciamos o plotter com os argumentos restantes em kwargs (ex: {'programa_id': 139}).
+    plotter = PlotterClass(**kwargs)
+
+    # 3. Criamos o dicionário de filtros a partir dos parâmetros da query (ex: ?ano_inicial=...).
+    filtros = request.GET.dict().copy() # Usamos .copy() por segurança
+
+    # 4. A PARTE CRUCIAL: Atualizamos os filtros com os argumentos da URL (kwargs).
+    #    Isso adiciona {'programa_id': 139} ao dicionário de filtros.
+    filtros.update(kwargs)
+
+    # --- FIM DA CORREÇÃO ---
+
+    # 5. Agora, passamos o dicionário de filtros COMPLETO para a BasePlots.
+    df = plotter.get_dataframe_for_plot(nome_plot, filtros)
 
     if df.empty:
         return HttpResponse("Nenhum dado encontrado para os filtros selecionados.", status=404)
 
-    # 4. Gera a resposta CSV.
+    # A geração da resposta CSV permanece a mesma.
     response = HttpResponse(
-        content_type='text/csv; charset=utf-8-sig', # 'utf-8-sig' garante compatibilidade com Excel
+        content_type='text/csv; charset=utf-8-sig',
         headers={'Content-Disposition': f'attachment; filename="{plotter_name}_{nome_plot}.csv"'},
     )
-    # Usa o Pandas para escrever o CSV diretamente na resposta, usando ';' como separador.
     df.to_csv(path_or_buf=response, index=False, sep=';')
 
     return response

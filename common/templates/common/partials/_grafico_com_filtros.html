@@ -1,22 +1,47 @@
 {# em common/partials/_grafico_com_filtros.html (VERSÃO REFORÇADA) #}
 
+
 <div class="container mt-4">
 
-    <form x-data="{}"
-          x-init="$el.reset()"
-          autocomplete="off"
-          hx-get="{{ url_grafico|safe }}"
-          hx-target="#{{ grafico_id }}"
-          hx-trigger="change delay:300ms"
-          hx-indicator="#{{ spinner_id }}"
-          hx-include="closest form">
+    {# --- PASSO A: A "PONTE" DJANGO -> JAVASCRIPT --- #}
+    {# Preparamos a URL base de download aqui para evitar erros de sintaxe e NoReverseMatch. #}
+    {% if programa_id %}
+        {% url 'common:download_csv_generic_with_id' plotter_name=plotter_name programa_id=programa_id nome_plot=nome_plot as download_base_url %}
+    {% else %}
+        {% url 'common:download_csv_generic' plotter_name=plotter_name nome_plot=nome_plot as download_base_url %}
+    {% endif %}
 
-        {% block filtros %}
-        {% endblock filtros %}
-    </form>
+    <div x-data="{ 
+            downloadUrl: '#',
+            updateDownloadUrl() {
+                // O JavaScript agora apenas pega a URL que o Django já construiu.
+                const baseUrl = '{{ download_base_url }}';
+                // E anexa os parâmetros de filtro atuais do formulário.
+                const params = new URLSearchParams(new FormData($refs.filtersForm)).toString();
+                this.downloadUrl = `${baseUrl}?${params}`;
+            }
+        }"
+        x-init="updateDownloadUrl()">
 
-    <div class="grafico position-relative">
+        <form x-ref="filtersForm"
+              @change="updateDownloadUrl()"
+              autocomplete="off"
+              hx-get="{{ url_grafico|safe }}"
+              hx-target="#{{ grafico_id }}"
+              hx-trigger="change delay:300ms"
+              hx-indicator="#{{ spinner_id }}"
+              hx-include="this">
 
+            {% block filtros %}
+            {# Este bloco será preenchido pelo _layout_de_filtros_dinamico.html #}
+            {% endblock filtros %}
+
+        </form>
+
+    </div>
+
+    <div class="grafico position-relative mt-3">
+        
         <div id="{{ spinner_id }}" class="htmx-indicator position-absolute top-0 start-0 w-100 h-100
                     d-flex justify-content-center align-items-center"
              style="z-index: 10; background: rgba(255,255,255,0.7); pointer-events: none;">
@@ -28,10 +53,8 @@
         <div id="{{ grafico_id }}">
         
         {% if grafico_html %}
-            {# CAMINHO FELIZ: Se a view forneceu o HTML, renderize-o. #}
             {{ grafico_html|safe }}
         {% else %}
-            {# CAMINHO DE ERRO: Se a view NÃO forneceu, mostre um erro claro. #}
             <div class="alert alert-danger border-danger p-3">
                 <h5 class="fw-bold"><i class="fas fa-exclamation-triangle me-2"></i>Erro de Implementação</h5>
                 <p class="mb-1">
@@ -39,9 +62,7 @@
                 </p>
                 <hr>
                 <p class="mb-0 small">
-                    <strong>Ação Necessária:</strong> A view do Django que renderiza esta página <strong>deve</strong>
-                    pré-renderizar o gráfico e passá-lo para o template na variável de contexto correspondente.
-                    Isso é necessário para garantir a performance e evitar bugs de carregamento.
+                    <strong>Ação Necessária:</strong> A view do Django <strong>deve</strong> pré-renderizar o gráfico e passá-lo para o template.
                 </p>
             </div>
         {% endif %}

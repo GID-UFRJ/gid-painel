@@ -64,7 +64,7 @@ docentes_geral_por_ano = {
 # --- Mapeamentos Específicos por PPG (para a classe PlotsPpgDetalhe) ---
 
 discentes_por_ano_ppg = {
-    "nome_plot": "discentes_por_ano",         # <-- ADICIONADO
+    "nome_plot": "discentes_por_ano_ppg",         # <-- ADICIONADO
     "estrategia_plot": "aggregated",      # <-- ADICIONADO
     "modelo": Discente,
     "titulo_base": "Discentes do Programa",
@@ -90,7 +90,7 @@ discentes_por_ano_ppg = {
 }
 
 docentes_por_ano_ppg = {
-    "nome_plot": "docentes_por_ano",         # <-- ADICIONADO
+    "nome_plot": "docentes_por_ano_ppg",         # <-- ADICIONADO
     "estrategia_plot": "aggregated",      # <-- ADICIONADO
     "modelo": Docente,
     "titulo_base": "Docentes do Programa",

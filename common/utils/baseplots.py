@@ -156,6 +156,38 @@ class BasePlots:
 
         queryset = modelo.objects.all()
 
+        # ==================================================================
+        # INÍCIO DOS PRINTS DE DEPURAÇÃO
+        # ==================================================================
+        print("\n" + "="*50)
+        print("--- DEPURAÇÃO EM _get_base_queryset ---")
+        print(f"[INFO] Tipo de Entidade: '{tipo_entidade}'")
+        print(f"[INFO] Filtros recebidos da view (filtros_usuario): {filtros_usuario}")
+        print(f"[INFO] Filtros FINAIS a serem aplicados: {filtros_finais}")
+        print("-" * 20)
+        
+        for chave_filtro, valor in filtros_finais.items():
+            if valor is None or (isinstance(valor, str) and valor.lower() in ["total", ""]):
+                continue
+            
+            campo_real = mapa_filtros_config.get(chave_filtro)
+            
+            print(f"-> Processando filtro: '{chave_filtro}' = '{valor}'")
+            if campo_real:
+                print(f"   - Mapeado para o campo do DB: '{campo_real}'")
+                queryset = queryset.filter(**{campo_real: valor})
+                print(f"   - Filtro APLICADO.")
+            else:
+                print(f"   - ⚠️ AVISO: Chave de filtro '{chave_filtro}' não encontrada no mapa de filtros da receita. Ignorando.")
+        
+        # O print mais importante: mostra a query SQL que o Django vai executar.
+        print("\n[SQL] Query final construída:")
+        print(queryset.query)
+        print("="*50 + "\n")
+        # ==================================================================
+        # FIM DOS PRINTS DE DEPURAÇÃO
+        # ==================================================================
+
         for chave_filtro, valor in filtros_finais.items():
             if valor is None or (isinstance(valor, str) and valor.lower() in ["total", ""]):
                 continue

@@ -189,8 +189,8 @@ def ppg_detalhe(request, programa_id):
         filtros_iniciais = {'programa_id': prog_id}
         contexto_plots = {
             'conceito_programa_ano_plot': p.generate_plot_html(nome_plot='conceito_programa_por_ano', filtros_selecionados=filtros_iniciais),
-            'discentes_ano_plot': p.generate_plot_html(nome_plot='discentes_por_ano', filtros_selecionados=filtros_iniciais),
-            'docentes_ano_plot': p.generate_plot_html(nome_plot='docentes_por_ano', filtros_selecionados=filtros_iniciais),
+            'discentes_ano_plot': p.generate_plot_html(nome_plot='discentes_por_ano_ppg', filtros_selecionados=filtros_iniciais),
+            'docentes_ano_plot': p.generate_plot_html(nome_plot='docentes_por_ano_ppg', filtros_selecionados=filtros_iniciais),
             'media_titulacao_ano_plot': p.generate_plot_html(nome_plot='media_titulacao_por_ano', filtros_selecionados=filtros_iniciais),
         }
 
@@ -206,14 +206,23 @@ def ppg_detalhe(request, programa_id):
     return render(request, "sucupira/posgrad/ppg_detalhe.html", context)
 
 
-def grafico_generico_ppg(request, programa_id: int, nome_plot: str):
+def grafico_generico_ppg(request, **kwargs):
     """
     View genérica para as atualizações HTMX da seção Detalhe do PPG.
     """
-    plotter = PlotsPpgDetalhe(programa_id=programa_id)
+    # --- INÍCIO DA CORREÇÃO ---
+    # 1. Extraímos o 'nome_plot' dos argumentos da URL.
+    nome_plot = kwargs.pop('nome_plot', None)
+    if not nome_plot:
+        raise Http404("O 'nome_plot' não foi fornecido na URL.")
+
+    # 2. O 'kwargs' restante agora contém apenas o 'programa_id'.
+    plotter = PlotsPpgDetalhe(**kwargs)
+    # --- FIM DA CORREÇÃO ---
 
     filtros = request.GET.dict()
-    filtros['programa_id'] = programa_id
+    # Adicionamos o programa_id aos filtros para que a estratégia o receba.
+    filtros['programa_id'] = kwargs.get('programa_id')
 
     grafico_html = plotter.generate_plot_html(
         nome_plot=nome_plot,
