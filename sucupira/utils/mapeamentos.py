@@ -132,6 +132,12 @@ conceito_programa_por_ano = {
         "ano_final": "ano__ano_valor__lte",
     },
     "filtros_padrao": {"ano_inicial": 2013},
+    "yaxes_config": {
+        "range": [0, 7.5],      # Define o intervalo do eixo Y de 0 a 7.5
+        "tickmode": 'linear',   # Garante que os "ticks" (marcações) sejam lineares
+        "tick0": 0,             # Começa a primeira marcação no 0
+        "dtick": 1              # O intervalo entre cada marcação é 1 (0, 1, 2, ...)
+    }
 }
 
 media_titulacao_por_ano_ppg = {
@@ -157,6 +163,21 @@ media_titulacao_por_ano_ppg = {
         "sexo": "pessoa__tp_sexo__sexo",
         "nacionalidade": "pessoa__tipo_nacionalidade__ds_tipo_nacionalidade", 
         "faixa_etaria": "faixa_etaria__ds_faixa_etaria",
+    },
+    # Configuração para a aparência da "trace" (a barra/linha em si)
+    "trace_config": {
+        "texttemplate": "%{y:.1f}"  # Formata o texto na barra para 1 casa decimal
+    },
+
+    # Configuração para o tooltip (hover)
+    "hover_config": {
+        # Diz ao Plotly para incluir a coluna 'Contagem' nos dados de hover
+        "custom_data_cols": ["Contagem"], 
+        
+        # Define o template do hover.
+        # %{y:.1f} -> valor do eixo y, formatado com 1 casa decimal
+        # %{customdata[0]} -> o primeiro item de 'custom_data_cols', ou seja, a Contagem
+        "template": "<b>%{x}</b><br>Média: %{y} meses<br>Nº de Alunos: %{customdata[0]}<extra></extra>"
     },
 }
 
