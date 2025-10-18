@@ -2,13 +2,14 @@ from django.http import HttpResponse, Http404
 import pandas as pd
 
 # Importe TODAS as suas classes de plotagem de todos os apps
-from sucupira.utils.plots import PlotsPessoal, PlotsPpgDetalhe
+from sucupira.utils.plots import PlotsPessoal, PlotsPpgDetalhe, PlotsPpgUfrj
 # from rankings.utils.plots import PlotsRankings # Exemplo de como adicionar no futuro
 
 # --- O MAPA QUE CONECTA O MUNDO EXTERNO (URL) ÀS SUAS CLASSES ---
 PLOTTER_MAPPING = {
     'pessoal': PlotsPessoal,
     'ppg_detalhe': PlotsPpgDetalhe,
+    'posgrad_ufrj': PlotsPpgUfrj,
     # 'rankings': PlotsRankings, # Exemplo de como registrar um novo app no futuro
 }
 
