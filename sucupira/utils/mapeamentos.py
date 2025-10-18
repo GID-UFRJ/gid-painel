@@ -239,6 +239,41 @@ top_paises_docentes = {
     "filtros": { "limite": None },
 }
 
+programas_contagem_por_ano = {
+    "nome_plot": "programas_contagem_por_ano", # Nome público único para URL/template
+    "estrategia_plot": "aggregated",      # Usamos a estratégia existente!
+    #"tipo_grafico_padrao": "linha",         # Começa como linha
+    "modelo": AnoPrograma,                # <<< Fonte principal dos dados
+    "titulo_base": "Número de Programas Registrados", # Título mais preciso
+    "eixo_x_campo": "ano__ano_valor",     # Agruparemos pelo ano do registro
+    "eixo_x_nome": "Ano do Registro",
+    "eixo_x_tipo": "numerico_continuo",   # Ajuda o Plotly a desenhar linhas
+    "eixo_y_campo": "programa_id",        # <<< O que queremos contar
+    "eixo_y_nome": "Número de Programas",
+    "eixo_y_agregacao": "count_distinct", # <<< A operação: contar programas únicos por ano
+    
+    # Filtros que o usuário poderá aplicar (diretamente nos campos de AnoPrograma)
+    "filtros": {
+        "ano_inicial": "ano__ano_valor__gte",
+        "ano_final": "ano__ano_valor__lte",
+        "modalidade": "nm_modalidade_programa__nm_modalidade_programa",
+        "grande_area": "grande_area__nm_grande_area_conhecimento", # Adicionando filtro por área
+        # Adicione outros filtros se desejar (ex: area_avaliacao)
+    },
+
+    # Filtro padrão sugerido: contar apenas programas ativos por padrão
+    "filtros_padrao": {
+    },
+
+    # Agrupamento que o usuário poderá escolher
+    "agrupamentos": {
+        "conceito": "cd_conceito_programa__cd_conceito_programa",
+        "in_rede": "in_rede",
+    },
+}
+
+
+
 # =============================================================================
 # DICIONÁRIO FINAL - Importado pelas classes de Plots
 # =============================================================================
@@ -250,6 +285,10 @@ MAPEAMENTOS = {
     "docentes_sunburst": docentes_por_area_sunburst,
     "top_paises_discentes": top_paises_discentes,
     "top_paises_docentes": top_paises_docentes,
+
+    # Gráficos para todas as PPGs da UFRJ
+    "programas_contagem": programas_contagem_por_ano,
+
 
     # Gráficos Específicos de um PPG
     "discentes_ppg": discentes_por_ano_ppg,

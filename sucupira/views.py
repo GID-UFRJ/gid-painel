@@ -5,7 +5,7 @@ from django.db.models import OuterRef, Subquery
 
 # Importe os modelos, as classes de plotagem (que agora estão simplificadas) e o decorador
 from .models import Programa, AnoPrograma, Curso
-from .utils.plots import PlotsPessoal, PlotsPpgDetalhe
+from .utils.plots import PlotsPessoal, PlotsPpgDetalhe, PlotsPpgUfrj
 from common.utils.cache import cache_context_data
 
 
@@ -18,9 +18,6 @@ def index(request):
     namespace = request.resolver_match.namespace
     return render(request, f"sucupira/{namespace}/index.html")
 
-def posgrad_ufrj(request):
-    """Placeholder para uma futura página."""
-    return HttpResponse('Página em construção')
 
 
 # ==============================================================================
@@ -92,6 +89,75 @@ def grafico_generico_pessoal(request, nome_plot: str):
         filtros_selecionados=request.GET.dict()
     )
     
+    return HttpResponse(grafico_html)
+
+# ==============================================================================
+# VIEW PARA A PÓS-GRADUAÇÃO DA UFRJ NO GERAL (POSGRAD_UFRJ)
+# ==============================================================================
+
+def posgrad_ufrj(request):
+    """Placeholder para uma futura página."""
+    @cache_context_data(key_prefix='posgrad_ufrj', timeout=3600)
+    def get_cached_context():
+        """
+        Gera e cacheia o contexto completo, usando a nova arquitetura de orquestração
+        para criar os plots iniciais.
+        """
+        p = PlotsPpgUfrj()
+
+        abas = [
+            {
+                "id": "ppgs_ufrj",
+                "label": "PPGs UFRJ",
+                "icone": "fas fa-graduation-cap",
+                "titulo": "Análise dos PPGs da UFRJ",
+                "template_name": "sucupira/partials/posgrad/posgrad_ufrj/_aba_ppgs_ufrj_conteudo.html"
+            }
+        ]
+
+        # Note que 'cards_programas_por_modalidade' retorna uma lista,
+        # então vamos juntá-la com os outros cards.
+        card_total = p.card_total_programas_ultimo_ano()
+        cards_modalidade = p.cards_programas_por_modalidade()
+        card_conceito_max = p.card_total_programas_conceito_maximo()
+
+        # Juntamos todos os cards em uma única lista para o template
+        todos_os_cards = ([card_total] if card_total else []) + \
+                         (cards_modalidade or []) + \
+                         ([card_conceito_max] if card_conceito_max else [])
+
+        contexto_cards = {
+            'cards': todos_os_cards
+        }
+
+        contexto_plots = {
+            'programas_contagem_ano_plot': p.generate_plot_html(nome_plot='programas_contagem_por_ano', filtros_selecionados={}),
+        }
+        
+        context = {
+            "abas": abas,
+            **contexto_cards,
+            **contexto_plots,
+        }
+
+        return context
+
+    context = get_cached_context()
+    return render(request, r'sucupira/posgrad/posgrad_ufrj.html', context)
+
+
+
+def grafico_generico_posgrad_ufrj(request, nome_plot: str):
+    """
+    View genérica para as atualizações HTMX da seção Pessoal.
+    """
+    plotter = PlotsPpgUfrj()
+
+    grafico_html = plotter.generate_plot_html(
+        nome_plot=nome_plot,
+        filtros_selecionados=request.GET.dict()
+    )
+
     return HttpResponse(grafico_html)
 
 

@@ -1,0 +1,12 @@
+{# common/templates/common/partials/filtros/_filtro_conceito_programa.html #}
+
+{% load common_filters %}
+<div class="col-md-3">
+    <label for="{{ grafico_id }}-conceito-programa" class="form-label">Grande Área</label>
+    <select id="{{ grafico_id }}-conceito-programa" name="conceito-programa" class="form-select">
+        <option value="total" selected>Todas</option>
+        {% for conceito in conceitos %}
+        <option value="{{ conceito.cd_conceito_programa }}">{{ conceito.cd_conceito_programa|capitalizar_frase }}</option>
+        {% endfor %}
+    </select>
+</div>

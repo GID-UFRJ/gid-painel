@@ -1,11 +1,17 @@
 {# common/templates/common/partials/filtros/_filtro_agrupamento.html #}
+
 <div class="col-md-2">
     <label for="{{ grafico_id }}-agrupamento" class="form-label">Agrupar por</label>
     <select id="{{ grafico_id }}-agrupamento" name="agrupamento" class="form-select">
-        <option value="" selected>Total</option>
-        <option value="nacionalidade">Nacionalidade</option>
-        <option value="sexo">Sexo</option>
-        <option value="faixa_etaria">Faixa Etária</option>
-        {# Adicione aqui outras opções de agrupamento comuns #}
+        
+        <option value="" selected>Total</option> 
+        
+        {# Agora iteramos sobre os itens (chave, valor) do dicionário agrupamentos_disponiveis. #}
+        {% for titulo_visivel, valor_interno in agrupamentos_disponiveis.items %}
+            {# O 'value' do <option> é o valor interno (ex: 'faixa_etaria'). #}
+            {# O texto visível é a chave do dicionário (ex: 'Faixa Etária'). #}
+            <option value="{{ valor_interno }}">{{ titulo_visivel }}</option>
+        {% endfor %}
+
     </select>
 </div>

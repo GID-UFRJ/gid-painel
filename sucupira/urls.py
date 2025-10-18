@@ -16,6 +16,8 @@ urlpatterns = [
     # Endpoint para todos os gráficos da seção "Pessoal"
     path('graficos/pessoal/<str:nome_plot>/', views.grafico_generico_pessoal, name='grafico_generico_pessoal'),
 
+    # Endpoint para todos os gráficos da seção "PosGrad UFRJ"
+    path('graficos/posgrad_ufrj/<str:nome_plot>/', views.grafico_generico_posgrad_ufrj, name='grafico_generico_posgrad_ufrj'),
 
     # Endpoint para todos os gráficos da seção "PPG Detalhe"
     path('graficos/ppg/<int:programa_id>/<str:nome_plot>/', views.grafico_generico_ppg, name='grafico_generico_ppg'),

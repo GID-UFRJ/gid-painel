@@ -16,7 +16,7 @@ from .mapeamentos import MAPEAMENTOS
 from django.db.models import Count, Max
 from common.utils.baseplots import BasePlots
 from .mapeamentos import MAPEAMENTOS
-from sucupira.models import Discente, Docente, Ano
+from sucupira.models import Discente, Docente, Ano, AnoPrograma
 
 # Supondo que 'grafico_kpi' seja uma função que você já tenha
 # from .kpi_generator import grafico_kpi 
@@ -78,10 +78,6 @@ class PlotsPessoal(BasePlots):
 
 
 
-
-# Adicione a importação da sua função de limites de ano
-# from .helpers import get_limites_de_ano_global
-
 class PlotsPpgDetalhe(BasePlots):
     '''Gráficos específicos de um Programa de Pós-Graduação.'''
     MAPEAMENTOS = MAPEAMENTOS
@@ -90,3 +86,96 @@ class PlotsPpgDetalhe(BasePlots):
         if programa_id is None:
             raise ValueError("O ID do programa é obrigatório para PlotsPpgDetalhe.")
         self.programa_id = programa_id
+
+
+class PlotsPpgUfrj(BasePlots):
+    '''Gráficos específicos sobre os PPGS da UFRJ'''
+    MAPEAMENTOS = MAPEAMENTOS
+
+    def _get_ultimo_ano(self):
+        """
+        [NOVO MÉTODO AUXILIAR]
+        Busca o último ano com registros. É chamado a cada requisição,
+        garantindo que o dado esteja sempre atualizado.
+        """
+        return Ano.objects.aggregate(max_ano=Max("ano_valor"))["max_ano"]
+
+    def card_total_programas_ultimo_ano(self):
+        """
+        [CORRIGIDO] Conta o total de programas únicos no último ano registrado.
+        """
+        ultimo_ano = self._get_ultimo_ano()
+        if ultimo_ano is None:
+            return None
+
+        total = (
+            AnoPrograma.objects
+            .filter(ano__ano_valor=ultimo_ano)
+            .values("programa_id")
+            .distinct()
+            .count()
+        )
+
+        img = grafico_kpi( 
+            valor=total, 
+            rotulo=f"PPGs ({ultimo_ano})", 
+            cor='#4169E1',
+        )
+        return img
+    
+    def cards_programas_por_modalidade(self):
+        """
+        [CORRIGIDO] Gera um card para cada modalidade de programa, contando
+        quantos programas pertencem a cada uma no último ano.
+        """
+        ultimo_ano = self._get_ultimo_ano()
+        if ultimo_ano is None:
+            return [] # Retorna uma lista vazia se não houver dados
+
+        qs = (
+            AnoPrograma.objects
+            .filter(ano__ano_valor=ultimo_ano)
+            .values("nm_modalidade_programa__nm_modalidade_programa")
+            .annotate(total=Count("programa_id", distinct=True))
+            .order_by("nm_modalidade_programa__nm_modalidade_programa")
+        )
+
+        dados = {item["nm_modalidade_programa__nm_modalidade_programa"]: item["total"] for item in qs}
+        cards = []
+        for modalidade, total in dados.items():
+            img = grafico_kpi(
+                valor=total,
+                rotulo=f"PPGs {modalidade}",
+                cor='#4169E1',
+            )
+            cards.append(img)
+        return cards
+
+    def card_total_programas_conceito_maximo(self):
+        """
+        [CORRIGIDO] Conta quantos programas atingiram o conceito máximo (6 ou 7)
+        no último ano registrado.
+        """
+        ultimo_ano = self._get_ultimo_ano()
+        if ultimo_ano is None:
+            return None
+
+        # Filtra por conceitos considerados máximos
+        total = (
+            AnoPrograma.objects
+            .filter(
+                ano__ano_valor=ultimo_ano,
+                cd_conceito_programa__cd_conceito_programa__in=[7] # Filtro por conceito 6 ou 7
+            )
+            .values("programa_id")
+            .distinct()
+            .count()
+        )
+
+        img = grafico_kpi( 
+            valor=total, 
+            rotulo=f"PPGs CAPES 7 ({ultimo_ano})", 
+            cor='#28a745', # Cor diferente para destaque
+        )
+        return img
+

@@ -1,0 +1,18 @@
+{# sucupira/partials/pessoal_ppg.html #}
+
+{% extends 'common/base.html' %} 
+
+{% load common_tags %}
+
+{% block conteudo %}
+
+<div class='divisoria'>
+{% for card_img in cards %}
+    <img src="data:image/png;base64, {{ card_img }}" alt="KPI Card" class="imagemsuperior"/>
+{% endfor %}
+</div>
+
+{# Adicionando as abas #}
+{% render_abas abas abas_id="posgrad-ufrj-abas" %}
+
+{% endblock %}
