@@ -16,8 +16,16 @@ body {
   list-style-type: none;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  /* overflow: hidden; */
   background-color: #333;
+}
+
+/* Adiciona um pseudo-elemento "after" ao .menu_ul
+   para forçá-lo a conter os filhos flutuantes. */
+.menu_ul::after {
+  content: "";
+  display: table;
+  clear: both;
 }
 
 .menu_li {
@@ -38,6 +46,44 @@ li a:hover:not(.active) {
 
 .active {
   background-color: #04AA6D;
+}
+
+/* =======================================
+   REGRAS COMPLETAS PARA O DROPDOWN
+======================================= */
+
+/* O <li> container (ex: "Pessoal") precisa de
+   posicionamento relativo para o menu "filho". */
+.menu_li_dropdown {
+  position: relative;
+  /* Herda o 'float: left' da classe .menu_li */
+}
+
+/* O <ul> do submenu (a caixa do dropdown) */
+.dropdown_content {
+  display: none; /* <-- ESSA LINHA ESTAVA FALTANDO (ESCONDE O MENU) */
+  position: absolute; /* <-- ESSA LINHA ESTAVA FALTANDO (FAZ FLUTUAR) */
+  background-color: #333; /* Cor de fundo igual ao menu pai */
+  min-width: 160px; /* Largura do dropdown */
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 100; /* Garante que fique sobre outros elementos */
+  
+  /* --- Suas regras existentes (corretas) --- */
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* A "mágica": Mostra o dropdown quando o <li> pai é sobrevoado */
+/* <-- ESTE BLOCO INTEIRO ESTAVA FALTANDO --> */
+.menu_li_dropdown:hover > .dropdown_content {
+  display: block; /* <-- FAZ O MENU APARECER */
+}
+
+/* Estilo dos links <a> dentro do dropdown */
+.dropdown_content a {
+  /* Herda cor, padding, text-decoration do .menu_li a */
+  text-align: left; /* Sua regra existente (correta) */
 }
 
 

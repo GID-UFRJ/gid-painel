@@ -2,11 +2,43 @@
 
 <div>
     <ul class='menu_ul'>
+        
         <li class='menu_li'><a href="{% url 'homepage:index' %}">Homepage</a></li>
-        <li class='menu_li'><a href="{% url 'openalex:index' %}">Pesquisa</a></li>
-        <li class='menu_li'><a href="{% url 'pessoal:index' %}">Pessoal</a></li>
-        <li class='menu_li'><a href="{% url 'posgrad:index' %}">Pós-Graduação</a></li>
-        <li class='menu_li'><a href="{% url 'rankings:index' %}">Rankings</a></li>
+        
+        <li class='menu_li menu_li_dropdown'>
+            <a href="{% url 'openalex:index' %}">Pesquisa</a>
+            <ul class='dropdown_content'>
+                <!-- <li><a href="{% url 'openalex:index' %}">Index</a></li> -->
+                <li><a href="{% url 'openalex:producao' %}">Produção</a></li>
+                <li><a href="{% url 'openalex:impacto' %}">Impacto</a></li>
+                <li><a href="{% url 'openalex:colaboracao' %}">Colaboração</a></li>
+            </ul>
+        </li>
+
+        <li class='menu_li menu_li_dropdown'>
+            <a href="{% url 'pessoal:index' %}">Pessoal</a>
+            <ul class='dropdown_content'>
+                <!-- <li><a href="{% url 'pessoal:index' %}">Index</a></li> -->
+                <li><a href="{% url 'pessoal:pessoal_discentes' %}">Discentes</a></li>
+                <li><a href="{% url 'pessoal:pessoal_docentes' %}">Docentes</a></li>
+            </ul>
+        </li>
+
+        <li class='menu_li menu_li_dropdown'>
+            <a href="{% url 'posgrad:index' %}">Pós-Graduação</a>
+            <ul class='dropdown_content'>
+                <!-- <li><a href="{% url 'posgrad:index' %}">Index</a></li> -->
+                <li><a href="{% url 'posgrad:posgrad_ufrj' %}">Pós-Graduação na UFRJ</a></li>
+                <li><a href="{% url 'posgrad:ppgs' %}">PPGs individuais</a></li>
+                </ul>
+        </li>
+
+        <li class='menu_li menu_li_dropdown'>
+            <a href="{% url 'rankings:index' %}">Rankings</a>
+            <ul class='dropdown_content'>
+                <li><a href="{% url 'rankings:index' %}">Index</a></li>
+                </ul>
+        </li>
 
         {% for item in menu_items %}
           <li class='menu_li'><a href="{% url 'url_grafico_painel' item %}">{{ item.nome }}</a></li>
