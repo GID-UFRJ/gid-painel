@@ -1,0 +1,22 @@
+{% extends "common/base.html" %}
+
+{% block conteudo %}
+<div class="container mt-4">
+    
+    <div class="mb-4">
+        <h1>Painel Pessoal: Discentes</h1>
+        <p class="lead">Análises sobre o corpo discente dos programas de pós-graduação.</p>
+    </div>
+
+    <div class="divisoria">
+        {% for card in n_titulados_cards %}
+            <img src="data:image/png;base64, {{ card }}" alt="" class='imagemsuperior'/>
+        {% endfor %}
+    </div>
+    <hr>
+
+    {# Reutiliza o partial que era a aba de discentes #}
+    {% include "sucupira/partials/pessoal/_aba_discentes_conteudo.html" %}
+
+</div>
+{% endblock %}

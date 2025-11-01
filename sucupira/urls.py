@@ -6,7 +6,13 @@ app_name = 'sucupira'
 urlpatterns = [
     #Endpoints das páginas dos painéis em si
     path('', views.index, name='index'),
-    path('pessoal_ppg', views.pessoal_ppg, name='pessoal_ppg'),
+
+    # ROTA ANTIGA (página com abas)
+    #path('pessoal_ppg', views.pessoal_ppg, name='pessoal_ppg'),
+
+    path('pessoal_discentes/', views.pessoal_discentes, name='pessoal_discentes'),
+    path('pessoal_docentes/', views.pessoal_docentes, name='pessoal_docentes'),
+
     path('posgrad_ufrj/', views.posgrad_ufrj, name='posgrad_ufrj'),
     path('ppgs/', views.ppgs, name='ppgs'),
     path('ppgs/<int:programa_id>/', views.ppg_detalhe, name='ppg_detalhe'),

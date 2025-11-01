@@ -21,7 +21,7 @@
 {% endblock %} 
 
 {% block conteudo_secundario %}
-<h5># <a href="{% url 'pessoal:pessoal_ppg' %}">Pessoal PPG UFRJ</a></h5>
+<h5># Pessoal PPG UFRJ</h5>
 
 <p>
     Para este painel, os dados estão apresentados em duas abas, Discentes e Docentes. Para cada um deles selecionamos 
@@ -29,7 +29,7 @@
 </p>
 
 
-<h6># Discentes</h6>
+<h6><a href="{% url 'pessoal:pessoal_discentes' %}"># Discentes</a></h6>
 
 <p>
     Inclui os totais de discentes por ano na PG segundo cada grau de curso (todos os cursos, mestrado, doutorado, mestrado profissional, etc...). 
@@ -43,7 +43,7 @@
     encontrados nesses dados são classificados como 'D' (sexo desconhecido).
 </p>
 
-<h6># Docentes</h6>
+<h6><a href="{% url 'pessoal:pessoal_docentes' %}"># Docentes</a></h6>
 
 <p>
     Inclui os totais de docentes por ano na PG. Para cada um destes grupos, é possível usar os filtros de: 

@@ -1,0 +1,22 @@
+{% extends "common/base.html" %}
+
+{% block conteudo %}
+<div class="container mt-4">
+    
+    <div class="mb-4">
+        <h1>Painel Pessoal: Docentes</h1>
+        <p class="lead">Análises sobre o corpo docente dos programas de pós-graduação.</p>
+    </div>
+
+    <div class="divisoria">
+        {% if docentes_card %}
+          <img src="data:image/png;base64, {{ docentes_card }}" alt="" class='imagemsuperior'/>
+        {% endif %}
+    </div>
+    <hr>
+
+    {# Reutiliza o partial que era a aba de docentes #}
+    {% include "sucupira/partials/pessoal/_aba_docentes_conteudo.html" %}
+
+</div>
+{% endblock %}
