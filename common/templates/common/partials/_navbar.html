@@ -1,54 +1,128 @@
 {% load static %}
 
-<div>
-    <ul class='menu_ul'>
-        <li class='menu_li logo-item'>
-            <a href="{% url 'homepage:index' %}">
-                <img src="{% static 'common/images/ufrj_logo.png' %}" alt="Logo" class="logo-image">
+<nav class="navbar navbar-dark" style="background-color: #003366;">
+    <div class="container-fluid">
+        <a class="navbar-brand logo-item" href="{% url 'homepage:index' %}">
+            <img src="{% static 'common/images/ufrj_logo.png' %}" alt="Logo" class="logo-image me-4">
+
+            <span class="navbar-title d-none d-sm-inline">PÓS-GRADUAÇÃO E PESQUISA DA UFRJ EM NÚMEROS</span>
+        </a>
+        
+        <button class="navbar-toggler" type="button" 
+                data-bs-toggle="offcanvas" 
+                data-bs-target="#offCanvasMenu" 
+                aria-controls="offCanvasMenu" 
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</nav>
+
+{% load static %}
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offCanvasMenu" aria-labelledby="offCanvasMenuLabel">
+    
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offCanvasMenuLabel" style="color: #003366;">MENU PRINCIPAL</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fechar Menu"></button>
+    </div>
+    
+    <div class="offcanvas-body p-0 d-flex flex-column">
+        
+        <div class="list-group list-group-flush custom-menu-links flex-grow-1">
+            
+            <a href="{% url 'homepage:index' %}" class="list-group-item list-group-item-action">
+                Homepage
             </a>
-        </li>
+            
+            <div class="list-group-item custom-menu-links-parent d-flex justify-content-between align-items-center">
+                <a href="{% url 'openalex:index' %}" class="list-group-item-link">
+                    Pesquisa
+                </a>
+                <button class="btn btn-sm p-0 custom-toggle-btn" 
+                        type="button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#collapsePesquisa" 
+                        aria-expanded="false" 
+                        aria-controls="collapsePesquisa">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="collapse" id="collapsePesquisa">
+                <a href="{% url 'openalex:producao' %}" class="list-group-item list-group-item-action sub-item">Produção</a>
+                <a href="{% url 'openalex:impacto' %}" class="list-group-item list-group-item-action sub-item">Impacto</a>
+                <a href="{% url 'openalex:colaboracao' %}" class="list-group-item list-group-item-action sub-item">Colaboração</a>
+            </div>
+            
+            <div class="list-group-item custom-menu-links-parent d-flex justify-content-between align-items-center">
+                <a href="{% url 'pessoal:index' %}" class="list-group-item-link">
+                    Pessoal
+                </a>
+                <button class="btn btn-sm p-0 custom-toggle-btn" 
+                        type="button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#collapsePessoal" 
+                        aria-expanded="false" 
+                        aria-controls="collapsePessoal">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="collapse" id="collapsePessoal">
+                <a href="{% url 'pessoal:pessoal_discentes' %}" class="list-group-item list-group-item-action sub-item">Discentes</a>
+                <a href="{% url 'pessoal:pessoal_docentes' %}" class="list-group-item list-group-item-action sub-item">Docentes</a>
+            </div>
+
+            <div class="list-group-item custom-menu-links-parent d-flex justify-content-between align-items-center">
+                <a href="{% url 'posgrad:index' %}" class="list-group-item-link">
+                    Pós-Graduação
+                </a>
+                <button class="btn btn-sm p-0 custom-toggle-btn" 
+                        type="button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#collapsePosgrad" 
+                        aria-expanded="false" 
+                        aria-controls="collapsePosgrad">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="collapse" id="collapsePosgrad">
+                 <a href="{% url 'posgrad:posgrad_ufrj' %}" class="list-group-item list-group-item-action sub-item">Pós-Graduação na UFRJ</a>
+                 <a href="{% url 'posgrad:ppgs' %}" class="list-group-item list-group-item-action sub-item">PPGs individuais</a>
+            </div>
+
+            <div class="list-group-item custom-menu-links-parent d-flex justify-content-between align-items-center">
+                <a href="{% url 'rankings:index' %}" class="list-group-item-link">
+                    Rankings
+                </a>
+                <button class="btn btn-sm p-0 custom-toggle-btn" 
+                        type="button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#collapseRankings" 
+                        aria-expanded="false" 
+                        aria-controls="collapseRankings">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="collapse" id="collapseRankings">
+                <a href="{% url 'homepage:index' %}" class="list-group-item list-group-item-action sub-item">Ranking Shanghai</a>
+            </div>
+
+            {% for item in menu_items %}
+              <a href="{% url 'url_grafico_painel' item %}" class="list-group-item list-group-item-action">
+                {{ item.nome }}
+              </a>
+            {% endfor %}
+            
+        </div>
         
-        <li class='menu_li'><a href="{% url 'homepage:index' %}">Homepage</a></li>
-        
-        <li class='menu_li menu_li_dropdown'>
-            <a href="{% url 'openalex:index' %}">Pesquisa</a>
-            <ul class='dropdown_content'>
-                <!-- <li><a href="{% url 'openalex:index' %}">Index</a></li> -->
-                <li><a href="{% url 'openalex:producao' %}">Produção</a></li>
-                <li><a href="{% url 'openalex:impacto' %}">Impacto</a></li>
-                <li><a href="{% url 'openalex:colaboracao' %}">Colaboração</a></li>
-            </ul>
-        </li>
+        <div class="mt-auto p-3 text-center" style="border-top: 1px solid #ddd;">
+             <div class="social-icons">
+                 <i class="fab fa-instagram fa-2x mx-2" style="color: #003366;"></i>
+                 <i class="fab fa-facebook-f fa-2x mx-2" style="color: #003366;"></i>
+                 <i class="fab fa-youtube fa-2x mx-2" style="color: #003366;"></i>
+                 <i class="fab fa-linkedin-in fa-2x mx-2" style="color: #003366;"></i>
+             </div>
+        </div>
 
-        <li class='menu_li menu_li_dropdown'>
-            <a href="{% url 'pessoal:index' %}">Pessoal</a>
-            <ul class='dropdown_content'>
-                <!-- <li><a href="{% url 'pessoal:index' %}">Index</a></li> -->
-                <li><a href="{% url 'pessoal:pessoal_discentes' %}">Discentes</a></li>
-                <li><a href="{% url 'pessoal:pessoal_docentes' %}">Docentes</a></li>
-            </ul>
-        </li>
-
-        <li class='menu_li menu_li_dropdown'>
-            <a href="{% url 'posgrad:index' %}">Pós-Graduação</a>
-            <ul class='dropdown_content'>
-                <!-- <li><a href="{% url 'posgrad:index' %}">Index</a></li> -->
-                <li><a href="{% url 'posgrad:posgrad_ufrj' %}">Pós-Graduação na UFRJ</a></li>
-                <li><a href="{% url 'posgrad:ppgs' %}">PPGs individuais</a></li>
-                </ul>
-        </li>
-
-        <li class='menu_li menu_li_dropdown'>
-            <a href="{% url 'rankings:index' %}">Rankings</a>
-            <ul class='dropdown_content'>
-                <li><a href="{% url 'rankings:index' %}">Index</a></li>
-                </ul>
-        </li>
-
-        {% for item in menu_items %}
-          <li class='menu_li'><a href="{% url 'url_grafico_painel' item %}">{{ item.nome }}</a></li>
-        {% endfor %}
-
-        <li class='menu_li' style="float:right"><a class="active">PAINEL //// GID - PR2</a></li>
-    </ul>
+    </div>
 </div>

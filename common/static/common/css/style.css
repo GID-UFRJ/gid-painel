@@ -251,3 +251,134 @@ li a:hover:not(.active) {
     border-color: #00254c !important;
     box-shadow: 0 0 0 0.25rem rgba(0, 51, 102, 0.5); 
   }
+
+
+/* =======================================
+   Estilos do Menu Off-Canvas/Modal
+======================================= */
+
+/* 1. Cores e Layout dos Links Principais */
+.custom-menu-links .list-group-item {
+    color: #003366; /* Cor do texto (Azul UFRJ) */
+    font-weight: bold;
+    border-top: 1px solid #ddd; /* Linha divisória clara */
+    padding: 15px 20px; /* Padding generoso como no seu exemplo */
+    font-size: 1.1rem;
+    cursor: pointer; /* Indica que é clicável */
+}
+
+/* 2. Estilo dos Sub-itens (dropdowns internos) */
+.custom-menu-links .sub-item {
+    padding-left: 40px; /* Recuo para sub-itens */
+    font-weight: normal; /* Texto normal para sub-itens */
+    font-size: 1rem;
+    background-color: #f8f8f8; /* Fundo levemente cinza para diferenciar */
+    border-top: none;
+    border-bottom: 1px solid #eee;
+}
+
+/* 3. Estilo Hover (Mouse sobre os itens) */
+.custom-menu-links .list-group-item:hover {
+    background-color: #f0f0f0; 
+}
+.custom-menu-links .sub-item:hover {
+    background-color: #e0e0e0; 
+}
+
+/* 4. Ícone de Seta (Para girar quando o submenu estiver aberto) */
+/* Esta regra depende da biblioteca de ícones que você está usando (Font Awesome) */
+.list-group-item[aria-expanded="true"] .fa-chevron-down {
+    transform: rotate(180deg);
+    transition: transform 0.3s ease-in-out;
+}
+.list-group-item[aria-expanded="false"] .fa-chevron-down {
+    transform: rotate(0deg);
+    transition: transform 0.3s ease-in-out;
+}
+
+/* =======================================
+   Ajuste da Largura do Menu Offcanvas
+======================================= */
+
+#offCanvasMenu {
+    /* Largura padrão (para telas maiores) */
+    width: 25vw; /* 25% da Largura da Viewport (1/4 de tela) */
+}
+
+/* Regra de Mídia para Ajustar em Telas Pequenas */
+/* Em dispositivos móveis, é melhor que ocupe mais espaço (ex: 80% ou 90%) */
+@media (max-width: 768px) {
+    #offCanvasMenu {
+        width: 80vw; /* 80% da tela em celulares, para melhor usabilidade */
+    }
+}
+
+
+/* Container que encapsula o link e o botão toggle */
+.custom-menu-links-parent {
+    /* Define a altura e cor do item principal */
+    color: #003366; 
+    font-weight: bold;
+    border-top: 1px solid #ddd;
+    padding: 15px 20px;
+    font-size: 1.1rem;
+}
+
+/* O link principal dentro do container */
+.list-group-item-link {
+    /* Ocupa o espaço máximo possível */
+    flex-grow: 1;
+    text-decoration: none; /* Remove sublinhado padrão */
+    color: inherit; /* Herda a cor do pai */
+}
+
+/* O botão de expansão do collapse (seta) */
+.custom-toggle-btn {
+    /* Remove estilos de botão padrão do Bootstrap */
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #003366;
+    margin-left: 10px; /* Espaçamento entre o texto e a seta */
+}
+
+/* Estilo para a seta girar (mantido da resposta anterior) */
+.custom-toggle-btn[aria-expanded="true"] .fa-chevron-down {
+    transform: rotate(180deg);
+    transition: transform 0.3s ease-in-out;
+}
+
+
+/* Container que encapsula o link e o botão toggle */
+.custom-menu-links-parent {
+    /* Define a altura e cor do item principal */
+    color: #003366; 
+    font-weight: bold;
+    border-top: 1px solid #ddd;
+    padding: 15px 20px;
+    font-size: 1.1rem;
+}
+
+/* O link principal dentro do container */
+.list-group-item-link {
+    /* Ocupa o espaço máximo possível */
+    flex-grow: 1;
+    text-decoration: none; /* Remove sublinhado padrão */
+    color: inherit; /* Herda a cor do pai */
+}
+
+/* O botão de expansão do collapse (seta) */
+.custom-toggle-btn {
+    /* Remove estilos de botão padrão do Bootstrap */
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #003366;
+    margin-left: 10px; /* Espaçamento entre o texto e a seta */
+}
+
+/* Estilo para a seta girar (mantido da resposta anterior) */
+.custom-toggle-btn[aria-expanded="true"] .fa-chevron-down {
+    transform: rotate(180deg);
+    transition: transform 0.3s ease-in-out;
+}
