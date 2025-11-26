@@ -17,7 +17,7 @@ body {
   margin: 0;
   padding: 0;
   /* overflow: hidden; */
-  background-color: #333;
+  background-color: #003366;
 }
 
 /* Adiciona um pseudo-elemento "after" ao .menu_ul
@@ -47,6 +47,20 @@ li a:hover:not(.active) {
 .active {
   background-color: #04AA6D;
 }
+
+/* Estilo para a imagem do logo da UFRJ na navbar */
+.logo-image {
+  height: 40px; /* Define uma altura fixa menor para o logo */
+  width: auto; /* Mantém a proporção da imagem */
+  vertical-align: middle; /* Alinha verticalmente a imagem com o texto/padding */
+}
+
+/* Ajuste o padding do link <a> que contém o logo */
+.logo-item a {
+  padding: 5px 16px; /* Ajuste o padding vertical */
+}
+
+
 
 /* =======================================
    REGRAS COMPLETAS PARA O DROPDOWN
@@ -207,3 +221,33 @@ li a:hover:not(.active) {
     .nav-pills {
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     }
+
+
+/* =======================================
+   Classe de Botão Personalizada: Azul UFRJ
+======================================= */
+
+  .btn-ufrj-blue {
+    /* Cor de fundo principal: Azul da Navbar */
+    background-color: #003366; 
+    /* Cor da borda para combinar */
+    border-color: #003366; 
+    /* Cor do texto para garantir contraste */
+    color: white; 
+  }
+  
+  .btn-ufrj-blue:hover {
+    /* Azul ligeiramente mais escuro (ou mais claro) para o efeito hover */
+    background-color: #00254c; 
+    border-color: #00254c;
+    color: white;
+  }
+  
+  /* Estilo para quando o botão estiver pressionado/ativo (foco) */
+  .btn-ufrj-blue:focus,
+  .btn-ufrj-blue:active {
+    /* Mantenha a cor de fundo no foco/ativo e use uma sombra de foco que combine */
+    background-color: #00254c !important; 
+    border-color: #00254c !important;
+    box-shadow: 0 0 0 0.25rem rgba(0, 51, 102, 0.5); 
+  }

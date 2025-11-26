@@ -5,5 +5,7 @@ app_name='rankings'
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path("classificacao/", views.classificacao, name="classificacao")
+    #path("academicos/", views.academicos, name="academicos"),
+    #path("sustentabilidade/", views.sustentabilidade, name="sustentabilidade")
+
 ]
