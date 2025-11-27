@@ -103,34 +103,6 @@ body {
 }
 
 
-/* ===========================
-   Abas de navegação (conteúdo)
-=========================== */
-/*    .nav-pills .nav-link {
-        color: #495057;
-        font-weight: 500;
-        padding: 0.75rem 1.5rem;
-        transition: all 0.3s ease;
-        border-radius: 0.5rem !important;
-        margin-right: 0.5rem;
-    }
-    
-    .nav-pills .nav-link:hover {
-        background-color: rgba(13, 110, 253, 0.1);
-        color: #0d6efd;
-    }
-    
-    .nav-pills .nav-link.active {
-        background-color: #0d6efd;
-        color: white;
-        box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
-    }
-    
-    .nav-pills {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    }
-    */
-
 /* =======================================
    Classe de Botão Personalizada: Azul UFRJ
 ======================================= */
@@ -321,4 +293,65 @@ body {
 .custom-breadcrumb-container-full .breadcrumb-item::before {
     color: #aaa; /* Cor mais suave para o separador */
     opacity: 1;
+}
+
+/* =======================================
+   Estilos do Footer (Rodapé - Limpo)
+======================================= */
+
+/* Container Principal do Footer */
+#custom-site-footer {
+    background-color: #3d3d3d; /* Cinza escuro */
+    color: white;
+    font-size: 0.9rem;
+    padding-top: 20px;
+}
+
+/* Divisórias (Linhas horizontais) */
+.footer-divider-bottom {
+    /* Mantenha apenas a divisória inferior para separar o copyright */
+    border-top: 1px solid rgba(255, 255, 255, 0.2); 
+    opacity: 0.7;
+    margin: 1rem 0 0 0; /* Remove margem inferior para colar no copyright */
+}
+
+/* Coluna Esquerda: Logos e Contato */
+.footer-col-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.footer-ufrj-logo {
+    max-width: 150px; 
+    height: auto;
+}
+.footer-address {
+    line-height: 1.6;
+    margin-top: 10px;
+}
+
+/* Colunas Direitas (Logos e Desenvolvedor) */
+.developed-by-text {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+.footer-sgccom-logo {
+    max-width: 100px; 
+    height: auto;
+}
+
+.footer-institutionals-logos img {
+    max-height: 50px; 
+    height: auto;
+    margin: 10px 15px;
+}
+
+/* Copyright e To Top */
+.footer-credits a {
+    color: white;
+    text-decoration: none;
+}
+.footer-credits a:hover {
+    color: #cd2653;
+    text-decoration: underline;
 }
