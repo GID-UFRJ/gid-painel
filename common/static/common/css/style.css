@@ -252,133 +252,115 @@ li a:hover:not(.active) {
     box-shadow: 0 0 0 0.25rem rgba(0, 51, 102, 0.5); 
   }
 
+/* ===================================================
+   ESTILOS DE MENU OFF-CANVAS - PARA A BARRA DE NAVEGAÇÃO
+   =================================================== */
 
-/* =======================================
-   Estilos do Menu Off-Canvas/Modal
-======================================= */
+/* ---------------------------------------
+   SEÇÃO 1: ESTRUTURA E LAYOUT GERAL
+------------------------------------------ */
 
-/* 1. Cores e Layout dos Links Principais */
-.custom-menu-links .list-group-item {
-    color: #003366; /* Cor do texto (Azul UFRJ) */
-    font-weight: bold;
-    border-top: 1px solid #ddd; /* Linha divisória clara */
-    padding: 15px 20px; /* Padding generoso como no seu exemplo */
-    font-size: 1.1rem;
-    cursor: pointer; /* Indica que é clicável */
-}
-
-/* 2. Estilo dos Sub-itens (dropdowns internos) */
-.custom-menu-links .sub-item {
-    padding-left: 40px; /* Recuo para sub-itens */
-    font-weight: normal; /* Texto normal para sub-itens */
-    font-size: 1rem;
-    background-color: #f8f8f8; /* Fundo levemente cinza para diferenciar */
-    border-top: none;
-    border-bottom: 1px solid #eee;
-}
-
-/* 3. Estilo Hover (Mouse sobre os itens) */
-.custom-menu-links .list-group-item:hover {
-    background-color: #f0f0f0; 
-}
-.custom-menu-links .sub-item:hover {
-    background-color: #e0e0e0; 
-}
-
-/* 4. Ícone de Seta (Para girar quando o submenu estiver aberto) */
-/* Esta regra depende da biblioteca de ícones que você está usando (Font Awesome) */
-.list-group-item[aria-expanded="true"] .fa-chevron-down {
-    transform: rotate(180deg);
-    transition: transform 0.3s ease-in-out;
-}
-.list-group-item[aria-expanded="false"] .fa-chevron-down {
-    transform: rotate(0deg);
-    transition: transform 0.3s ease-in-out;
-}
-
-/* =======================================
-   Ajuste da Largura do Menu Offcanvas
-======================================= */
-
+/* Ajuste da Largura do Menu Offcanvas */
 #offCanvasMenu {
-    /* Largura padrão (para telas maiores) */
     width: 25vw; /* 25% da Largura da Viewport (1/4 de tela) */
 }
-
-/* Regra de Mídia para Ajustar em Telas Pequenas */
-/* Em dispositivos móveis, é melhor que ocupe mais espaço (ex: 80% ou 90%) */
 @media (max-width: 768px) {
     #offCanvasMenu {
         width: 80vw; /* 80% da tela em celulares, para melhor usabilidade */
     }
 }
 
-
-/* Container que encapsula o link e o botão toggle */
-.custom-menu-links-parent {
-    /* Define a altura e cor do item principal */
+/* Estilo para TUDO: Link Simples E Contêiner Pai (Aplica cor e altura) */
+.custom-menu-links-parent,
+.custom-menu-links .list-group-item-action {
+    /* Padding para Altura e Recuo da Borda: 20px Vertical, 30px Horizontal */
+    padding: 20px 30px; 
     color: #003366; 
     font-weight: bold;
     border-top: 1px solid #ddd;
-    padding: 15px 20px;
     font-size: 1.1rem;
+    cursor: pointer;
 }
 
-/* O link principal dentro do container */
+/* ---------------------------------------
+   SEÇÃO 2: LINK E BOTÃO TOGGLE 
+------------------------------------------ */
+
+/* O link principal (texto) */
 .list-group-item-link {
-    /* Ocupa o espaço máximo possível */
-    flex-grow: 1;
-    text-decoration: none; /* Remove sublinhado padrão */
-    color: inherit; /* Herda a cor do pai */
+    flex-grow: 1; 
+    text-decoration: none; 
+    color: inherit; 
+    display: flex;
+    align-items: center; 
+    
+    /* DIVISÓRIA: Borda no Link Principal */
+    border-right: 1px solid #e0e0e0; 
+    padding-right: 15px; /* Espaço entre a borda e o botão */
 }
 
-/* O botão de expansão do collapse (seta) */
+/* O botão de expansão do collapse (seta) - MAIOR ÁREA CLICÁVEL */
 .custom-toggle-btn {
-    /* Remove estilos de botão padrão do Bootstrap */
     background: none;
     border: none;
     cursor: pointer;
     color: #003366;
-    margin-left: 10px; /* Espaçamento entre o texto e a seta */
+    
+    /* 1. AUMENTA O TAMANHO DO ÍCONE */
+    font-size: 1.5em; 
+    
+    /* 2. AUMENTA O ALVO DE CLIQUE com padding */
+    padding: 10px 20px; 
+
+    /* 3. SEPARAÇÃO E ALINHAMENTO */
+    margin-right: 0; /* Alinha o botão com o padding de 30px do pai */
+    margin-left: 10px; /* Mantém a separação da borda */
+
+    /* Garante a centralização vertical do ícone */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Estilo para a seta girar (mantido da resposta anterior) */
+/* ---------------------------------------
+   SEÇÃO 3: SUB-ITENS E HOVER UNIFICADOS
+------------------------------------------ */
+
+/* Estilo dos Sub-itens (dropdowns internos) */
+.custom-menu-links .sub-item {
+    padding: 15px 30px 15px 40px; /* Recuo à esquerda de 40px */
+    font-weight: normal;
+    font-size: 1rem;
+    background-color: #f8f8f8; 
+    border-top: none;
+    border-bottom: 1px solid #eee;
+    color: #003366;
+}
+
+/* 1. HOVER DO FUNDO SUAVE (Aplica a cor de fundo #f0f0f0 em TODOS os itens) */
+.custom-menu-links-parent:hover,
+.custom-menu-links .list-group-item-action:hover,
+.custom-menu-links .sub-item:hover {
+    background-color: #f0f0f0; 
+}
+
+/* 2. HOVER DE TEXTO (Aplica sublinhado em TODOS os links) */
+.list-group-item-link:hover,
+.custom-menu-links .list-group-item-action:hover {
+    text-decoration: underline;
+}
+
+/* 3. HOVER DO BOTÃO (Fica vermelho/acento) */
+.custom-toggle-btn:hover {
+    color: #cd2653; 
+}
+
+/* Estilo para a seta girar */
 .custom-toggle-btn[aria-expanded="true"] .fa-chevron-down {
     transform: rotate(180deg);
     transition: transform 0.3s ease-in-out;
 }
-
-
-/* Container que encapsula o link e o botão toggle */
-.custom-menu-links-parent {
-    /* Define a altura e cor do item principal */
-    color: #003366; 
-    font-weight: bold;
-    border-top: 1px solid #ddd;
-    padding: 15px 20px;
-    font-size: 1.1rem;
-}
-
-/* O link principal dentro do container */
-.list-group-item-link {
-    /* Ocupa o espaço máximo possível */
-    flex-grow: 1;
-    text-decoration: none; /* Remove sublinhado padrão */
-    color: inherit; /* Herda a cor do pai */
-}
-
-/* O botão de expansão do collapse (seta) */
-.custom-toggle-btn {
-    /* Remove estilos de botão padrão do Bootstrap */
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #003366;
-    margin-left: 10px; /* Espaçamento entre o texto e a seta */
-}
-
-/* Estilo para a seta girar (mantido da resposta anterior) */
-.custom-toggle-btn[aria-expanded="true"] .fa-chevron-down {
-    transform: rotate(180deg);
+.custom-toggle-btn[aria-expanded="false"] .fa-chevron-down {
+    transform: rotate(0deg);
     transition: transform 0.3s ease-in-out;
 }
