@@ -132,8 +132,52 @@ body {
     box-shadow: 0 0 0 0.25rem rgba(0, 51, 102, 0.5); 
   }
 
+
 /* ===================================================
-   ESTILOS DE MENU OFF-CANVAS - PARA A BARRA DE NAVEGAÇÃO
+   Navbar
+   =================================================== */
+
+
+/* Navbar em si */
+
+.navbar {
+    /* Define margem na esquerda e na direita */
+    padding-left: 4rem; /* Ou um valor em rem, ex: 1.5rem */
+    padding-right: 4rem;
+
+}
+
+
+/* O Bootstrap já costuma aplicar d-flex e align-items-center, mas este CSS garante: */
+.navbar-brand {
+    display: flex;
+    align-items: center; /* 🎯 Centraliza verticalmente o logo e o título */
+    /* Remove margens extras que podem ter sido definidas por outras regras do Bootstrap */
+    padding-top: 0; 
+    padding-bottom: 0;
+}
+
+/* Logo ufrj */
+.logo-image {
+  height: 48px; /* Reduza este valor se precisar que a navbar seja mais fina */
+  width: auto; 
+  vertical-align: middle; 
+  margin-right: 15px;
+}
+
+/* Título navbar */
+.navbar-title {
+  color: #fff;
+  margin: 0; /* Remove margens indesejadas */
+  font-family: sans-serif;
+  line-height: normal;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+
+/* ===================================================
+   estilos de menu off-canvas - para a barra de navegação
    =================================================== */
 
 /* ---------------------------------------
@@ -252,7 +296,7 @@ body {
 .custom-breadcrumb-container-full {
     /* Fundo Azul UFRJ em toda a linha */
     background-color: #003366; 
-    padding: 0.5rem 1rem; /* Padding para dar espaço vertical e horizontal */
+    padding: 0.5rem 4.5rem; /* Padding para dar espaço vertical e horizontal */
     border-radius: 0; /* Remove cantos arredondados, fica como uma barra */
     margin-bottom: 20px; /* Espaço abaixo da barra */
 }
