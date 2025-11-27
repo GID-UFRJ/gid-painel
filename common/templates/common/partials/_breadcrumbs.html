@@ -2,7 +2,7 @@
 
 {% breadcrumbs as crumbs %}
 
-<nav aria-label="breadcrumb">
+<nav aria-label="breadcrumb", class="custom-breadcrumb-container-full">
   <ol class="breadcrumb">
     {% for name, url in crumbs %}
       {% if not forloop.last %}
