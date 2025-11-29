@@ -1,14 +1,18 @@
 {% load static %}
 
 <footer id="custom-site-footer" class="footer-dark">
-    <div class="container py-4">
+    <div class="container-fluid py-4">
         
         <div class="row align-items-start footer-content-main">
-            
-            <div class="col-md-6 col-lg-4 footer-col-left mb-4">
-                <div class="footer-logo-wrapper">
-                    <img src="{% static 'common/images/ufrj_logo.png' %}" alt="Logo UFRJ" class="footer-ufrj-logo mb-3">
+    
+            <div class="col-lg-6 footer-col-left mb-4 d-flex align-items-start">
+                
+                <div class="footer-logo-wrapper me-4"> {# me-4 adiciona margem à direita para separar do endereço #}
+                    <a href="https://ufrj.br">
+                        <img src="{% static 'common/images/ufrj_logo_footer.png' %}" alt="Logo UFRJ" class="footer-ufrj-logo">
+                    </a>
                 </div>
+                
                 <p class="footer-address">
                     Av. Pedro Calmon. nº 550 – Prédio da Reitoria, 2º andar<br>
                     Cidade Universitária – Rio de Janeiro, RJ – CEP 21941-901<br>
@@ -16,25 +20,33 @@
                 </p>
             </div>
             
-            <div class="col-md-6 col-lg-4 footer-col-center mb-4 text-center">
-                <p class="developed-by-text">Desenvolvido por</p>
-                <img src="{% static 'caminho/para/logo_sgccom.png' %}" alt="Logo SGCCON" class="footer-sgccom-logo">
-            </div>
-
-            <div class="col-md-12 col-lg-4 footer-col-right mb-4 text-center">
-                <div class="footer-institutionals-logos d-flex justify-content-center align-items-center">
-                    <img src="{% static 'caminho/para/logo_ouvidoria.png' %}" alt="Ouvidoria UFRJ" class="footer-ouvidoria-logo mx-3">
-                    <img src="{% static 'caminho/para/logo_acesso_info.png' %}" alt="Acesso à Informação" class="footer-acesso-info-logo mx-3">
+            <div class="col-lg-6 footer-col-right mb-4 d-flex justify-content-end align-items-center">
+                
+                <div class="footer-institutionals-logos d-flex justify-content-start align-items-center me-5"> {# me-5 separa do texto "Desenvolvido por" #}
+                    <a href="http://www.ouvidoria.ufrj.br">
+                        <img src="{% static 'common/images/logo_ouvidoria_ufrj.png' %}" alt="Ouvidoria UFRJ" class="footer-ouvidoria-logo mx-4">
+                    </a>
+                    <a href="https://www.gov.br/acessoainformacao/pt-br">
+                        <img src="{% static 'common/images/logo_acesso_info_ufrj.png' %}" alt="Acesso à Informação" class="footer-acesso-info-logo mx-4">
+                    </a>
                 </div>
-            </div>
             
+                <div class="developed-by-wrapper text-center">
+                    <p class="developed-by-text mb-0">Desenvolvido por</p>
+                    <p> 
+                        <a href="https://pr2.ufrj.br/gid" class="gid-link">GID - Escritório de Gestão de Indicadores de Desempenho</a>
+
+                    </p>
+                </div>
+                
+            </div>
         </div>
         
         <hr class="footer-divider-bottom">
 
         <div class="footer-credits d-flex justify-content-between align-items-center flex-wrap pt-3">
             <p class="footer-copyright mb-0">
-                &copy; {% now "Y" %} PR2 – Pró-Reitoria de Pós-Graduação e Pesquisa
+                &copy; {% now "Y" %} <a href="https://pr2.ufrj.br">PR2 – Pró-Reitoria de Pós-Graduação e Pesquisa</a>
             </p>
             <a href="#top" class="to-the-top text-white">Ir para o topo ↑</a>
         </div>

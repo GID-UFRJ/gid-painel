@@ -1,13 +1,24 @@
 /* ===========================
    Estilos globais
 =========================== */
-body {
-  background-color: #f5f5f5; /* Gainsboro */
-  min-height: 100vh; /* garante que ocupe a tela inteira */
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif; /* opcional */
+
+html, body {
+    height: 100%;
 }
+
+body {
+    min-height: 100vh;
+    background-color: #f5f5f5; /* Gainsboro */
+    font-family: Arial, sans-serif; /* opcional */
+    display: flex;
+    flex-direction: column;
+}
+
+/* O bloco principal expande para empurrar o footer */
+main {
+    flex: 1;
+}
+
 
 /* =======================================
    Estilos das páginas iniciais (index)
@@ -17,14 +28,14 @@ body {
 /* ------ Estilos para a página inteira: ------- */
 
 /* Parágrafos justificados */
-.index p {
+.text-justify p {
   text-align: justify;
 }
 
 /* Classe para controlar a altura e a rolagem das colunas */
 .conteudo-principal.conteudo-rolavel,
 .conteudo-secundario.conteudo-rolavel {
-  max-height: 70vh; /* 70% da altura da janela de visualização */
+  max-height: 65vh; /* 70% da altura da janela de visualização */
   overflow-y: auto; /* Adiciona barra de rolagem vertical quando necessário */
   width: 100%;      /* Garante que o conteúdo ocupe toda a largura da coluna */
 }
@@ -340,62 +351,71 @@ body {
 }
 
 /* =======================================
-   Estilos do Footer (Rodapé - Limpo)
+   Estilos do Footer (Rodapé)
 ======================================= */
 
-/* Container Principal do Footer */
+/* Container Principal do Footer (mantido, apenas o HTML mudou para container-fluid) */
 #custom-site-footer {
-    background-color: #3d3d3d; /* Cinza escuro */
+    background-color: #3d3d3d;
     color: white;
-    font-size: 0.9rem;
-    padding-top: 20px;
+    font-size: 0.85rem; /* Reduzido o tamanho da fonte */
+    margin-top: 20px;
+    padding-left: 4rem; /* Ou um valor em rem, ex: 1.5rem */
+    padding-right: 4rem;
 }
 
-/* Divisórias (Linhas horizontais) */
-.footer-divider-bottom {
-    /* Mantenha apenas a divisória inferior para separar o copyright */
-    border-top: 1px solid rgba(255, 255, 255, 0.2); 
-    opacity: 0.7;
-    margin: 1rem 0 0 0; /* Remove margem inferior para colar no copyright */
+/*tamanho do texto*/
+#custom-site-footer p {
+    font-size: 1rem;  /* ajuste como quiser */
 }
 
-/* Coluna Esquerda: Logos e Contato */
+
+/* Conteúdo principal do footer */
+.footer-content-main {
+    align-items: center !important;
+}
+
+
+/* 1. Coluna Esquerda: Logo e Endereço (lado a lado) */
 .footer-col-left {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    /* O d-flex no HTML já garante o alinhamento horizontal */
+    align-items: center !important; /* Centraliza verticalmente o logo com o endereço */
 }
-.footer-ufrj-logo {
-    max-width: 150px; 
-    height: auto;
-}
-.footer-address {
-    line-height: 1.6;
-    margin-top: 10px;
-}
-
-/* Colunas Direitas (Logos e Desenvolvedor) */
-.developed-by-text {
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-}
-.footer-sgccom-logo {
-    max-width: 100px; 
+.footer-ufrj-logo  {
+    max-width: 200px; /* Logo menor para caber ao lado do endereço */
     height: auto;
 }
 
 .footer-institutionals-logos img {
-    max-height: 50px; 
+    max-height: 60px; /* Tamanho dos outros logos institucionais */
     height: auto;
-    margin: 10px 15px;
 }
 
-/* Copyright e To Top */
-.footer-credits a {
-    color: white;
-    text-decoration: none;
+
+.footer-address {
+    line-height: 1.5;
+    margin: 0; /* Remove margens extras */
 }
-.footer-credits a:hover {
-    color: #cd2653;
-    text-decoration: underline;
+
+/* 2. Coluna Direita: Logos e Desenvolvido por (lado a lado) */
+.footer-col-right {
+    /* O d-flex justify-content-end no HTML já empurra para a direita */
+    align-items: center !important; /* Alinha tudo verticalmente no meio */
+}
+
+
+.developed-by-text {
+    font-weight: 500;
+    margin-bottom: 0.2rem !important; /* Compacta o texto sobre o logo */
+}
+
+.footer-divider-bottom {
+    margin-bottom: 0.1rem;
+}
+
+.gid-link {
+    display: block;
+    max-width: 250px;
+    margin: 0 auto;       /* centraliza */
+    white-space: normal;  /* força quebras de linha */
 }

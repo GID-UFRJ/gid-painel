@@ -10,32 +10,33 @@
   <!-- Breadcrumbs -->
   {% include 'common/partials/_breadcrumbs.html' %}
 
-  <!-- Conteúdo dividido em duas colunas -->
-  <div class="container py-4 index">
-    <div class="row align-items-stretch">
+  <main>  <!-- Conteúdo dividido em duas colunas -->
+    <div class="container py-4 text-justify">
+      <div class="row align-items-stretch">
 
-      <!-- Coluna esquerda (conteúdo principal) -->
-      <div class="col-md-4 d-flex">
-        <div class="card w-100 d-flex flex-column">
-          <div class="card-body conteudo-principal d-flex flex-column conteudo-rolavel">
-            <div class="mt-auto mb-auto">
-              {% block conteudo_principal %}{% endblock %}
+        <!-- Coluna esquerda (conteúdo principal) -->
+        <div class="col-md-4 d-flex">
+          <div class="card w-100 d-flex flex-column">
+            <div class="card-body conteudo-principal d-flex flex-column conteudo-rolavel">
+              <div class="mt-auto mb-auto">
+                {% block conteudo_principal %}{% endblock %}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Coluna direita (conteúdo secundário) -->
-      <div class="col-md-8 d-flex align-items-center">
-        <div class="conteudo-secundario p-3 d-flex flex-column conteudo-rolavel">
-          <div class="conteudo-wrapper mt-auto mb-auto">
-            {% block conteudo_secundario %}{% endblock %}
+        <!-- Coluna direita (conteúdo secundário) -->
+        <div class="col-md-8 d-flex align-items-center">
+          <div class="conteudo-secundario p-3 d-flex flex-column conteudo-rolavel">
+            <div class="conteudo-wrapper mt-auto mb-auto">
+              {% block conteudo_secundario %}{% endblock %}
+            </div>
           </div>
         </div>
-      </div>
 
+      </div>
     </div>
-  </div>
+  </main>
 
   <!-- Footer -->
   {% include 'common/partials/_footer.html' %}
