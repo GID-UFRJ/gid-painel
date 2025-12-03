@@ -1,0 +1,86 @@
+{% extends "common/base.html" %}
+
+{% block conteudo %}
+        
+<div class="container p-4">
+    <br>
+    <div class="row justify-content-center">
+        <div class="col-8">
+            <h2 class="text-center text-black">Desenvolvimento</h2>
+            <br>
+            <div class="text-black text-justify">
+                <p>
+                    O Painel “PG e Pesquisa da UFRJ em números” foi desenvolvido ao longo do ano de 2025 de forma conjunta pela equipe do <a href='https://pr2.ufrj.br/gid/'>GID</a>.
+                    O projeto, desde sua concepção, visou culminar na elaboração de uma ferramenta útil à gestão e tomada de decisão institucional para a UFRJ. Em reuniões iniciais, definiu-se 
+                    que o painel iria utilizar apenas ferramentas e dados abertos em seu desenvolvimento, tanto por questões de transparência quanto para evitar gastos perenes com licenças de 
+                    softwares/bases de dados proprietários.
+                </p>
+                <p>
+                    As reuniões mensais do GID foram utilizadas para tanto o acompanhamento quanto refinamento do projeto, assim como reuniões extras dedicadas exclusivamente à discutir algum aspecto
+                    específico da aplicação. Foi através do trabalho conjunto do grupo que foram definidas todas 
+                    as características do painel, como as ferramentas e dados utilizados em seu desenvolvimento, assim como a estruturação de seu conteúdo. Por exemplo, a versão inicial do 
+                    painel (que pode ser acessada através <a href="https://github.com/gavieira/ufrj_dashboard">deste link</a>) utilizava o framework Python 
+                    <a href="https://github.com/plotly/dash">Dash</a>. Entretanto, a partir do feedback de toda a equipe, percebeu-se bem cedo no ciclo de desenvolvimento que iríamos necessitar
+                    de uma ferramenta mais versátil, o que desencadeou uma rápida migração da aplicação para <a href="https://github.com/django/django">Django</a>, framework no qual a versão final 
+                    do painel foi implementada.
+                </p>
+                <p>
+                    A definição das fontes de dados também foi amplamente decidida no decorrer de tais reuniões. Para dados de pesquisa, sempre se cogitou utilizar os dados da 
+                    <a href="https://openalex.org/">OpenAlex</a>. Por outro lado, nos estágios iniciais do projeto, planejava-se utilizar informações da plataforma 
+                    <a href="https://graduação.ufrj.br/index.php/559-sistema-integrado-de-gestao-academica/164">SIGA</a> como fonte de dados para os painéis de Pós-Graduação, algo que rapidamente se mostrou inviável após discussões internas do grupo.
+                    Logo, optamos por utilizar os <a href="https://dadosabertos.capes.gov.br">Dados Abertos CAPES</a> para tais painéis.                 
+                </p>
+                <p> 
+                    Com a identificação rápida e eficiente do ônus e bônus de cada fonte de dados por meio do grupo, foi possível não apenas selecionar fontes de dados adequadas, 
+                    como também estabelecer que tipos de visualizações poderiam ser extraídas dos dados, o que foi essencial para estabelecer estratégias de limpeza e organização dos mesmos.
+                    Ao final desse processo, obtivemos um rico, porém compacto (aprox. 725MB) banco de dados que mostra diversas facetas da Pesquisa e Pós-Graduação da UFRJ. As tabelas geradas nesse
+                    processo estão disponíveis publicamente em xxxxxxxxxxx.
+                </p>
+                <p>
+                    Em suma, o GID e a PR-2 esperam que o painel seja útil no sentido de auxiliar tomadas de decisão institucionais e que possamos continuar 
+                    trabalhando junto à comunidade acadêmica da UFRJ para melhorar este painel e realizar cada vez mais seu potencial enquanto ferramenta de gestão. Qualquer feedback sobre o painel
+                    pode ser enviado para o email do GID: <a href="mailto:gid@pr2.ufrj.br">gid@pr2.ufrj.br</a>.
+                </p>
+
+            <h2 class="text-center text-black">Créditos</h2>
+            <br>
+
+                <ul>
+                    <li class="list-group-item mb-3">
+                        <strong>Coordenação Geral</strong>
+                        <ul class="mt-1">
+                            <li>Prof. Jacqueline Leta (<a href="http://lattes.cnpq.br/4133191475294218">Lattes</a>)</li>
+                        </ul>
+                    </li>
+                    <li class="list-group-item mb-3">
+                        <strong>Programação</strong>
+                        <ul class="mt-1">
+                            <li>Gabriel Alves Vieira (<a href="http://lattes.cnpq.br/4543319851875322">Lattes</a>)</li>
+                            <li>Leonardo Tinoco Rosa (<a href="http://lattes.cnpq.br/0910251371146905">Lattes</a>)</li>
+                        </ul>
+                    </li>
+                    <li class="list-group-item mb-3">
+                        <strong>Levantamento de Dados</strong>
+                        <ul class="mt-1">
+                            <li>Felipe Silva Izidoro da Fonseca (<a href="http://lattes.cnpq.br/3033849341307886">Lattes</a>)</li>
+                            <li>Raquel de Souza Leal (<a href="http://lattes.cnpq.br/4136609790390562">Lattes</a>)</li>
+                        </ul>
+                    </li>
+                    <li class="list-group-item mb-3">
+                        <strong>Agradecimentos especiais</strong>
+                        <ul class="mt-1">
+                            <li>Prof. Vania Lisboa da Silveira Guedes (<a href="http://lattes.cnpq.br/8438289850732520">Lattes</a>)</li>
+                            <li>Tiago Ferreira do Carmo</li>
+                        </ul>
+                    </li>
+                </ul>
+
+             
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %} 
