@@ -1,13 +1,36 @@
 from django.db import models
 
-class RankingTipo(models.Model):
+
+class UpperCaseMixin(models.Model):
+    class Meta:
+        abstract = True
+
+    # 1. Configuração padrão: Lista de campos para IGNORAR
+    uppercase_exclude = []
+
+    def save(self, *args, **kwargs):
+        for field in self._meta.fields:
+            # Pula se o campo estiver na lista de exclusão
+            if field.name in self.uppercase_exclude:
+                continue
+
+            # Verifica se é texto e se tem valor
+            if isinstance(field, (models.CharField, models.TextField)):
+                valor_atual = getattr(self, field.name, None)
+                if valor_atual and isinstance(valor_atual, str):
+                    # Aplica a transformação
+                    setattr(self, field.name, valor_atual.strip().upper())
+
+        super().save(*args, **kwargs)
+
+class RankingTipo(UpperCaseMixin):
     """Ex: Acadêmico, Sustentabilidade"""
     nome = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.nome
 
-class Ranking(models.Model):
+class Ranking(UpperCaseMixin):
     """Ex: THE, Shanghai, THE IMPACT"""
     nome = models.CharField(max_length=200)
     tipo = models.ForeignKey(RankingTipo, on_delete=models.CASCADE)
@@ -18,7 +41,7 @@ class Ranking(models.Model):
     def __str__(self):
         return f"{self.nome} ({self.tipo.nome})"
 
-class EscopoGeografico(models.Model):
+class EscopoGeografico(UpperCaseMixin):
     """
     Refere-se EXCLUSIVAMENTE à abrangência geográfica.
     Ex: Mundo, América Latina, Nacional, Ásia.
@@ -28,7 +51,7 @@ class EscopoGeografico(models.Model):
     def __str__(self):
         return self.nome
 
-class ODS(models.Model):
+class ODS(UpperCaseMixin):
     """
     Objetivos de Desenvolvimento Sustentável.
     Ex: ODS_3, ODS_4.
@@ -41,7 +64,7 @@ class ODS(models.Model):
             return f"{self.codigo} - {self.descricao}"
         return self.codigo
 
-class RankingEntrada(models.Model):
+class RankingEntrada(UpperCaseMixin):
     ranking = models.ForeignKey(Ranking, on_delete=models.CASCADE)
     
     # Separação clara entre ONDE e O QUÊ

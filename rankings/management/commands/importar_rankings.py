@@ -4,35 +4,30 @@ from pathlib import Path
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
-# IMPORTANTE: Substitua 'seu_app' pelo nome real do seu aplicativo
+# IMPORTANTE: Substitua 'rankings' pelo nome real do seu app se for diferente
 from rankings.models import RankingTipo, Ranking, EscopoGeografico, ODS, RankingEntrada
 
 class Command(BaseCommand):
     help = 'Importa dados de ODS e Rankings automaticamente da pasta "importar/ranking"'
 
     def handle(self, *args, **options):
-        # 1. Definir o diretório base (Raiz do Projeto / importar / ranking)
+        # 1. Definir diretórios
         base_dir = settings.BASE_DIR
         diretorio_importacao = base_dir / 'importar' / 'ranking'
-
-        # 2. Definir os nomes esperados dos arquivos
-        # Altere aqui se os nomes dos seus arquivos forem diferentes
         arquivo_ods = diretorio_importacao / 'ods.csv'
         arquivo_rankings = diretorio_importacao / 'rankings.csv'
 
         self.stdout.write(self.style.WARNING(f'Buscando arquivos em: {diretorio_importacao}'))
 
-        # 3. Validações de existência
+        # 2. Validações
         if not os.path.isdir(diretorio_importacao):
             raise CommandError(f'O diretório não existe: {diretorio_importacao}')
-
         if not os.path.exists(arquivo_ods):
-            raise CommandError(f'Arquivo de ODS não encontrado. Esperado: {arquivo_ods}')
-        
+            raise CommandError(f'Arquivo de ODS não encontrado: {arquivo_ods}')
         if not os.path.exists(arquivo_rankings):
-            raise CommandError(f'Arquivo de Rankings não encontrado. Esperado: {arquivo_rankings}')
+            raise CommandError(f'Arquivo de Rankings não encontrado: {arquivo_rankings}')
 
-        # 4. Execução da Importação
+        # 3. Execução
         try:
             with transaction.atomic():
                 self.importar_ods(arquivo_ods)
@@ -42,6 +37,8 @@ class Command(BaseCommand):
             
         except Exception as e:
             self.stdout.write(self.style.ERROR(f'Erro crítico durante a importação: {e}'))
+            # Se quiser ver o erro completo, descomente a linha abaixo:
+            # raise e
 
     def importar_ods(self, caminho):
         self.stdout.write(f'Lendo ODS de: {caminho.name}...')
@@ -49,7 +46,8 @@ class Command(BaseCommand):
             reader = csv.DictReader(f)
             count = 0
             for row in reader:
-                codigo = row['escopoNome'].strip()
+                # CONVERSÃO PARA UPPER AQUI
+                codigo = row['escopoNome'].strip().upper()
                 descricao = row['escopoNomeCompleto'].strip()
 
                 ODS.objects.update_or_create(
@@ -62,9 +60,11 @@ class Command(BaseCommand):
     def importar_rankings(self, caminho):
         self.stdout.write(f'Lendo Rankings de: {caminho.name}...')
         
-        tipo_academico, _ = RankingTipo.objects.get_or_create(nome="Acadêmico")
-        tipo_sustentabilidade, _ = RankingTipo.objects.get_or_create(nome="Sustentabilidade")
+        # Strings "hardcoded" também devem ser UPPER para encontrar no banco
+        tipo_academico, _ = RankingTipo.objects.get_or_create(nome="ACADÊMICO")
+        tipo_sustentabilidade, _ = RankingTipo.objects.get_or_create(nome="SUSTENTABILIDADE")
         
+        # Cache local para performance (chaves em UPPER)
         ods_existentes = set(ODS.objects.values_list('codigo', flat=True))
 
         with open(caminho, 'r', encoding='utf-8') as f:
@@ -72,19 +72,20 @@ class Command(BaseCommand):
             count = 0
             
             for row in reader:
-                raw_ranking = row['Ranking'].strip()
-                raw_tipo = row['Tipo'].strip()
-                raw_escopo = row['Escopo'].strip()
+                # CONVERSÃO PARA UPPER AQUI (Essencial para get_or_create funcionar)
+                raw_ranking = row['Ranking'].strip().upper()
+                raw_tipo = row['Tipo'].strip().upper()
+                raw_escopo = row['Escopo'].strip().upper()
+                
                 year = int(row['Year'])
                 
                 p_min_str = row.get('Posição Mínima', '').strip()
                 p_max_str = row.get('Posição Máxima', '').strip()
-                
                 p_min = int(p_min_str) if p_min_str else (int(p_max_str) if p_max_str else 0)
                 p_max = int(p_max_str) if p_max_str else p_min
 
                 # Decisão do Tipo
-                tipo_obj = tipo_academico if raw_tipo == "Acadêmico" else tipo_sustentabilidade
+                tipo_obj = tipo_academico if raw_tipo == "ACADÊMICO" else tipo_sustentabilidade
                 
                 # Decisão do Ranking Pai
                 ranking_obj, _ = Ranking.objects.get_or_create(
@@ -98,7 +99,7 @@ class Command(BaseCommand):
                 
                 if raw_escopo in ods_existentes:
                     obj_ods = ODS.objects.get(codigo=raw_escopo)
-                    obj_geo, _ = EscopoGeografico.objects.get_or_create(nome="Mundo")
+                    obj_geo, _ = EscopoGeografico.objects.get_or_create(nome="MUNDO")
                 else:
                     obj_geo, _ = EscopoGeografico.objects.get_or_create(nome=raw_escopo)
                 
