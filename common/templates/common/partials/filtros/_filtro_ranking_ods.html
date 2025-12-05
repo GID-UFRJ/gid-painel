@@ -1,0 +1,10 @@
+<div class="col-md-3">
+    <label for="{{ grafico_id }}-ods" class="form-label">ODS</label>
+    <select id="{{ grafico_id }}-ods" name="ods" class="form-select">
+        {% for ods in odss %} {# Note a variável 'odss' que é passada para a templatetag #}
+            <option value="{{ ods.codigo }}">
+                {{ ods.codigo|cut:"ODS_" }} {% if ods.descricao %} - {{ ods.descricao|truncatechars:40 }} {% endif %}
+            </option>
+        {% endfor %}
+    </select>
+</div>

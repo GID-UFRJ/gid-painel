@@ -20,7 +20,7 @@
 {% endblock %} 
 
 {% block conteudo_secundario %}
-<h5># Rankings acadêmicos </h5>
+<h5><a href="{% url 'rankings:academicos' %}"># Rankings acadêmicos</a></h5>
 
     <p>
         Este painel aborda o desempenho da UFRJ em rankings acadêmicos, dentre os quais temos:
@@ -60,7 +60,7 @@
         </li>
     </ul>    
 
-<h5># Rankings de sustentabilidade </h5>
+<h5><a href="{% url 'rankings:sustentabilidade' %}"># Rankings de sustentabilidade</a></h5>
     <p>
         Este painel visa detalhar o desempenho da UFRJ em rankings de sustentabilidade, dentre os quais temos:
     </p>

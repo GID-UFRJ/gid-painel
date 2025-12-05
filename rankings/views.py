@@ -1,9 +1,40 @@
 from django.shortcuts import render
 from . import scripts_graficos
+from django.http import HttpResponse, Http404
+from .utils.plots import PlotsRankings
 #
 #
 def index(request):
     return(render(request, r'rankings/index.html'))
+
+def academicos(request):
+    """Página exclusiva para Rankings Acadêmicos."""
+    # Contexto vazio para ativar o Lazy Loading do template
+    context = {
+        'evolucao_academico_plot': None, 
+    }
+    return render(request, "rankings/academicos.html", context)
+
+def sustentabilidade(request):
+    """Página exclusiva para Rankings de Sustentabilidade."""
+    context = {
+        'evolucao_sustentabilidade_plot': None,
+    }
+    return render(request, "rankings/sustentabilidade.html", context)
+
+def grafico_generico_rankings(request, nome_plot):
+    """View HTMX que serve os gráficos para ambas as páginas."""
+    plotter = PlotsRankings()
+    if not hasattr(plotter, nome_plot):
+        raise Http404
+    
+    metodo = getattr(plotter, nome_plot)
+    # Retorna o HTML puro
+    return HttpResponse(metodo(**request.GET.dict()))
+
+
+
+
 #
 #def classificacao(request):
 #    g=scripts_graficos.Grafico_ranking()
