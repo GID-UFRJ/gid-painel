@@ -1,68 +1,66 @@
 # rankings/utils/mapeamentos.py
 from rankings.models import RankingEntrada
 
-# Receita para Rankings Acadêmicos
-evolucao_ranking_academico = {
+# --- Configuração Base (DRY: Don't Repeat Yourself) ---
+# Definimos as configurações comuns de eixos para não repetir código
+_config_faixa_base = {
+    "estrategia_plot": "faixa", 
     "modelo": RankingEntrada,
-    "titulo_base": "Evolução da Posição no Ranking",
+    "titulo_base": "Evolução da Posição",
     
     "eixo_x_campo": "ano",
     "eixo_x_nome": "Ano",
     "eixo_x_tipo": "numerico_continuo",
 
-    "eixo_y_campo": "posicao_minima", # Usamos a posição mínima como referência
-    "eixo_y_nome": "Posição (Menor é Melhor)",
-    "eixo_y_agregacao": "min", # Queremos o valor exato (ou o mínimo se houver duplicidade estranha)
-
-    "filtros": {
-        "ranking_nome": "ranking__nome",
-        "escopo": "escopo_geografico__nome",
-        "ano_inicial": "ano__gte",
-        "ano_final": "ano__lte",
-        # Filtro fixo para garantir que só pegamos acadêmicos
-        "tipo_ranking": "ranking__tipo__nome", 
-    },
-    "filtros_padrao": {
-        "tipo_ranking": "ACADÊMICO",
-        "ano_inicial": 2018,
-    },
-    "agrupamentos": {
-        "ranking": "ranking__nome", # Para comparar diferentes rankings (ex: THE vs QS)
-        "escopo": "escopo_geografico__nome",
-    },
-}
-
-# Receita para Rankings de Sustentabilidade (Com ODS)
-evolucao_ranking_sustentabilidade = {
-    "modelo": RankingEntrada,
-    "titulo_base": "Desempenho em Sustentabilidade (ODS)",
-    
-    "eixo_x_campo": "ano",
-    "eixo_x_nome": "Ano",
-    "eixo_x_tipo": "numerico_continuo",
-
-    "eixo_y_campo": "posicao_minima",
+    "eixo_y_min": "posicao_minima",
+    "eixo_y_max": "posicao_maxima",
     "eixo_y_nome": "Posição",
-    "eixo_y_agregacao": "min",
+    "eixo_y_invertido": True, # Inverte o eixo Y (1º lugar no topo)
 
+    # Filtros disponíveis para a URL
     "filtros": {
         "ranking_nome": "ranking__nome",
-        "ods": "ods__codigo", # Filtro extra importante aqui!
+        "escopo": "escopo_geografico__nome",
         "ano_inicial": "ano__gte",
         "ano_final": "ano__lte",
         "tipo_ranking": "ranking__tipo__nome",
+        "ods": "ods__codigo",
     },
-    "filtros_padrao": {
-        "tipo_ranking": "SUSTENTABILIDADE",
-        "ano_inicial": 2019,
-    },
+    
+    # Agrupamentos disponíveis (caso venha a agrupar algo no futuro)
     "agrupamentos": {
-        "ods": "ods__codigo", # Para comparar performance entre diferentes ODS
         "ranking": "ranking__nome",
+        "escopo": "escopo_geografico__nome",
+        "ods": "ods__codigo",
     },
 }
 
+# --- Variação 1: Acadêmico ---
+ranking_academico_faixa = _config_faixa_base.copy()
+
+ranking_academico_faixa["nome_plot"] = "academico_faixa"
+
+ranking_academico_faixa["filtros_padrao"] = {
+    "tipo_ranking": "ACADÊMICO",
+    "ano_inicial": 2018,
+    # No acadêmico, o agrupamento padrão é por Ranking
+}
+
+# --- Variação 2: Sustentabilidade ---
+ranking_sustentabilidade_faixa = _config_faixa_base.copy()
+
+ranking_sustentabilidade_faixa["nome_plot"] = "sustentabilidade_faixa"
+
+ranking_sustentabilidade_faixa["filtros_padrao"] = {
+    "tipo_ranking": "SUSTENTABILIDADE",
+    "ranking_nome": "THE IMPACT", # Default seguro para ODS
+    "ods": "ODS_3",
+    "ano_inicial": 2019,
+    # Na sustentabilidade, geralmente queremos comparar ODSs, mas o padrão aqui pode ser ranking
+}
+
 MAPEAMENTOS = {
-    "ranking_academico_evolucao": evolucao_ranking_academico,
-    "ranking_sustentabilidade_evolucao": evolucao_ranking_sustentabilidade,
+    # Nomes internos que usaremos no PlotsRankings
+    "academico_faixa": ranking_academico_faixa,
+    "sustentabilidade_faixa": ranking_sustentabilidade_faixa,
 }

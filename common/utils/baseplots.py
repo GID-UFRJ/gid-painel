@@ -9,7 +9,7 @@ from django.db.models import Count, Sum, Avg
 
 # Importamos as "ferramentas" da nossa "caixa de ferramentas" (o pacote plots_tipos)
 # Certifique-se de que o __init__.py em plots_tipos está exportando essas classes.
-from .plots_tipos import AggregatedPlotStrategy, HierarchicalPlotStrategy, TopNStrategy, DirectPlotStrategy
+from .plots_tipos import AggregatedPlotStrategy, HierarchicalPlotStrategy, TopNStrategy, DirectPlotStrategy, RangeAreaStrategy
 
 
 class BasePlots:
@@ -29,7 +29,8 @@ class BasePlots:
         'aggregated': AggregatedPlotStrategy,
         'hierarchical': HierarchicalPlotStrategy,
         'topn': TopNStrategy,
-        'direct': DirectPlotStrategy, # <-- REGISTRE A NOVA ESTRATÉGIA
+        'direct': DirectPlotStrategy, 
+        'faixa': RangeAreaStrategy,
     }
 
     CATEGORY_ORDERS = {
