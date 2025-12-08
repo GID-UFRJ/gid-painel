@@ -83,7 +83,7 @@ class RangeAreaStrategy(XYBaseStrategy):
                     line=dict(color=cor, shape='spline', width=3),
                     
                     showlegend=True,
-                    name=str(grupo), # Nome do ranking se for linha única
+                    name="Posição", # Nome do ranking se for linha única
                     legendgroup=str(grupo),
                     
                     hovertemplate="Posição: %{y}<extra></extra>",
