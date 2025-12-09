@@ -1,6 +1,11 @@
 # rankings/utils/mapeamentos.py
 from rankings.models import RankingEntrada
 
+import datetime
+
+# Define o ano atual dinamicamente (ex: 2025)
+ano_atual = datetime.date.today().year + 1
+
 # --- Configuração Base (DRY: Don't Repeat Yourself) ---
 # Definimos as configurações comuns de eixos para não repetir código
 _config_faixa_base = {
@@ -43,6 +48,8 @@ ranking_academico_faixa["nome_plot"] = "academico_faixa"
 ranking_academico_faixa["filtros_padrao"] = {
     "tipo_ranking": "ACADÊMICO",
     "ano_inicial": 2018,
+    "ano_final":ano_atual,
+    "escopo": "MUNDO",
     # No acadêmico, o agrupamento padrão é por Ranking
 }
 
@@ -55,6 +62,9 @@ ranking_sustentabilidade_faixa["filtros_padrao"] = {
     "tipo_ranking": "SUSTENTABILIDADE",
     "ranking_nome": "THE IMPACT", # Default seguro para ODS
     "ano_inicial": 2019,
+    "ano_final":ano_atual,
+    "escopo": "MUNDO",
+
     # Na sustentabilidade, geralmente queremos comparar ODSs, mas o padrão aqui pode ser ranking
 }
 

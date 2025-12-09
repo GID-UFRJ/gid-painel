@@ -34,7 +34,8 @@ def sustentabilidade(request):
     grafico_inicial = plotter.evolucao_sustentabilidade(
         ranking_nome="THE IMPACT",
         ods="None", 
-        ano_inicial="2019"
+        ano_inicial="2019",
+        escopo="MUNDO"
     )
 
     context = {

@@ -23,50 +23,55 @@ class RangeAreaStrategy(XYBaseStrategy):
         """
         Busca os dados considerando dois campos Y (min e max) em vez de um.
         Trata explicitamente o caso de filtro 'None'/'Empty' para buscar campos nulos.
+        Aplica filtros padrão do mapeamento para evitar duplicidade de nomes (QS Acadêmico vs QS Sustentabilidade).
         """
         # --- 1. TRATAMENTO DE FILTROS ESPECIAIS (ODS NULO) ---
-        # Copiamos para não afetar o dicionário original da requisição
         filtros_modificados = self.filtros.copy()
-        filtrar_apenas_nulos = False
-        
-        # Verifica se o filtro 'ods' veio como string vazia "" ou string "None"
+
         valor_ods = filtros_modificados.get('ods')
+        filtrar_apenas_nulos = False
+
         if valor_ods == 'None' or valor_ods == '':
-            # Removemos do dicionário para que o BasePlots não tente filtrar ods__codigo=""
             if 'ods' in filtros_modificados:
                 del filtros_modificados['ods']
-            # Ativamos a flag para aplicar o filtro isnull depois
             filtrar_apenas_nulos = True
 
-        # --- 2. QUERY BASE ---
+        # --- 2. MERGE DE DEFAULTS (A CORREÇÃO PARA O SEU PROBLEMA) ---
+        # Garante que filtros como 'tipo_ranking' definidos no mapeamentos.py
+        # sejam aplicados se não estiverem presentes na requisição.
+        defaults = self.mapeamento.get("filtros_padrao", {})
+        for chave, valor in defaults.items():
+            if chave not in filtros_modificados:
+                filtros_modificados[chave] = valor
+
+        # --- 3. QUERY BASE ---
         queryset, _, _ = self.plotter._get_base_queryset(
             self.mapeamento['__tipo_entidade__'], 
             filtros_modificados
         )
 
-        # --- 3. APLICAÇÃO DO FILTRO ISNULL (SE NECESSÁRIO) ---
+        # --- 4. APLICAÇÃO DO FILTRO ISNULL ---
         if filtrar_apenas_nulos:
-            # Garante que traga apenas rankings gerais (sem ODS vinculada)
             queryset = queryset.filter(ods__isnull=True)
 
-        # --- 4. PREPARAÇÃO DOS CAMPOS ---
+        # --- 5. PREPARAÇÃO DOS CAMPOS ---
         eixo_x = self.mapeamento["eixo_x_campo"]
         y_min = self.mapeamento["eixo_y_min"]
         y_max = self.mapeamento["eixo_y_max"]
-        
+
         campos = [eixo_x, y_min, y_max]
-        
-        # Lógica de Agrupamento (opcional, mas mantida para robustez)
+
         agrupamento = self.filtros.get("agrupamento")
         campo_grupo = None
-        
+
         if agrupamento:
             campo_grupo = self.mapeamento["agrupamentos"].get(agrupamento)
             if campo_grupo:
                 campos.append(campo_grupo)
 
-        # --- 5. EXECUÇÃO E DATAFRAME ---
-        dados = queryset.values(*campos).order_by(eixo_x)
+        # --- 6. EXECUÇÃO E DATAFRAME ---
+        # Adicionamos distinct() para evitar duplicatas puras de banco, caso existam
+        dados = queryset.values(*campos).order_by(eixo_x).distinct()
         df = pd.DataFrame(list(dados))
 
         if df.empty:
@@ -78,11 +83,10 @@ class RangeAreaStrategy(XYBaseStrategy):
             y_min: "y_min",
             y_max: "y_max"
         }
-        
+
         if campo_grupo:
             rename_map[campo_grupo] = "grupo"
         else:
-            # Cria grupo fictício baseado no título base ou nome do ranking
             df['grupo'] = self.mapeamento.get('titulo_base', 'Ranking')
 
         df.rename(columns=rename_map, inplace=True)
@@ -179,6 +183,7 @@ class RangeAreaStrategy(XYBaseStrategy):
 
             # --- CONFIGURAÇÃO DO EIXO X (Spikes/Guias) ---
             xaxis=dict(
+                type='category',
                 showspikes=True,      # Ativa a linha guia
                 spikemode='across',   # Linha atravessa o gráfico
                 spikesnap='data',     # A linha "gruda" no dado (ano), não segue o mouse no vazio
