@@ -31,8 +31,6 @@ def sustentabilidade(request):
     plotter = PlotsRankings()
     
     # 2. Gera o gráfico inicial manualmente (Server-Side Rendering)
-    # IMPORTANTE: Passamos 'ods="ODS_3"' para garantir que o THE IMPACT
-    # venha filtrado corretamente logo de cara.
     grafico_inicial = plotter.evolucao_sustentabilidade(
         ranking_nome="THE IMPACT",
         ods="None", 

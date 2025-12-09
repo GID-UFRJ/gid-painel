@@ -104,7 +104,8 @@
                 </button>
             </div>
             <div class="collapse" id="collapseRankings">
-                <a href="{% url 'homepage:index' %}" class="list-group-item list-group-item-action sub-item">Ranking Shanghai</a>
+                <a href="{% url 'rankings:academicos' %}" class="list-group-item list-group-item-action sub-item">Acadêmicos</a>
+                <a href="{% url 'rankings:sustentabilidade' %}" class="list-group-item list-group-item-action sub-item">Sustentabilidade</a>
             </div>
 
             {% for item in menu_items %}
