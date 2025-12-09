@@ -11,22 +11,52 @@ class RangeAreaStrategy(XYBaseStrategy):
     Estratégia para gerar gráficos de Faixa (Ribbon/Range Area).
     
     Características:
-    - Eixo Y Invertido.
-    - Se Min != Max: Exibe legendas explícitas "Melhor Posição" e "Pior Posição".
-    - Legenda estática (cliques desativados).
+    - Eixo Y Invertido (Padrão para Rankings: 1 é melhor que 100).
+    - Suporte a filtro explícito de 'Sem ODS' (Geral).
+    - Se Min == Max: Plota linha sólida única.
+    - Se Min != Max: Plota faixa (Melhor=Sólida, Pior=Pontilhada).
+    - Legendas informativas estáticas.
+    - Tooltips individuais limpos.
     """
 
     def get_dataframe(self) -> pd.DataFrame:
-        # 1. Query
-        queryset, _, _ = self.plotter._get_base_queryset(self.mapeamento['__tipo_entidade__'], self.filtros)
+        """
+        Busca os dados considerando dois campos Y (min e max) em vez de um.
+        Trata explicitamente o caso de filtro 'None'/'Empty' para buscar campos nulos.
+        """
+        # --- 1. TRATAMENTO DE FILTROS ESPECIAIS (ODS NULO) ---
+        # Copiamos para não afetar o dicionário original da requisição
+        filtros_modificados = self.filtros.copy()
+        filtrar_apenas_nulos = False
+        
+        # Verifica se o filtro 'ods' veio como string vazia "" ou string "None"
+        valor_ods = filtros_modificados.get('ods')
+        if valor_ods == 'None' or valor_ods == '':
+            # Removemos do dicionário para que o BasePlots não tente filtrar ods__codigo=""
+            if 'ods' in filtros_modificados:
+                del filtros_modificados['ods']
+            # Ativamos a flag para aplicar o filtro isnull depois
+            filtrar_apenas_nulos = True
 
+        # --- 2. QUERY BASE ---
+        queryset, _, _ = self.plotter._get_base_queryset(
+            self.mapeamento['__tipo_entidade__'], 
+            filtros_modificados
+        )
+
+        # --- 3. APLICAÇÃO DO FILTRO ISNULL (SE NECESSÁRIO) ---
+        if filtrar_apenas_nulos:
+            # Garante que traga apenas rankings gerais (sem ODS vinculada)
+            queryset = queryset.filter(ods__isnull=True)
+
+        # --- 4. PREPARAÇÃO DOS CAMPOS ---
         eixo_x = self.mapeamento["eixo_x_campo"]
         y_min = self.mapeamento["eixo_y_min"]
         y_max = self.mapeamento["eixo_y_max"]
         
         campos = [eixo_x, y_min, y_max]
         
-        # 2. Agrupamento (opcional)
+        # Lógica de Agrupamento (opcional, mas mantida para robustez)
         agrupamento = self.filtros.get("agrupamento")
         campo_grupo = None
         
@@ -35,14 +65,14 @@ class RangeAreaStrategy(XYBaseStrategy):
             if campo_grupo:
                 campos.append(campo_grupo)
 
-        # 3. Execução
+        # --- 5. EXECUÇÃO E DATAFRAME ---
         dados = queryset.values(*campos).order_by(eixo_x)
         df = pd.DataFrame(list(dados))
 
         if df.empty:
             return pd.DataFrame()
 
-        # 4. Renomeação
+        # Renomeação padronizada
         rename_map = {
             eixo_x: self.mapeamento["eixo_x_nome"],
             y_min: "y_min",
@@ -52,6 +82,7 @@ class RangeAreaStrategy(XYBaseStrategy):
         if campo_grupo:
             rename_map[campo_grupo] = "grupo"
         else:
+            # Cria grupo fictício baseado no título base ou nome do ranking
             df['grupo'] = self.mapeamento.get('titulo_base', 'Ranking')
 
         df.rename(columns=rename_map, inplace=True)
@@ -72,10 +103,11 @@ class RangeAreaStrategy(XYBaseStrategy):
         for grupo, cor in zip(grupos, palette):
             sub_df = df[df['grupo'] == grupo].sort_values(by=eixo_x_nome)
 
+            # Verifica se é um ranking exato (Min == Max em todos os pontos)
             eh_ranking_exato = sub_df['y_min'].equals(sub_df['y_max'])
 
             if eh_ranking_exato:
-                # --- CENÁRIO A: Linha Única ---
+                # --- CENÁRIO A: Linha Única (Posição Exata) ---
                 fig.add_trace(go.Scatter(
                     x=sub_df[eixo_x_nome],
                     y=sub_df['y_min'],
@@ -83,7 +115,9 @@ class RangeAreaStrategy(XYBaseStrategy):
                     line=dict(color=cor, shape='spline', width=3),
                     
                     showlegend=True,
-                    name="Posição", # Nome do ranking se for linha única
+                    # Se houver múltiplos grupos (comparação), usa o nome do grupo. 
+                    # Se for ranking único, usa "Posição" ou o nome do grupo.
+                    name=str(grupo),
                     legendgroup=str(grupo),
                     
                     hovertemplate="Posição: %{y}<extra></extra>",
@@ -98,28 +132,30 @@ class RangeAreaStrategy(XYBaseStrategy):
                     y=sub_df['y_max'],
                     mode='lines+markers',
                     
+                    # Visual: Pontilhada
                     line=dict(color=cor, shape='spline', width=3, dash='dot'), 
                     
                     showlegend=True,
-                    name="Pior Posição", # <--- ISSO CORRIGE O "trace 1"
+                    name="Pior Posição", 
                     legendgroup=str(grupo),
                     
                     hovertemplate="Pior Posição: %{y}<extra></extra>",
                 ))
 
-                # 2. MELHOR POSIÇÃO (Mínimo Numérico) -> CONTÍNUA
+                # 2. MELHOR POSIÇÃO (Mínimo Numérico) -> CONTÍNUA + PREENCHIMENTO
                 fig.add_trace(go.Scatter(
                     x=sub_df[eixo_x_nome],
                     y=sub_df['y_min'],
                     mode='lines+markers',
                     
+                    # Visual: Sólida
                     line=dict(color=cor, shape='spline', width=3, dash='solid'), 
                     
                     fill='tonexty', 
                     fillcolor=self._hex_to_rgba(cor, 0.2),
                     
                     showlegend=True,
-                    name="Melhor Posição", # <--- ISSO CORRIGE O "trace 2"
+                    name="Melhor Posição",
                     legendgroup=str(grupo),
                     
                     hovertemplate="Melhor Posição: %{y}<extra></extra>",
@@ -134,32 +170,34 @@ class RangeAreaStrategy(XYBaseStrategy):
             autosize=True,
             margin=dict(l=40, r=40, t=60, b=40),
             
-            # --- MUDANÇA AQUI ---
-            # De: hovermode="x unified"
-            # Para: hovermode="x"
-            # Isso cria tooltips individuais e remove a lista com ícones
+            # Tooltips individuais (sem ícones agrupados)
             hovermode="x",
+            
+            # Distância (em px) para ativar o "imã" do spike. 
+            # Deve ficar aqui no root do layout, não dentro de xaxis.
             spikedistance=30,
-            # --------------------
 
-            # Opcional: Adiciona uma linha vertical guia (Spike) para facilitar a leitura
-            # já que removemos o 'unified' que tinha a linha por padrão.
+            # --- CONFIGURAÇÃO DO EIXO X (Spikes/Guias) ---
             xaxis=dict(
-                showspikes=True, 
-                spikemode='across', 
-                spikesnap='data', 
+                showspikes=True,      # Ativa a linha guia
+                spikemode='across',   # Linha atravessa o gráfico
+                spikesnap='data',     # A linha "gruda" no dado (ano), não segue o mouse no vazio
+                
                 showline=True, 
                 showgrid=True
             ),
+            # ---------------------------------------------
             
+            # Legenda Estática
             legend=dict(
                 orientation="h",
                 yanchor="bottom", y=1.02,
                 xanchor="right", x=1,
-                itemclick=False,
-                itemdoubleclick=False
+                itemclick=False,       # Desativa clique simples
+                itemdoubleclick=False  # Desativa clique duplo
             ),
 
+            # Inverte o eixo Y se configurado (Rankings: 1 no topo)
             yaxis=dict(autorange="reversed") if self.mapeamento.get('eixo_y_invertido', False) else {}
         )
 
@@ -167,6 +205,7 @@ class RangeAreaStrategy(XYBaseStrategy):
         return fig.to_html(full_html=False, include_plotlyjs="cdn", config=config)
 
     def _hex_to_rgba(self, hex_color, alpha):
+        """Método utilitário para converter cor Hex para RGBA com transparência."""
         hex_color = hex_color.lstrip('#')
         if len(hex_color) == 6:
             r, g, b = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))

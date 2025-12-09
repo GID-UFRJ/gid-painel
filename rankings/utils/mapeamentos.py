@@ -54,7 +54,6 @@ ranking_sustentabilidade_faixa["nome_plot"] = "sustentabilidade_faixa"
 ranking_sustentabilidade_faixa["filtros_padrao"] = {
     "tipo_ranking": "SUSTENTABILIDADE",
     "ranking_nome": "THE IMPACT", # Default seguro para ODS
-    "ods": "ODS_3",
     "ano_inicial": 2019,
     # Na sustentabilidade, geralmente queremos comparar ODSs, mas o padrão aqui pode ser ranking
 }
