@@ -1,11 +1,10 @@
 from django.shortcuts import render
-
-# Create your views here.
-from django.http import HttpResponse
-
+from .utils.plots import HomePlotter
 
 def index(request):
-    return render(request, r'homepage/index.html')
+    return render(request, r'homepage/index.html',{
+        'plotter': HomePlotter()
+    })
 
 def creditos(request):
     return render(request, r'homepage/creditos.html')

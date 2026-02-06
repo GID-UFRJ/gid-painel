@@ -7,9 +7,18 @@ import re
 from django.db.models import Count, Sum, Avg
 
 
+# Importe diretamente dos arquivos específicos
+from .plots_tipos.agregado import AggregatedPlotStrategy
+from .plots_tipos.hierarquico import HierarchicalPlotStrategy
+from .plots_tipos.topn import TopNStrategy
+from .plots_tipos.direto import DirectPlotStrategy
+from .plots_tipos.faixa import RangeAreaStrategy
+from .plots_tipos.kpi import KPIStrategy # <--- Importe direto do arquivo kpi.py
+
+
 # Importamos as "ferramentas" da nossa "caixa de ferramentas" (o pacote plots_tipos)
 # Certifique-se de que o __init__.py em plots_tipos está exportando essas classes.
-from .plots_tipos import AggregatedPlotStrategy, HierarchicalPlotStrategy, TopNStrategy, DirectPlotStrategy, RangeAreaStrategy
+#from .plots_tipos import AggregatedPlotStrategy, HierarchicalPlotStrategy, TopNStrategy, DirectPlotStrategy, RangeAreaStrategy, KPIStrategy
 
 
 class BasePlots:
@@ -31,6 +40,7 @@ class BasePlots:
         'topn': TopNStrategy,
         'direct': DirectPlotStrategy, 
         'faixa': RangeAreaStrategy,
+        'kpi': KPIStrategy,
     }
 
     CATEGORY_ORDERS = {

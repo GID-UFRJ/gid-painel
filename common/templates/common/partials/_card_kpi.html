@@ -1,0 +1,20 @@
+<div class="card shadow-sm border-0 h-100 kpi-card" style="--card-color: {{ cor|default:'#4169E1' }};">
+    <div class="card-body">
+        <div class="d-flex align-items-center">
+            {% if icone %}
+            <div class="flex-shrink-0 me-3">
+                <i class="{{ icone }} fa-2x kpi-icon"></i>
+            </div>
+            {% endif %}
+            <div>
+                <h6 class="text-muted mb-1 text-uppercase fw-bold kpi-label">
+                    {{ rotulo }}
+                </h6>
+                <h2 class="mb-0 fw-bold kpi-value">
+                    {{ valor }}
+                    {% if sufixo %}<small class="text-muted">{{ sufixo }}</small>{% endif %}
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>
