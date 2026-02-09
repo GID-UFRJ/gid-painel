@@ -1,8 +1,8 @@
 # rankings/utils/plots.py
-from common.utils.baseplots import BasePlots
+from common.utils.dispatcher import Dispatcher
 from .mapeamentos import MAPEAMENTOS
 
-class PlotsRankings(BasePlots):
+class PlotsRankings(Dispatcher):
     MAPEAMENTOS = MAPEAMENTOS
 
     def evolucao_academico(self, **kwargs):

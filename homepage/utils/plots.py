@@ -1,8 +1,8 @@
 # homepage/utils/plots.py
-from common.utils.baseplots import BasePlots
+from common.utils.dispatcher import Dispatcher
 from .mapeamentos import MAPEAMENTOS
 
-class HomePlotter(BasePlots):
+class HomePlotter(Dispatcher):
     @property
     def MAPEAMENTOS(self):
         return MAPEAMENTOS

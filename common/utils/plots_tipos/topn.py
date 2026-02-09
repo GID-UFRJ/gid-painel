@@ -2,7 +2,7 @@
 
 import pandas as pd
 from django.db.models import Count, Sum
-from .base import BasePlotStrategy
+from .base_plot import BasePlotStrategy
 
 class TopNStrategy(BasePlotStrategy):
     """

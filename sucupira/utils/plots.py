@@ -7,21 +7,20 @@ from django.db.models import F, Q, Count, Sum, Min, Avg, Max, Subquery, OuterRef
 from django.db.models.functions import Coalesce
 from gid.utils_scripts_graficos import cores, grafico_barra, grafico_kpi
 from gid.utils_scripts_graficos_plotly import grafico_linha_plotly, grafico_barra_plotly, grafico_barra_plotly2
-from common.utils.baseplots import BasePlots
 from django.shortcuts import render
 from .mapeamentos import MAPEAMENTOS
 
 # sucupira/utils/plots.py (ou onde sua classe está)
 
 from django.db.models import Count, Max
-from common.utils.baseplots import BasePlots
+from common.utils.dispatcher import Dispatcher
 from .mapeamentos import MAPEAMENTOS
 from sucupira.models import Discente, Docente, Ano, AnoPrograma
 
 # Supondo que 'grafico_kpi' seja uma função que você já tenha
 # from .kpi_generator import grafico_kpi 
 
-class PlotsPessoal(BasePlots):
+class PlotsPessoal(Dispatcher):
     '''Gráficos gerais sobre discentes e docentes da Pós-Graduação.'''
     MAPEAMENTOS = MAPEAMENTOS
 
@@ -78,7 +77,7 @@ class PlotsPessoal(BasePlots):
 
 
 
-class PlotsPpgDetalhe(BasePlots):
+class PlotsPpgDetalhe(Dispatcher):
     '''Gráficos específicos de um Programa de Pós-Graduação.'''
     MAPEAMENTOS = MAPEAMENTOS
 
@@ -88,7 +87,7 @@ class PlotsPpgDetalhe(BasePlots):
         self.programa_id = programa_id
 
 
-class PlotsPpgUfrj(BasePlots):
+class PlotsPpgUfrj(Dispatcher):
     '''Gráficos específicos sobre os PPGS da UFRJ'''
     MAPEAMENTOS = MAPEAMENTOS
 

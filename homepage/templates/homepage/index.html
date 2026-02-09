@@ -23,19 +23,144 @@
                     Além disso, ao ter seu código-fonte disponível na íntegra no <a href="https://github.com/GID-UFRJ/gid-painel">GitHub</a> e permitir a extração integral dos dados de cada uma das análises, 
                     o Painel está em completa sintonia com o conceito de transparência pública, na mesma direção de outras iniciativas da UFRJ e do governo federal.
                 </p>
-
-                <p>
-                    Para melhor compreensão de todos, as informações estão dispostas em quatro painéis de dados específicos sobre:
-                </p>
                 
-                <div class="row">
+
+
+                <h4>PPGs</h4>
+
+                <hr class="hr-ufrj">
+
+
+                <div class="row mb-4">
+
                     <div class="col-md-3">
-                        {% render_kpi plotter "kpi_docentes_ufrj" %}
+                        {% render_kpi plotter "kpi_total_documentos" %}
                     </div>
+
+                    <div class="col-md-3">
+                        {% render_kpi plotter "kpi_total_artigos" %}
+                    </div>
+
+                    <div class="col-md-3">
+                        {% render_kpi plotter "kpi_total_oa" %}
+                    </div>
+
+                    <div class="col-md-3">
+                        {% render_kpi plotter "kpi_total_citacoes_artigos" %}
+                    </div>
+                    
+                </div>
+
+
+                <h4>PPGs</h4>
+
+                <hr class="hr-ufrj">
+
+                <div class="row mb-4">
+
                     <div class="col-md-3">
                         {% render_kpi plotter "kpi_programas_ufrj" %}
                     </div>
+
+                    <div class="col-md-3">
+                        {% render_kpi plotter "kpi_programas_academicos" %}
+                    </div>
+
+                    <div class="col-md-3">
+                        {% render_kpi plotter "kpi_programas_profissionais" %}
+                    </div>
+
+                    <div class="col-md-3">
+                        {% render_kpi plotter "kpi_programas_nota_7" %}
+                    </div>
+
                 </div>
+
+                <div class="row mb-4">
+
+                    <div class="col-md-3">
+                        {% render_kpi plotter "kpi_media_titulacao_doutorado" %}
+                    </div>
+
+                    <div class="col-md-3">
+                        {% render_kpi plotter "kpi_media_titulacao_mestrado" %}
+                    </div>
+
+                    <div class="col-md-3">
+                        {% render_kpi plotter "kpi_media_titulacao_profissional" %}
+                    </div>
+
+                </div>
+
+
+
+                <h4>Docentes</h4>
+
+                <hr class="hr-ufrj">
+
+                <div class="row mb-4">
+
+                    <div class="col-md-3">
+                        {% render_kpi plotter "kpi_docentes_ufrj" %}
+                    </div>
+
+                    <div class="col-md-3">
+                        {% render_kpi plotter "kpi_docentes_bolsistas" %}
+                    </div>
+                    
+                    <div class="col-md-3">
+                        {% render_kpi plotter "kpi_docentes_de" %}
+                    </div>
+
+                    <div class="col-md-3">
+                        {% render_kpi plotter "kpi_docentes_estrangeiros" %}
+                    </div>
+
+
+                </div>
+
+                <div class="container mt-4">
+                    <h4>Discentes</h4>
+
+                    <hr class="hr-ufrj">
+
+                    <div class="row mb-4">
+                        <div class="col-md-4">{% render_kpi plotter "kpi_matriculados_doutorado" %}</div>
+                        <div class="col-md-4">{% render_kpi plotter "kpi_matriculados_mestrado" %}</div>
+                        <div class="col-md-4">{% render_kpi plotter "kpi_matriculados_profissional" %}</div>
+                    </div>
+                
+                    <div class="row">
+                        <div class="col-md-4">{% render_kpi plotter "kpi_titulados_doutorado" %}</div>
+                        <div class="col-md-4">{% render_kpi plotter "kpi_titulados_mestrado" %}</div>
+                        <div class="col-md-4">{% render_kpi plotter "kpi_titulados_profissional" %}</div>
+                    </div>
+                </div>
+
+                <h4>Rankings</h4>
+
+                <hr class="hr-ufrj">
+
+                    <div class="row mb-4">
+                        <div class="col-md-4">{% render_kpi plotter "kpi_posicao_the_latam" %}</div>
+                        <div class="col-md-4">{% render_kpi plotter "kpi_posicao_qs_latam" %}</div>
+                    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+                <p class="mt-5">
+                    Para melhor compreensão de todos, visualizações mais complexas são dispostas em quatro painéis de dados específicos sobre:
+                </p>
+                
 
                 <div class="d-flex flex-wrap justify-content-between">
                     <a href="{% url 'openalex:index' %}" class="btn btn-ufrj-blue flex-fill mx-1 my-1">

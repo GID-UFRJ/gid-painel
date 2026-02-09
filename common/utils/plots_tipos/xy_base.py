@@ -2,7 +2,7 @@
 
 import pandas as pd
 from abc import abstractmethod
-from .base import BasePlotStrategy
+from .base_plot import BasePlotStrategy
 from pandas.api.types import CategoricalDtype
 
 class XYBaseStrategy(BasePlotStrategy):

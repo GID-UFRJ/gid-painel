@@ -2,7 +2,7 @@
 
 import pandas as pd
 from django.db.models import Count, Sum, Avg
-from .base import BasePlotStrategy # Importa a classe base do mesmo pacote
+from .base_plot import BasePlotStrategy
 
 class HierarchicalPlotStrategy(BasePlotStrategy):
     """

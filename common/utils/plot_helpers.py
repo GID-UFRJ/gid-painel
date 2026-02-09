@@ -1,3 +1,30 @@
+# common/utils/plot_helpers.py
+
+from django.db.models import Min, Max
+
+def extrair_periodo(queryset, campo_ano):
+    """Extrai min/max de um campo e retorna string formatada."""
+    if not campo_ano:
+        return None
+        
+    res = queryset.aggregate(min_a=Min(campo_ano), max_a=Max(campo_ano))
+    min_a, max_a = res['min_a'], res['max_a']
+
+    if min_a is None:
+        return None
+    return str(min_a) if min_a == max_a else f"{min_a}-{max_a}"
+
+
+def formatar_decimal(valor, precisao=1):
+    """Formata um número com casas decimais fixas."""
+    if valor is None:
+        return "0"
+    try:
+        return f"{float(valor):.{precisao}f}".replace(".", ",")
+    except (ValueError, TypeError):
+        return str(valor)
+
+
 def formatar_magnitude(valor, precisao=1):
     """
     Transforma números grandes em strings legíveis (K, M, B, T).

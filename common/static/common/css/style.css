@@ -113,6 +113,29 @@ main {
   border-radius: 20px;
 }
 
+/* Estilo base para os cards de KPI */
+.kpi-card {
+    border-left: 5px solid var(--card-color, #4169E1); /* O segundo valor é o padrão (fallback) */
+    transition: transform 0.2s ease-in-out;
+}
+
+.kpi-card:hover {
+    transform: translateY(-5px); /* Um leve efeito ao passar o mouse */
+}
+
+.kpi-icon {
+    color: var(--card-color, #4169E1);
+}
+
+.kpi-value {
+    color: #333;
+    font-size: 2rem;
+}
+
+.kpi-label {
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
 
 /* =======================================
    Classe de Botão Personalizada: Azul UFRJ
@@ -216,6 +239,13 @@ main {
     font-size: 1.1rem;
     cursor: pointer;
 }
+
+/* Estilo para régua horizontal */
+.hr-ufrj {
+    border-top: 5px solid #003366;
+    opacity: 1;
+}
+
 
 /* ---------------------------------------
    SEÇÃO 2: LINK E BOTÃO TOGGLE 
