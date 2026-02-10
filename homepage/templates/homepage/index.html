@@ -19,36 +19,44 @@
                 </p>
                 <p>
                     A construção deste Painel, que é resultado do esforço coletivo da equipe <a href="https://pr2.ufrj.br/gid">GID</a>, priorizou o uso de ferramentas abertas disponíveis em Python 
-                    e também de fontes abertas, como a Plataforma Sucupira e a base bibliográfica OpenAlex, das quais foram coletadas grande parte das informações apresentadas aqui. 
+                    e também de fontes abertas, como a Plataforma Sucupira e a base bibliográfica OpenAlex, das quais foram coletadas a maior parte das informações apresentadas aqui. 
                     Além disso, ao ter seu código-fonte disponível na íntegra no <a href="https://github.com/GID-UFRJ/gid-painel">GitHub</a> e permitir a extração integral dos dados de cada uma das análises, 
                     o Painel está em completa sintonia com o conceito de transparência pública, na mesma direção de outras iniciativas da UFRJ e do governo federal.
                 </p>
                 
+                <p>
+                    Seguem abaixo alguns indicadores sobre a produção científica e pós-graduação da UFRJ
+                    obtida através destas fontes de dados abertas:
+                </p>
 
-
-                <h4>PPGs</h4>
+                <h4>Produção</h4>
 
                 <hr class="hr-ufrj">
 
 
                 <div class="row mb-4">
 
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         {% render_kpi plotter "kpi_total_documentos" %}
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         {% render_kpi plotter "kpi_total_artigos" %}
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         {% render_kpi plotter "kpi_total_oa" %}
                     </div>
 
-                    <div class="col-md-3">
+                    
+                </div>
+
+                <div class="row mb-4">
+
+                    <div class="col-md-6">
                         {% render_kpi plotter "kpi_total_citacoes_artigos" %}
                     </div>
-                    
+
                 </div>
 
 
@@ -78,15 +86,15 @@
 
                 <div class="row mb-4">
 
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         {% render_kpi plotter "kpi_media_titulacao_doutorado" %}
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         {% render_kpi plotter "kpi_media_titulacao_mestrado" %}
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         {% render_kpi plotter "kpi_media_titulacao_profissional" %}
                     </div>
 
@@ -130,7 +138,7 @@
                         <div class="col-md-4">{% render_kpi plotter "kpi_matriculados_profissional" %}</div>
                     </div>
                 
-                    <div class="row">
+                    <div class="row mb-4">
                         <div class="col-md-4">{% render_kpi plotter "kpi_titulados_doutorado" %}</div>
                         <div class="col-md-4">{% render_kpi plotter "kpi_titulados_mestrado" %}</div>
                         <div class="col-md-4">{% render_kpi plotter "kpi_titulados_profissional" %}</div>
@@ -141,24 +149,16 @@
 
                 <hr class="hr-ufrj">
 
-                    <div class="row mb-4">
+                    <div class="row mb-5">
                         <div class="col-md-4">{% render_kpi plotter "kpi_posicao_the_latam" %}</div>
                         <div class="col-md-4">{% render_kpi plotter "kpi_posicao_qs_latam" %}</div>
                     </div>
 
 
 
-
-
-
-
-
-
-
-
-
-                <p class="mt-5">
-                    Para melhor compreensão de todos, visualizações mais complexas são dispostas em quatro painéis de dados específicos sobre:
+                <p class="mt-4 mb-4">
+                    Para melhor compreensão de todos, as visualizações completas das séries temporais acerca  da pesquisa e
+                    pós-graduação da UFRJ estão dispostas em quatro painéis de dados específicos sobre:
                 </p>
                 
 

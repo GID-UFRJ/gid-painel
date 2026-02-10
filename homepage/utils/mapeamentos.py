@@ -263,13 +263,13 @@ MAPEAMENTOS = {
         "modelo": Discente,
         "titulo_base": "Média Titulação Doutorado",
         "icone": "fas fa-hourglass-half",
-        "cor": "#20c997",
+        "cor": cor_doutorado,
         "eixo_y_campo": "qt_mes_titulacao",
         "eixo_y_agregacao": "avg",
         "sufixo": "meses", # Adiciona a unidade no card
         "formatacao": "decimal", # Para mostrar ex: 44.5
         "mostrar_periodo": "ano_id",
-        "filtrar_ultimo_ano": True,
+        #"filtrar_ultimo_ano": True,
         "filtros_padrao": {
             "situacao__nm_situacao_discente": "TITULADO",
             "grau_academico__nm_grau_curso": "DOUTORADO"
@@ -283,13 +283,13 @@ MAPEAMENTOS = {
         "modelo": Discente,
         "titulo_base": "Média Titulação Mestrado",
         "icone": "fas fa-hourglass-half",
-        "cor": "#17a2b8",
+        "cor": cor_mestrado,
         "eixo_y_campo": "qt_mes_titulacao",
         "eixo_y_agregacao": "avg",
         "sufixo": "meses",
         "formatacao": "decimal",
         "mostrar_periodo": "ano_id",
-        "filtrar_ultimo_ano": True,
+        #"filtrar_ultimo_ano": True,
         "filtros_padrao": {
             "situacao__nm_situacao_discente": "TITULADO",
             "grau_academico__nm_grau_curso": "MESTRADO"
@@ -303,13 +303,13 @@ MAPEAMENTOS = {
         "modelo": Discente,
         "titulo_base": "Média Titulação M. Profissional",
         "icone": "fas fa-hourglass-half",
-        "cor": "#6c757d",
+        "cor": cor_profissional,
         "eixo_y_campo": "qt_mes_titulacao",
         "eixo_y_agregacao": "avg",
         "sufixo": "meses",
         "formatacao": "decimal",
         "mostrar_periodo": "ano_id",
-        "filtrar_ultimo_ano": True,
+        #"filtrar_ultimo_ano": True,
         "filtros_padrao": {
             "situacao__nm_situacao_discente": "TITULADO",
             "grau_academico__nm_grau_curso": "MESTRADO PROFISSIONAL"

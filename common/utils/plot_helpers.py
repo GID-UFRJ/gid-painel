@@ -50,7 +50,7 @@ def formatar_magnitude(valor, precisao=1):
         magnitude += 1
         valor_num /= 1000.0
 
-    sufixos = ['', 'mil', 'milhoões']
+    sufixos = ['', ' mil', ' milhões']
     
     # Formata com a precisão desejada e remove zeros à direita desnecessários
     # Ex: 1.50 -> 1.5 | 1.0 -> 1
