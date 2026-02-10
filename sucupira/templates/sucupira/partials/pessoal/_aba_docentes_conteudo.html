@@ -2,18 +2,24 @@
 
 {% load sucupira_tags %}
 
-{# MODIFICADO: Aponta para a URL genérica com nome_plot='docentes_por_ano' #}
-{% url 'pessoal:grafico_generico_pessoal' nome_plot='docentes_por_ano' as url_docentes_ano %}
-{% render_filtros_pessoal "docentes" url_docentes_ano "docentes-ano" "spinner-docentes-ano" docentes_ano_plot %}
+{# ============================================================================== #}
+{# Gráfico 1: Docentes por Ano                                                  #}
+{# ============================================================================== #}
+{% url 'sucupira:grafico_generico_pessoal' nome_plot='docentes_por_ano' as url_docentes_ano %}
+{% render_filtros_pessoal "docentes" url_grafico=url_docentes_ano grafico_id="docentes-ano" spinner_id="spinner-docentes-ano" grafico_html=docentes_ano_plot plotter_name="pessoal" nome_plot="docentes_por_ano" %}
 
 <hr class="my-5">
 
-{# MODIFICADO: Aponta para a URL genérica com nome_plot='docentes_por_area_sunburst' #}
-{% url 'pessoal:grafico_generico_pessoal' nome_plot='docentes_por_area_sunburst' as url_docentes_sunburst %}
-{% render_filtros_pessoal "sunburst" url_docentes_sunburst "docentes-sunburst" "spinner-docentes-sunburst" docentes_sunburst_plot %}
+{# ============================================================================== #}
+{# Gráfico 2: Docentes por Área (Sunburst)                                      #}
+{# ============================================================================== #}
+{% url 'sucupira:grafico_generico_pessoal' nome_plot='docentes_por_area_sunburst' as url_docentes_sunburst %}
+{% render_filtros_pessoal "sunburst" url_grafico=url_docentes_sunburst grafico_id="docentes-sunburst" spinner_id="spinner-docentes-sunburst" grafico_html=docentes_sunburst_plot plotter_name="pessoal" nome_plot="docentes_por_area_sunburst" %}
 
 <hr class="my-5">
 
-{# MODIFICADO: Aponta para a URL genérica com nome_plot='top_paises_docentes' #}
-{% url 'pessoal:grafico_generico_pessoal' nome_plot='top_paises_docentes' as url_top_docentes %}
-{% render_filtros_pessoal "top_paises_docentes" url_top_docentes "top-paises-docentes" "spinner-top-paises-docentes" top_paises_docentes_plot %}
+{# ============================================================================== #}
+{# Gráfico 3: Top Países de Docentes                                            #}
+{# ============================================================================== #}
+{% url 'sucupira:grafico_generico_pessoal' nome_plot='top_paises_docentes' as url_top_docentes %}
+{% render_filtros_pessoal "top_paises_docentes" url_grafico=url_top_docentes grafico_id="top-paises-docentes" spinner_id="spinner-top-paises-docentes" grafico_html=top_paises_docentes_plot plotter_name="pessoal" nome_plot="top_paises_docentes" %}

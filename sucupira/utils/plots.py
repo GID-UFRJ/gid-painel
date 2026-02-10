@@ -7,21 +7,20 @@ from django.db.models import F, Q, Count, Sum, Min, Avg, Max, Subquery, OuterRef
 from django.db.models.functions import Coalesce
 from gid.utils_scripts_graficos import cores, grafico_barra, grafico_kpi
 from gid.utils_scripts_graficos_plotly import grafico_linha_plotly, grafico_barra_plotly, grafico_barra_plotly2
-from common.utils.baseplots import BasePlots
 from django.shortcuts import render
 from .mapeamentos import MAPEAMENTOS
 
 # sucupira/utils/plots.py (ou onde sua classe está)
 
 from django.db.models import Count, Max
-from common.utils.baseplots import BasePlots
+from common.utils.dispatcher import Dispatcher
 from .mapeamentos import MAPEAMENTOS
-from sucupira.models import Discente, Docente, Ano
+from sucupira.models import Discente, Docente, Ano, AnoPrograma
 
 # Supondo que 'grafico_kpi' seja uma função que você já tenha
 # from .kpi_generator import grafico_kpi 
 
-class PlotsPessoal(BasePlots):
+class PlotsPessoal(Dispatcher):
     '''Gráficos gerais sobre discentes e docentes da Pós-Graduação.'''
     MAPEAMENTOS = MAPEAMENTOS
 
@@ -77,84 +76,8 @@ class PlotsPessoal(BasePlots):
         return img
 
 
-    # =========================================================================
-    # MÉTODOS DE GRÁFICO - ADAPTADOS PARA A NOVA BasePlots
-    # =========================================================================
-    def discentes_por_ano(
-        self,
-        tipo_grafico="barra",
-        titulo_override: str | None = None,
-        **kwargs
-    ):
-        """
-        # ADAPTADO
-        Gera gráfico de discentes por ano.
-        Argumentos de filtro (ex: ano_inicial, situacao) são passados via **kwargs.
-        """
-        # A nova BasePlots lida com os filtros diretamente
-        return self._gerar_grafico_agregado(
-            tipo_entidade="discentes_geral", # Usa o mapeamento geral "discentes"
-            tipo_grafico=tipo_grafico,
-            filtros_selecionados=kwargs,
-            agrupamento=kwargs.get("agrupamento"),
-            titulo_override=titulo_override,
-            distinct=True,
-        )
 
-    def docentes_por_ano(
-        self,
-        tipo_grafico="barra",
-        titulo_override: str | None = None,
-        **kwargs
-    ):
-        """
-        # ADAPTADO
-        Gera gráfico de docentes por ano.
-        Argumentos de filtro (ex: ano_final, grande_area) são passados via **kwargs.
-        """
-        return self._gerar_grafico_agregado(
-            tipo_entidade="docentes_geral", # Usa o mapeamento geral "docentes"
-            tipo_grafico=tipo_grafico,
-            filtros_selecionados=kwargs,
-            agrupamento=kwargs.get("agrupamento"),
-            titulo_override=titulo_override,
-            distinct=True,
-        )
-
-    def discentes_por_area_sunburst(self, **kwargs):
-        """
-        Gera gráfico Sunburst da distribuição de discentes por área.
-        """
-        return self._gerar_grafico_hierarquico(
-            tipo_entidade="discentes_sunburst",
-            tipo_grafico="sunburst", # Especifica o tipo de gráfico
-            filtros_selecionados=kwargs,
-            **kwargs
-        )
-
-    def docentes_por_area_sunburst(self, **kwargs):
-        """
-        Gera gráfico Sunburst da distribuição de docentes por área.
-        """
-        return self._gerar_grafico_hierarquico(
-            tipo_entidade="docentes_sunburst",
-            tipo_grafico="sunburst",
-            filtros_selecionados=kwargs
-        )
-    
-    def top_paises_discentes(self, **kwargs):
-        return self._gerar_grafico_ranking("top_paises_discentes", "barra", kwargs)
-    
-    def top_paises_docentes(self, **kwargs):
-        return self._gerar_grafico_ranking("top_paises_docentes", "barra", kwargs)
-
-# sucupira/utils/plots.py (ou onde sua classe está)
-
-from django.shortcuts import render
-# Adicione a importação da sua função de limites de ano
-# from .helpers import get_limites_de_ano_global
-
-class PlotsPpgDetalhe(BasePlots):
+class PlotsPpgDetalhe(Dispatcher):
     '''Gráficos específicos de um Programa de Pós-Graduação.'''
     MAPEAMENTOS = MAPEAMENTOS
 
@@ -163,151 +86,95 @@ class PlotsPpgDetalhe(BasePlots):
             raise ValueError("O ID do programa é obrigatório para PlotsPpgDetalhe.")
         self.programa_id = programa_id
 
-    @staticmethod
-    def gerar_grafico_view(request, programa_id, metodo_plot):
-        """
-        # ADAPTADO
-        View genérica que agora usa defaults dinâmicos para os anos.
-        """
-        plotter = PlotsPpgDetalhe(programa_id=programa_id)
-        
-        # Opcional, mas recomendado: use defaults do DB para os anos
-        # limites_db = get_limites_de_ano_global()
-        # ano_inicial_default = limites_db['min_ano']
-        # ano_final_default = limites_db['max_ano']
-        
-        # Fallback caso não use a função acima
-        ano_inicial_default = 2013
-        ano_final_default = 2025 # Usando o ano atual + 1 como default
 
-        # Extrai os parâmetros da URL, aplicando os defaults
-        params = request.GET.dict()
-        params.setdefault('ano_inicial', ano_inicial_default)
-        params.setdefault('ano_final', ano_final_default)
+class PlotsPpgUfrj(Dispatcher):
+    '''Gráficos específicos sobre os PPGS da UFRJ'''
+    MAPEAMENTOS = MAPEAMENTOS
 
-        # Chama o método de plotagem dinamicamente
-        if hasattr(plotter, metodo_plot):
-            metodo = getattr(plotter, metodo_plot)
-            graf = metodo(**params)
-        else:
-            graf = f"<p class='text-danger'>Erro: Método de plotagem '{metodo_plot}' não encontrado.</p>"
-
-        return render(request, "common/partials/_plot_reativo.html", {'graf': graf})
-
-    def discentes_por_ano(
-        self,
-        tipo_grafico="barra",
-        titulo_override: str | None = None,
-        **kwargs
-    ):
+    def _get_ultimo_ano(self):
         """
-        # ADAPTADO E SIMPLIFICADO
-        Gera gráfico de discentes por ano para um programa específico.
+        [NOVO MÉTODO AUXILIAR]
+        Busca o último ano com registros. É chamado a cada requisição,
+        garantindo que o dado esteja sempre atualizado.
         """
-        # Adiciona o filtro de programa_id que é mandatório para esta classe
-        kwargs['programa_id'] = self.programa_id
-        
-        return self._gerar_grafico_agregado(
-            tipo_entidade="discentes_ppg",
-            tipo_grafico=tipo_grafico,
-            filtros_selecionados=kwargs,
-            agrupamento=kwargs.get("agrupamento"),
-            titulo_override=titulo_override,
-            distinct=True,
+        return Ano.objects.aggregate(max_ano=Max("ano_valor"))["max_ano"]
+
+    def card_total_programas_ultimo_ano(self):
+        """
+        [CORRIGIDO] Conta o total de programas únicos no último ano registrado.
+        """
+        ultimo_ano = self._get_ultimo_ano()
+        if ultimo_ano is None:
+            return None
+
+        total = (
+            AnoPrograma.objects
+            .filter(ano__ano_valor=ultimo_ano)
+            .values("programa_id")
+            .distinct()
+            .count()
         )
- 
-    def docentes_por_ano(
-        self,
-        tipo_grafico="barra",
-        titulo_override: str | None = None,
-        **kwargs
-    ):
-        """
-        # ADAPTADO
-        Gera gráfico de docentes por ano para um programa específico.
-        """
-        kwargs['programa_id'] = self.programa_id
 
-        return self._gerar_grafico_agregado(
-            tipo_entidade="docentes_ppg",
-            tipo_grafico=tipo_grafico,
-            filtros_selecionados=kwargs,
-            agrupamento=kwargs.get("agrupamento"),
-            titulo_override=titulo_override,
-            distinct=True,
+        img = grafico_kpi( 
+            valor=total, 
+            rotulo=f"PPGs ({ultimo_ano})", 
+            cor='#4169E1',
         )
+        return img
     
-    def conceito_programa_por_ano(
-        self,
-        tipo_grafico="linha",
-        titulo_override: str | None = None,
-        **kwargs
-    ):
+    def cards_programas_por_modalidade(self):
         """
-        Gera o gráfico da evolução do conceito do programa,
-        com o eixo Y fixo de 0 a 7 e apenas com inteiros.
+        [CORRIGIDO] Gera um card para cada modalidade de programa, contando
+        quantos programas pertencem a cada uma no último ano.
         """
-        kwargs['programa_id'] = self.programa_id
-        
-        # 1. Adicione 'pronto_para_plot=False' aos kwargs para que ele seja passado
-        #    para a classe base e nos retorne o objeto fig.
-        kwargs['pronto_para_plot'] = False
-        
-        fig = self._gerar_grafico_direto(
-            tipo_entidade="conceito_ppg", 
-            tipo_grafico=tipo_grafico,
-            filtros_selecionados=kwargs,
-            titulo_override=titulo_override,
-            **kwargs # Passa o 'pronto_para_plot=False' adiante
+        ultimo_ano = self._get_ultimo_ano()
+        if ultimo_ano is None:
+            return [] # Retorna uma lista vazia se não houver dados
+
+        qs = (
+            AnoPrograma.objects
+            .filter(ano__ano_valor=ultimo_ano)
+            .values("nm_modalidade_programa__nm_modalidade_programa")
+            .annotate(total=Count("programa_id", distinct=True))
+            .order_by("nm_modalidade_programa__nm_modalidade_programa")
         )
 
-        # 2. Verifique se o que voltou é um gráfico (e não uma string de "sem dados")
-        if 'Figure' in str(type(fig)):
-            
-            # 3. Faça a customização do eixo Y
-            fig.update_yaxes(
-                range=[0, 7.5],
-                tickmode='linear',
-                tick0=0,
-                dtick=1
+        dados = {item["nm_modalidade_programa__nm_modalidade_programa"]: item["total"] for item in qs}
+        cards = []
+        for modalidade, total in dados.items():
+            img = grafico_kpi(
+                valor=total,
+                rotulo=f"PPGs {modalidade}",
+                cor='#4169E1',
             )
-        
-            # 4. Converta o objeto modificado para HTML.
-            return fig.to_html(full_html=False, include_plotlyjs="cdn", config={"responsive": True})
-        
-        # 5. Se fig não for um gráfico, apenas retorne-o.
-        return fig
+            cards.append(img)
+        return cards
 
-    def media_titulacao_por_ano(
-        self,
-        tipo_grafico="barra", 
-        titulo_override: str | None = None,
-        **kwargs
-    ):
+    def card_total_programas_conceito_maximo(self):
         """
-        Gera gráfico da média de meses para titulação por ano,
-        formatando APENAS o texto no gráfico para 1 casa decimal.
+        [CORRIGIDO] Conta quantos programas atingiram o conceito máximo (6 ou 7)
+        no último ano registrado.
         """
-        kwargs['programa_id'] = self.programa_id
-        
-        fig = self._gerar_grafico_agregado(
-            tipo_entidade="media_titulacao",
-            tipo_grafico=tipo_grafico,
-            filtros_selecionados=kwargs,
-            agrupamento=kwargs.get("agrupamento"),
-            titulo_override=titulo_override,
-            pronto_para_plot=False
+        ultimo_ano = self._get_ultimo_ano()
+        if ultimo_ano is None:
+            return None
+
+        # Filtra por conceitos considerados máximos
+        total = (
+            AnoPrograma.objects
+            .filter(
+                ano__ano_valor=ultimo_ano,
+                cd_conceito_programa__cd_conceito_programa__in=[7] # Filtro por conceito 6 ou 7
+            )
+            .values("programa_id")
+            .distinct()
+            .count()
         )
 
-        # VERIFICANDO O TIPO DO RETORNO!
-        #    A biblioteca Plotly usa 'Figure' como nome da classe do objeto do gráfico.
-        if 'Figure' in str(type(fig)):
-            fig.update_traces(texttemplate="%{y:.1f}")
+        img = grafico_kpi( 
+            valor=total, 
+            rotulo=f"PPGs CAPES 7 ({ultimo_ano})", 
+            cor='#28a745', # Cor diferente para destaque
+        )
+        return img
 
-            return  fig.to_html(
-                    full_html=False,
-                    include_plotlyjs="cdn",
-                    config={"responsive": True},
-                )
-
-        return fig

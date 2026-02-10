@@ -1,43 +1,22 @@
 /* ===========================
    Estilos globais
 =========================== */
+
+html, body {
+    height: 100%;
+}
+
 body {
-  background-color: #f5f5f5; /* Gainsboro */
-  min-height: 100vh; /* garante que ocupe a tela inteira */
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif; /* opcional */
+    min-height: 100vh;
+    background-color: #f5f5f5; /* Gainsboro */
+    font-family: Arial, sans-serif; /* opcional */
+    display: flex;
+    flex-direction: column;
 }
 
-/* ===========================
-   Breadcrumbs e Menu
-=========================== */
-.menu_ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background-color: #333;
-}
-
-.menu_li {
-  float: left;
-}
-
-.menu_li a {
-  display: block;
-  color: white;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-}
-
-li a:hover:not(.active) {
-  background-color: #111;
-}
-
-.active {
-  background-color: #04AA6D;
+/* O bloco principal expande para empurrar o footer */
+main {
+    flex: 1;
 }
 
 
@@ -49,14 +28,14 @@ li a:hover:not(.active) {
 /* ------ Estilos para a página inteira: ------- */
 
 /* Parágrafos justificados */
-.index p {
+.text-justify p {
   text-align: justify;
 }
 
 /* Classe para controlar a altura e a rolagem das colunas */
 .conteudo-principal.conteudo-rolavel,
 .conteudo-secundario.conteudo-rolavel {
-  max-height: 70vh; /* 70% da altura da janela de visualização */
+  max-height: 65vh; /* 70% da altura da janela de visualização */
   overflow-y: auto; /* Adiciona barra de rolagem vertical quando necessário */
   width: 100%;      /* Garante que o conteúdo ocupe toda a largura da coluna */
 }
@@ -134,30 +113,339 @@ li a:hover:not(.active) {
   border-radius: 20px;
 }
 
+/* Estilo base para os cards de KPI */
+.kpi-card {
+    border-left: 5px solid var(--card-color, #4169E1); /* O segundo valor é o padrão (fallback) */
+    transition: transform 0.2s ease-in-out;
+}
 
-/* ===========================
-   Abas de navegação (conteúdo)
-=========================== */
-    .nav-pills .nav-link {
-        color: #495057;
-        font-weight: 500;
-        padding: 0.75rem 1.5rem;
-        transition: all 0.3s ease;
-        border-radius: 0.5rem !important;
-        margin-right: 0.5rem;
+.kpi-card:hover {
+    transform: translateY(-5px); /* Um leve efeito ao passar o mouse */
+}
+
+.kpi-icon {
+    color: var(--card-color, #4169E1);
+}
+
+.kpi-value {
+    color: #333;
+    font-size: 2rem;
+}
+
+.kpi-label {
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+/* =======================================
+   Classe de Botão Personalizada: Azul UFRJ
+======================================= */
+
+  .btn-ufrj-blue {
+    /* Cor de fundo principal: Azul da Navbar */
+    background-color: #003366; 
+    /* Cor da borda para combinar */
+    border-color: #003366; 
+    /* Cor do texto para garantir contraste */
+    color: white; 
+  }
+  
+  .btn-ufrj-blue:hover {
+    /* Azul ligeiramente mais escuro (ou mais claro) para o efeito hover */
+    background-color: #00254c; 
+    border-color: #00254c;
+    color: white;
+  }
+  
+  /* Estilo para quando o botão estiver pressionado/ativo (foco) */
+  .btn-ufrj-blue:focus,
+  .btn-ufrj-blue:active {
+    /* Mantenha a cor de fundo no foco/ativo e use uma sombra de foco que combine */
+    background-color: #00254c !important; 
+    border-color: #00254c !important;
+    box-shadow: 0 0 0 0.25rem rgba(0, 51, 102, 0.5); 
+  }
+
+
+/* ===================================================
+   Navbar
+   =================================================== */
+
+
+/* Navbar em si */
+
+.navbar {
+    /* Define margem na esquerda e na direita */
+    padding-left: 4rem; /* Ou um valor em rem, ex: 1.5rem */
+    padding-right: 4rem;
+
+}
+
+
+/* O Bootstrap já costuma aplicar d-flex e align-items-center, mas este CSS garante: */
+.navbar-brand {
+    display: flex;
+    align-items: center; /* 🎯 Centraliza verticalmente o logo e o título */
+    /* Remove margens extras que podem ter sido definidas por outras regras do Bootstrap */
+    padding-top: 0; 
+    padding-bottom: 0;
+}
+
+/* Logo ufrj */
+.logo-image {
+  height: 48px; /* Reduza este valor se precisar que a navbar seja mais fina */
+  width: auto; 
+  vertical-align: middle; 
+  margin-right: 15px;
+}
+
+/* Título navbar */
+.navbar-title {
+  color: #fff;
+  margin: 0; /* Remove margens indesejadas */
+  font-family: sans-serif;
+  line-height: normal;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+
+/* ===================================================
+   estilos de menu off-canvas - para a barra de navegação
+   =================================================== */
+
+/* ---------------------------------------
+   SEÇÃO 1: ESTRUTURA E LAYOUT GERAL
+------------------------------------------ */
+
+/* Ajuste da Largura do Menu Offcanvas */
+#offCanvasMenu {
+    width: 25vw; /* 25% da Largura da Viewport (1/4 de tela) */
+}
+@media (max-width: 768px) {
+    #offCanvasMenu {
+        width: 80vw; /* 80% da tela em celulares, para melhor usabilidade */
     }
+}
+
+/* Estilo para TUDO: Link Simples E Contêiner Pai (Aplica cor e altura) */
+.custom-menu-links-parent,
+.custom-menu-links .list-group-item-action {
+    /* Padding para Altura e Recuo da Borda: 20px Vertical, 30px Horizontal */
+    padding: 20px 30px; 
+    color: #003366; 
+    font-weight: bold;
+    border-top: 1px solid #ddd;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+
+/* Estilo para régua horizontal */
+.hr-ufrj {
+    border-top: 5px solid #003366;
+    opacity: 1;
+}
+
+
+/* ---------------------------------------
+   SEÇÃO 2: LINK E BOTÃO TOGGLE 
+------------------------------------------ */
+
+/* O link principal (texto) */
+.list-group-item-link {
+    flex-grow: 1; 
+    text-decoration: none; 
+    color: inherit; 
+    display: flex;
+    align-items: center; 
     
-    .nav-pills .nav-link:hover {
-        background-color: rgba(13, 110, 253, 0.1);
-        color: #0d6efd;
-    }
+    /* DIVISÓRIA: Borda no Link Principal */
+    border-right: 1px solid #e0e0e0; 
+    padding-right: 15px; /* Espaço entre a borda e o botão */
+}
+
+/* O botão de expansão do collapse (seta) - MAIOR ÁREA CLICÁVEL */
+.custom-toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #003366;
     
-    .nav-pills .nav-link.active {
-        background-color: #0d6efd;
-        color: white;
-        box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
-    }
+    /* 1. AUMENTA O TAMANHO DO ÍCONE */
+    font-size: 1.5em; 
     
-    .nav-pills {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    }
+    /* 2. AUMENTA O ALVO DE CLIQUE com padding */
+    padding: 10px 20px; 
+
+    /* 3. SEPARAÇÃO E ALINHAMENTO */
+    margin-right: 0; /* Alinha o botão com o padding de 30px do pai */
+    margin-left: 10px; /* Mantém a separação da borda */
+
+    /* Garante a centralização vertical do ícone */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ---------------------------------------
+   SEÇÃO 3: SUB-ITENS E HOVER UNIFICADOS
+------------------------------------------ */
+
+/* Estilo dos Sub-itens (dropdowns internos) */
+.custom-menu-links .sub-item {
+    padding: 15px 30px 15px 40px; /* Recuo à esquerda de 40px */
+    font-weight: normal;
+    font-size: 1rem;
+    background-color: #f8f8f8; 
+    border-top: none;
+    border-bottom: 1px solid #eee;
+    color: #003366;
+}
+
+/* 1. HOVER DO FUNDO SUAVE (Aplica a cor de fundo #f0f0f0 em TODOS os itens) */
+.custom-menu-links-parent:hover,
+.custom-menu-links .list-group-item-action:hover,
+.custom-menu-links .sub-item:hover {
+    background-color: #f0f0f0; 
+}
+
+/* 2. HOVER DE TEXTO (Aplica sublinhado em TODOS os links) */
+.list-group-item-link:hover,
+.custom-menu-links .list-group-item-action:hover {
+    text-decoration: underline;
+}
+
+/* 3. HOVER DO BOTÃO (Fica vermelho/acento) */
+.custom-toggle-btn:hover {
+    color: #cd2653; 
+}
+
+/* Estilo para a seta girar */
+.custom-toggle-btn[aria-expanded="true"] .fa-chevron-down {
+    transform: rotate(180deg);
+    transition: transform 0.3s ease-in-out;
+}
+.custom-toggle-btn[aria-expanded="false"] .fa-chevron-down {
+    transform: rotate(0deg);
+    transition: transform 0.3s ease-in-out;
+}
+
+/* =======================================
+   Breadcrumbs: Estilo Chevron com Fundo Colorido
+======================================= */
+
+.custom-breadcrumb-container-full {
+    /* Fundo Azul UFRJ em toda a linha */
+    background-color: #003366; 
+    padding: 0.5rem 4.5rem; /* Padding para dar espaço vertical e horizontal */
+    border-radius: 0; /* Remove cantos arredondados, fica como uma barra */
+    margin-bottom: 20px; /* Espaço abaixo da barra */
+}
+
+/* O elemento <ol> interno */
+.custom-breadcrumb-container-full .breadcrumb {
+    /* Remove padding/margem padrão do Bootstrap na lista <ol> */
+    padding: 0; 
+    margin: 0;
+    /* Define o separador como seta (>) usando a variável CSS do Bootstrap */
+    --bs-breadcrumb-divider: '>'; 
+    background-color: transparent; /* Garante que o fundo seja o do container pai */
+}
+
+/* 1. Links (Itens não-ativos) */
+.custom-breadcrumb-container-full .breadcrumb-item a {
+    /* Links brancos para contraste com o fundo azul */
+    color: white; 
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.custom-breadcrumb-container-full .breadcrumb-item a:hover {
+    /* Cor de acento (vermelho/vinho) no hover */
+    color: #cd2653; 
+    text-decoration: underline; 
+}
+
+/* 2. Item Ativo (O último item) */
+.custom-breadcrumb-container-full .breadcrumb-item.active {
+    /* Cor cinza claro para o item atual */
+    color: #ccc; 
+    font-weight: 600;
+}
+
+/* 3. Cor da Divisória (Chevron) */
+/* O separador herda a cor do texto do item anterior, mas podemos forçá-lo a ser mais claro */
+.custom-breadcrumb-container-full .breadcrumb-item::before {
+    color: #aaa; /* Cor mais suave para o separador */
+    opacity: 1;
+}
+
+/* =======================================
+   Estilos do Footer (Rodapé)
+======================================= */
+
+/* Container Principal do Footer (mantido, apenas o HTML mudou para container-fluid) */
+#custom-site-footer {
+    background-color: #3d3d3d;
+    color: white;
+    font-size: 0.85rem; /* Reduzido o tamanho da fonte */
+    margin-top: 20px;
+    padding-left: 4rem; /* Ou um valor em rem, ex: 1.5rem */
+    padding-right: 4rem;
+}
+
+/*tamanho do texto*/
+#custom-site-footer p {
+    font-size: 1rem;  /* ajuste como quiser */
+}
+
+
+/* Conteúdo principal do footer */
+.footer-content-main {
+    align-items: center !important;
+}
+
+
+/* 1. Coluna Esquerda: Logo e Endereço (lado a lado) */
+.footer-col-left {
+    /* O d-flex no HTML já garante o alinhamento horizontal */
+    align-items: center !important; /* Centraliza verticalmente o logo com o endereço */
+}
+.footer-ufrj-logo  {
+    max-width: 200px; /* Logo menor para caber ao lado do endereço */
+    height: auto;
+}
+
+.footer-institutionals-logos img {
+    max-height: 60px; /* Tamanho dos outros logos institucionais */
+    height: auto;
+}
+
+
+.footer-address {
+    line-height: 1.5;
+    margin: 0; /* Remove margens extras */
+}
+
+/* 2. Coluna Direita: Logos e Desenvolvido por (lado a lado) */
+.footer-col-right {
+    /* O d-flex justify-content-end no HTML já empurra para a direita */
+    align-items: center !important; /* Alinha tudo verticalmente no meio */
+}
+
+
+.developed-by-text {
+    font-weight: 500;
+    margin-bottom: 0.2rem !important; /* Compacta o texto sobre o logo */
+}
+
+.footer-divider-bottom {
+    margin-bottom: 0.1rem;
+}
+
+.gid-link {
+    display: block;
+    max-width: 250px;
+    margin: 0 auto;       /* centraliza */
+    white-space: normal;  /* força quebras de linha */
+}

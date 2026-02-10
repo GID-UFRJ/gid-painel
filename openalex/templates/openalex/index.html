@@ -1,8 +1,10 @@
 {% extends "common/base_index.html" %}
 
+{% load i18n %} {# Carregado para podermos utilizar o bloco 'blocktrans'  #}
+
 {% block conteudo_principal %}
 
-<h4>Painel de dados sobre a PESQUISA da UFRJ</h4>
+<h4>PESQUISA da UFRJ</h4>
 
 <p>
     Os dados disponíveis neste painel foram coletados do <a href='https://openalex.org/'>OpenAlex</a>, 
@@ -13,11 +15,10 @@
 <p>
     Para recuperar os dados da UFRJ, foi utilizado o critério endereço 
     de filiação dos autores. Assim, os dados desta seção incluem documentos 
-    com pelo menos um/a autor/a filiado/a à UFRJ. Os dados foram obtidos programaticamente
+    com pelo menos uma autoria filiada à UFRJ. Os dados foram obtidos programaticamente
     a partir da <a href="https://docs.openalex.org/how-to-use-the-api/api-overview">API da OpenAlex</a>
-    e <a href="https://github.com/GID-UFRJ/gid-painel/blob/main/openalex/models.py">modelados</a> para 
-    amarzenamento em um banco de dados relacional. A equipe do <a href="https://pr2.ufrj.br/gid/">GID</a> 
-    atualiza esses dados a cada seis meses.
+    e foram modelados para amarzenamento em um banco de dados relacional. A equipe do 
+    <a href="https://pr2.ufrj.br/gid/">GID</a> atualiza esses dados a cada seis meses.
 </p>
 
 <p>
@@ -35,48 +36,80 @@
 {% endblock %} 
 
 {% block conteudo_secundario %}
-    <h5># <a href="{% url 'openalex:producao' %}">Produção</a></h5>
+    
+
+
+    <h5>
+        # <a href="{% url 'openalex:producao' %}">Produção</a>
+
+            {% blocktrans asvar producao_nota %}
+                <p>
+                    As áreas de conhecimento apresentadas nesta seção foram atribuídas pela OpenAlex, 
+                    não sendo possível a comparação entre as áreas, pois os totais são impactados pelo número 
+                    de periódicos que varia entre as áreas.
+                </p>
+                
+                <p>
+                    Já os dados de tipo de acesso do periódico foram reagrupados em duas categorias 
+                    (restrito e aberto) e, assim, é possível observar a adesão da UFRJ ao movimento 
+                    de acesso aberto. A autoria correspondente foi incluída nesta seção, pois ela 
+                    revela a real liderança da UFRJ na pesquisa publicada.
+                </p>
+            {% endblocktrans %}    
+
+            {% include "common/partials/_info_adicional.html" with texto=producao_nota %}
+    </h5>
 
     <p>
-        Inclui os totais por ano de publicação, por tipo de documento, por área, por tipo de 
-        acesso e por autoria correspondente. Vale ressaltar que as áreas de conhecimento apresentadas
-        nesta seção foram atribuídas pela OpenAlex, não sendo possível a comparação entre as áreas, 
-        pois os totais são impactados pelo número de periódicos que varia entre as áreas.  
+        Inclui os totais da produção científica da UFRJ segundo ano de publicação, tipo de documento, área, tipo de acesso e autoria correspondente. 
     </p>    
+
+    <h5 class="mt-4">
+        # <a href="{% url 'openalex:impacto' %}">Impacto</a>
+
+        {% blocktrans asvar impacto_nota %}
+            <p>
+                Importante destacar que a citação não é sinônimo de qualidade da pesquisa publicada, mas do impacto ou da visibilidade dela. 
+                Há inúmeros fatores que contribuem para o aumento de citação de uma pesquisa publicada (<a href='https://pubmed.ncbi.nlm.nih.gov/25272615/'>Erikson & Erlandson, 2014</a>). 
+            </p>
+
+            <p>
+                Já o Índice H, originalmente de um/a determinado/a autor/a, pode ser utilizado para a análise de qualquer conjunto de documentos 
+                (<a href='https://pubmed.ncbi.nlm.nih.gov/21839937/'>Jones et al., 2011</a>), leva em conta duas variáveis, 
+                a produção e a citação, e permite observar a produção-impacto sem a contribuição dos <i>outliers</i>. 
+                <a href='https://wp.ufpel.edu.br/labserg/um-texto-util-para-entender-o-h-index/'>Este texto</a> explica em detalhes as origens do índice H e como calculá-lo.
+            </p>
+        {% endblocktrans %}    
+
+        {% include "common/partials/_info_adicional.html" with texto=impacto_nota %}
+    
+    </h5>
+
     <p>
-        Já os dados de tipo de acesso do periódico são apresentados em duas categorias (aberto e fechado) 
-        e, assim, é possível observar a adesão da UFRJ ao <a href='https://www.periodicos.capes.gov.br/index.php/acessoaberto.html'>movimento de acesso aberto</a>. 
-        Por fim, a autoria correspondente foi incluída nesta seção pois ela revela a real liderança da UFRJ na pesquisa publicada.
+        Inclui os totais de citação recebidos pela produção científica da UFRJ segundo o ano, 
+        a área do periódico, o tipo de acesso e a autoria correspondente. Inclui também o Índice H da UFRJ segundo estas mesmas variáveis.
     </p>
 
-    <h5 class="mt-4"># <a href="{% url 'openalex:impacto' %}">Impacto</a></h5>
+
+    <h5 class="mt-4">
+        # <a href="{% url 'openalex:colaboracao' %}">Colaboração</a>
+    
+        {% blocktrans asvar colaboracao_nota %}
+
+            <p>
+                As análises permitem visualizar não apenas as parcerias da UFRJ, mas também eventual dependência seja de colaboradores estrangeiros seja de colaboradores brasileiros.
+            </p>
+
+        {% endblocktrans %}    
+
+        {% include "common/partials/_info_adicional.html" with texto=colaboracao_nota %}
+
+    </h5>
 
     <p>
-        Inclui os totais por ano de citação segundo a área do periódico, o tipo de acesso e a autoria correspondente. 
-        Inclui também o Índice H da UFRJ segundo estas mesmas variáveis.<br>
-    </p>
-
-    <p>
-        Importante destacar que a citação não é sinônimo de qualidade da pesquisa publicada, mas é sim do impacto 
-        ou da visibilidade dela. 
-        Há inúmeros fatores que contribuem para o aumento de citação de uma pesquisa publicada (<a href='https://pubmed.ncbi.nlm.nih.gov/25272615/'>Erikson & Erlandson, 2014</a>). 
-        Já o Índice H, originalmente criado para a avaliação quantitativa da produção de um/a determinado/a autor/a, pode ser utilizado para a análise de qualquer conjunto de documentos 
-        (<a href='https://pubmed.ncbi.nlm.nih.gov/21839937/'>Jones et al., 2011</a>) e leva em conta duas variáveis, 
-        a produção e a citação, permitindo observar a relação entre quantidade e impacto da produção sem a interferência de outliers (documentos excessivamente ou escassamente citados). 
-        <a href='https://wp.ufpel.edu.br/labserg/um-texto-util-para-entender-o-h-index/'>Este texto</a> explica em detalhes as origens do índice H e como calculá-lo.
-    </p>
-
-    <h5 class="mt-4"># <a href="{% url 'openalex:colaboracao' %}">Colaboração</a></h5>
-
-    <p>
-        Inclui os totais por ano da produção com pelo menos um/a autor/a filiado/a a uma instituição estrangeira e com pelo 
-        menos um/a autor/a filiado/a a uma instituição brasileira; além das 10 instituições estrangeiras 
-        e as 10 instituições brasileiras que mais assinaram pesquisa da UFRJ. 
-    </p>
-
-    <p>
-        Ressalta-se que estas análises permitem visualizar não apenas as parcerias da UFRJ, mas também eventual dependência 
-        seja de colaboradores estrangeiros seja de colaboradores brasileiros. 
+        Inclui os totais por ano da produção com pelo menos uma autoria filiada a uma instituição estrangeira e com pelo 
+        menos uma autoria filiada a uma instituição brasileira; além das instituições estrangeiras 
+        e brasileiras</b> que mais assinaram em conjunto com a UFRJ. 
     </p>
 
 <!--

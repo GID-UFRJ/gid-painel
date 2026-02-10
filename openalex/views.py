@@ -14,9 +14,9 @@ def producao(request):
     p = PlotsProducao()
 
     return render(request, r'openalex/producao.html', {
-        'card_01':p.producao_total(),
-        'card_02':p.producao_total_artigos(),
-        'card_03':p.producao_artigos_acesso_aberto(),
+        #'card_01':p.producao_total(),
+        #'card_02':p.producao_total_artigos(),
+        #'card_03':p.producao_artigos_acesso_aberto(),
         #'card_04':p.producao_total_citacoes(),
                  
         'graf_01':p.producao_por_ano(ano_inicial=1990, ano_final=2024),
@@ -47,8 +47,8 @@ def grafico_producao_por_ano(request):
 def impacto(request):
     p = PlotsImpacto()
     return render(request, r'openalex/impacto.html', {
-        'card_01':p.producao_total_citacoes(),
-        'card_02':p.producao_total_hindex(),
+        #'card_01':p.producao_total_citacoes(),
+        #'card_02':p.producao_total_hindex(),
 
         'graf_01':p.citacoes_por_ano(ano_inicial=1990, ano_final=2024),
         #'graf_02':p.top_instituicoes_colaboradoras(internacional=True),
@@ -80,8 +80,8 @@ def colaboracao(request):
     p = PlotsColaboracao()
 
     return render(request, r'openalex/colaboracao.html', {
-        'card_01':p.producao_colaboracao_nacional(),
-        'card_02':p.producao_colaboracao_internacional(),
+        #'card_01':p.producao_colaboracao_nacional(),
+        #'card_02':p.producao_colaboracao_internacional(),
 
         'graf_01':p.colaboracoes_por_ano(),
         'graf_02':p.top_instituicoes_colaboradoras(n_instituicoes=10, tipo_instituicao='nacional'),

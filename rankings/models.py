@@ -1,41 +1,87 @@
 from django.db import models
 
-# Create your models here.
-class Escopo(models.Model):
-    escopoId = models.IntegerField(primary_key=True)
-    escopoNome = models.CharField(max_length=100, unique=True, null = False) #Default do django é null = False, mas preferi ser explícito aqui...
-    escopoNomeCompleto = models.CharField(max_length=100, unique=True, null = True, blank = True) #Nome completo vai ser mais útil para identificar as ODS's. Pode ser nulo para outros escopos. Não necessariamente precisa ter apenas valores únicos, mas não vejo muita razão para ter duplicatas tbm.
-    
+
+class UpperCaseMixin(models.Model):
+    class Meta:
+        abstract = True
+
+    # 1. Configuração padrão: Lista de campos para IGNORAR
+    uppercase_exclude = []
+
+    def save(self, *args, **kwargs):
+        for field in self._meta.fields:
+            # Pula se o campo estiver na lista de exclusão
+            if field.name in self.uppercase_exclude:
+                continue
+
+            # Verifica se é texto e se tem valor
+            if isinstance(field, (models.CharField, models.TextField)):
+                valor_atual = getattr(self, field.name, None)
+                if valor_atual and isinstance(valor_atual, str):
+                    # Aplica a transformação
+                    setattr(self, field.name, valor_atual.strip().upper())
+
+        super().save(*args, **kwargs)
+
+class RankingTipo(UpperCaseMixin):
+    """Ex: Acadêmico, Sustentabilidade"""
+    nome = models.CharField(max_length=100, unique=True)
+
     def __str__(self):
-        return f"{self.escopoNome}"
+        return self.nome
 
-class Ranking(models.Model):
-    rankingId = models.IntegerField(primary_key=True)
-    rankingNome = models.CharField(max_length=100, unique=True, null = False) 
-
-    def __str__(self):
-        return f"{self.rankingNome }"
-
-class Ano(models.Model):
-    anoId = models.IntegerField(primary_key=True)
-    ano = models.IntegerField(unique=True, null=False)
-
-    def __str__(self):
-        return f"{self.ano}"
-
-class Resultado(models.Model):
-    resultadoId = models.AutoField(primary_key=True)
-    ranking = models.ForeignKey(Ranking, on_delete=models.CASCADE)
-    escopo = models.ForeignKey(Escopo, on_delete=models.CASCADE)
-    ano = models.ForeignKey(Ano, on_delete=models.CASCADE)
-    posicao = models.FloatField(null = False)
-    pontuacaoGeral = models.FloatField(null = True, blank=True)
+class Ranking(UpperCaseMixin):
+    """Ex: THE, Shanghai, THE IMPACT"""
+    nome = models.CharField(max_length=200)
+    tipo = models.ForeignKey(RankingTipo, on_delete=models.CASCADE)
 
     class Meta:
-        db_table_comment = "Resultados dos rankings em um dado escopo e ano"
-        constraints = [
-        models.UniqueConstraint(fields=['ranking', 'escopo', 'ano'], name='unique_resultados_tripla'), #Não achei como modelar chaves estrangeiras como chave primária composta, mas isso deve servir 
-        ] 
+        unique_together = ('nome', 'tipo')
 
     def __str__(self):
-        return f"{self.ranking.rankingNome} | {self.escopo.escopoNome} | {self.ano.ano}"
+        return f"{self.nome} ({self.tipo.nome})"
+
+class EscopoGeografico(UpperCaseMixin):
+    """
+    Refere-se EXCLUSIVAMENTE à abrangência geográfica.
+    Ex: Mundo, América Latina, Nacional, Ásia.
+    """
+    nome = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.nome
+
+class ODS(UpperCaseMixin):
+    """
+    Objetivos de Desenvolvimento Sustentável.
+    Ex: ODS_3, ODS_4.
+    """
+    codigo = models.CharField(max_length=20, unique=True, help_text="Ex: ODS_3")
+    descricao = models.CharField(max_length=255, blank=True, null=True, help_text="Ex: Saúde e Bem-Estar")
+
+    def __str__(self):
+        if self.descricao:
+            return f"{self.codigo} - {self.descricao}"
+        return self.codigo
+
+class RankingEntrada(UpperCaseMixin):
+    ranking = models.ForeignKey(Ranking, on_delete=models.CASCADE)
+    
+    # Separação clara entre ONDE e O QUÊ
+    escopo_geografico = models.ForeignKey(EscopoGeografico, on_delete=models.PROTECT) # Evita deletar o escopo se houver entradas
+    ods = models.ForeignKey(ODS, null=True, blank=True, on_delete=models.SET_NULL, help_text="Deixe em branco para rankings gerais ou institucionais")
+
+    ano = models.IntegerField()
+    posicao_minima = models.IntegerField()
+    posicao_maxima = models.IntegerField()
+
+    class Meta:
+        verbose_name = "Entrada de Ranking"
+        verbose_name_plural = "Entradas de Ranking"
+        # Garante que não haja duplicidade de dados para o mesmo ano/ranking/escopo/ods
+        unique_together = ('ranking', 'escopo_geografico', 'ods', 'ano')
+        ordering = ['-ano', 'ranking']
+
+    def __str__(self):
+        tema = self.ods.codigo if self.ods else "Geral"
+        return f"{self.ranking} | {self.escopo_geografico} | {tema} | {self.ano}"

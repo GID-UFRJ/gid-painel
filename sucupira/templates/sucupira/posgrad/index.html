@@ -1,41 +1,64 @@
-{% extends "common/base.html" %}
+{% extends "common/base_index.html" %}
 
-{% block conteudo %}
-        
-<div class="container p-4">
-    <br>
-    <div class="row justify-content-center">
-        <div class="col-8">
-            <h2 class="text-center text-black">Painel de Pós-Graduação</h2>
-            <br>
-            <div class="text-black">
-                <p>
-                    Este painel visa prover informações detalhadas sobre os programas de pós graduação (PPGs) da UFRJ. Ele pode ser dividido em dois subpainéis: 
-                </p>
-                <ul> 
-                    <li>
-                        <p>
-                            <a href="{% url 'posgrad:posgrad_ufrj' %}"><strong>Pós-Graduação na UFRJ</strong></a>: apresenta informações (e.g. total de discentes e docentes) 
-                            sobre a Pós-Graduação na UFRJ como um todo.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <a href="{% url 'posgrad:ppgs' %}"><strong>PPGs</strong></a>: apresenta informações detalhadas sobre cada um dos PPGs da UFRJ. 
-                        </p>
-                    </li>
-                </ul>    
-                <p>
-                    Os dados utlizados em ambos os painéis advém dos <a href="https://dadosabertos.capes.gov.br/">Dados Abertos da CAPES</a>,
-                    uma base de dados oficial que disponibiliza informações detalhadas sobre todos os programas de Pós-Graduação do Brasil. 
-                    Foram analisados aqui registros a partir de 2013, ano no qual a coleta dos dados pela CAPES passou a se dar através da plataforma 
-                    <a href="'https://sucupira.capes.gov.br/">Sucupira</a>. É válido ressaltar que os dados abertos da CAPES são atualizados com um certo
-                    atraso (e.g. em Agosto de 2025, os dados de 2024 ainda não estavam disponíveis). Logo, as informações presentes aqui podem estar 
-                    ligeiramente desatualizadas.
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
+{% load i18n %} {# Carregado para podermos utilizar o bloco 'blocktrans'  #}
+
+
+{% block conteudo_principal %}
+
+<h4> 
+    PÓS-GRADUAÇÃO: Os Programas
+
+    {% blocktrans asvar principal_nota %}
+        <p>
+            Apesar do portal de dados abertos apresentar dados desde o ano 2004, este painel utiliza apenas os registros a partir de 2013,
+            ano no qual a coleta passou a ser realizada através da plataforma <a href='https://sucupira.capes.gov.br/'>Sucupira</a>.
+
+        </p>
+    {% endblocktrans %}    
+
+    {% include "common/partials/_info_adicional.html" with texto=principal_nota %}
+
+
+</h4>
+
+<p>
+    Os dados disponíveis neste painel foram coletados do Portal de Dados Abertos da Capes, 
+    que disponibiliza informações em série histórica sobre o corpo docente e discente de 
+    todos os programas de pós-graduação registrados no país (ver: https://dadosabertos.capes.gov.br/)
+</p>
+
+<p>
+    Para a recuperação dos dados dos programas foram baixados todos os arquivos csv relativos à 
+    <a href="https://dadosabertos.capes.gov.br/organization/diretoria-de-avaliacao">avaliação da Pós-Graduação</a> disponibilizados pela CAPES. Posteriormente,
+    os registros relativos à UFRJ foram programaticamente extraídos de todos os arquivos através da linguagem Python. Os dados filtrados foram limpos e reestruturados,
+    sendo posteriormente utilizados para a população do banco de dados utilizado para os painéis de pessoal e pós-graduação. À medida que a CAPES disponibilizar dados para 
+    anos mais recentes, a equipe do GID irá baixá-los, limpá-los e adicioná-los ao banco de dados para que as análises disponibilizadas estejam tão atualizadas quanto possível.
+</p>
+
+<p>
+    Para este painel, os dados estão apresentados em dois blocos, um com a visão geral do conjunto de programas e outro com informações 
+    individualizadas sobre os mesmos, para os quais foram selecionadas variáveis que descrevem aspectos relevantes sobre a Pós-Graduação 
+    na UFRJ.
+</p>
 
 {% endblock %} 
+
+{% block conteudo_secundario %}
+<h5><a href="{% url 'posgrad:posgrad_ufrj' %}"># Programas - Geral</a></h5>
+
+<p>
+    Inclui os totais de Programas de Pós-Graduação da UFRJ segundo o ano, o conceito Capes, a modalidade e a área do Programa.
+</p>
+
+
+<h5><a href="{% url 'posgrad:ppgs' %}"># Programas - Individual</a></h5>
+
+<p>
+    Inclui detalhes de cada Programa de Pós-Graduação, incluindo informações 
+    gerais do Programa (nome, ano de criação, área de avaliação, etc...), assim 
+    como a evolução do conceito Capes, média de meses para a titulação, total 
+    de discentes e de docentes, dentre outros indicadores. 
+</p>
+
+
+{% endblock %}

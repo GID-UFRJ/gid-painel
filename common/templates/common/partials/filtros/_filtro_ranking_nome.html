@@ -1,0 +1,15 @@
+{# common/templates/common/partials/filtros/_filtro_ranking_nome.html #}
+
+<div class="col-md-3">
+    <label for="{{ grafico_id }}-ranking_nome" class="form-label">Ranking</label>
+    
+    <select id="{{ grafico_id }}-ranking_nome" 
+            name="ranking_nome" 
+            class="form-select js-ranking-control" {# Adicionada esta classe para o JS encontrar #}
+            data-target-ods="#div-{{ grafico_id }}-ods"> {# O JS saberá para onde apontar #}
+            
+        {% for ranking in rankings %}
+            <option value="{{ ranking.nome }}">{{ ranking.nome }}</option>
+        {% endfor %}
+    </select>
+</div>

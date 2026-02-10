@@ -2,6 +2,5 @@
 
 {% load sucupira_tags %}
 
-{# MODIFICADO: Aponta para a URL genérica com programa_id e nome_plot='docentes_por_ano' #}
-{% url 'posgrad:grafico_generico_ppg' programa_id=programa.id nome_plot='docentes_por_ano' as url_docentes_ano %}
-{% render_filtros_ppg_detalhe "docentes" url_docentes_ano "docentes-ano" "spinner-docentes-ano" docentes_ano_plot %}
+{% url 'sucupira:grafico_generico_ppg' programa_id=programa.id nome_plot='docentes_por_ano_ppg' as url_docentes_ano %}
+{% render_filtros_ppg_detalhe "docentes" url_grafico=url_docentes_ano grafico_id="docentes-ano" spinner_id="spinner-docentes-ano" grafico_html=docentes_ano_plot plotter_name="ppg_detalhe" nome_plot="docentes_por_ano_ppg" programa_id=programa.id %}

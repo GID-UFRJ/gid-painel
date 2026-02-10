@@ -1,0 +1,15 @@
+{# sucupira/templates/sucupira/partials/posgrad/posgrad_ufrj/_aba_ppgs_ufrj_conteudo.html #}
+
+{% load sucupira_tags %}
+
+<h3 style="text-align: center;">Programas de Pós-Graduação da UFRJ</h3>
+
+<hr class="my-5">
+
+<h2>Número de Programas Registrados por Ano</h2> {# Ou um título melhor #}
+
+{# Define a URL para a view genérica que servirá as atualizações HTMX #}
+{% url 'sucupira:grafico_generico_posgrad_ufrj' nome_plot='programas_contagem_por_ano' as url_programas_contagem %} 
+
+{# Chama a templatetag, passando todos os argumentos necessários #}
+{% render_filtros_posgrad_ufrj "programas_contagem" url_grafico=url_programas_contagem grafico_id="programas-contagem-ano" spinner_id="spinner-programas-contagem-ano" grafico_html=programas_contagem_ano_plot plotter_name="posgrad_ufrj" nome_plot="programas_contagem_por_ano" %}

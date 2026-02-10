@@ -4,13 +4,11 @@
 
 <h3 style="text-align: center;">Contagem de discentes</h3>
 
-{# MODIFICADO: Aponta para a URL genérica com programa_id e nome_plot='discentes_por_ano' #}
-{% url 'posgrad:grafico_generico_ppg' programa_id=programa.id nome_plot='discentes_por_ano' as url_discentes_ano %}
-{% render_filtros_ppg_detalhe "discentes" url_discentes_ano "discentes-ano" "spinner-discentes-ano" discentes_ano_plot %}
+{% url 'sucupira:grafico_generico_ppg' programa_id=programa.id nome_plot='discentes_por_ano_ppg' as url_discentes_ano %}
+{% render_filtros_ppg_detalhe "discentes" url_grafico=url_discentes_ano grafico_id="discentes-ano" spinner_id="spinner-discentes-ano" grafico_html=discentes_ano_plot plotter_name="ppg_detalhe" nome_plot="discentes_por_ano_ppg" programa_id=programa.id %}
 
 <br>
 <h3 style="text-align: center;">Média de meses para titulação</h3>
 
-{# MODIFICADO: Aponta para a URL genérica com programa_id e nome_plot='media_titulacao_por_ano' #}
-{% url 'posgrad:grafico_generico_ppg' programa_id=programa.id nome_plot='media_titulacao_por_ano' as url_media_titulacao_ano %}
-{% render_filtros_ppg_detalhe "media_titulacao" url_media_titulacao_ano "media-titulacao-ano" "spinner-media-titulacao-ano" media_titulacao_ano_plot %}
+{% url 'sucupira:grafico_generico_ppg' programa_id=programa.id nome_plot='media_titulacao_por_ano' as url_media_titulacao_ano %}
+{% render_filtros_ppg_detalhe "media_titulacao" url_grafico=url_media_titulacao_ano grafico_id="media-titulacao-ano" spinner_id="spinner-media-titulacao-ano" grafico_html=media_titulacao_ano_plot plotter_name="ppg_detalhe" nome_plot="media_titulacao_por_ano" programa_id=programa.id %}

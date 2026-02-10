@@ -1,0 +1,10 @@
+<div class="col-md-3">
+    <label for="{{ grafico_id }}-escopo" class="form-label">Escopo Geográfico</label>
+    <select id="{{ grafico_id }}-escopo" name="escopo" class="form-select">
+        {% for escopo in escopos %}
+            {# Lógica para marcar o padrão vindo da Tag ou View #}
+            {% if escopo_padrao and escopo.nome == escopo_padrao %}selected{% endif %}>
+            <option value="{{ escopo.nome }}">{{ escopo.nome }}</option>
+        {% endfor %}
+    </select>
+</div>

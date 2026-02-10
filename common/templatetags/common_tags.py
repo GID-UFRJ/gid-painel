@@ -1,3 +1,5 @@
+# common/templatetags/common_tags.py
+
 from django import template
 from urllib.parse import unquote
 

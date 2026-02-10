@@ -1,0 +1,21 @@
+{% extends 'common/base.html' %}
+{% load rankings_tags %}
+
+{% block conteudo %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Rankings Acadêmicos</h1>
+        <a href="{% url 'rankings:index' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <div class="card border-0 shadow">
+        <div class="card-body">
+            {# Configuração do gráfico #}
+            {% url 'rankings:grafico_generico' nome_plot='evolucao_academico' as url_academico %}
+            
+            {# Chamada da Tag (tipo="academico") #}
+            {% render_filtros_rankings "academico" url_academico "plot-academico" "spin-academico" evolucao_academico_plot %}
+        </div>
+    </div>
+{% endblock %}
