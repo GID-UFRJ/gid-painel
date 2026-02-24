@@ -12,4 +12,4 @@ docs/
 *.swp
 dump/
 dump/*
-requirements.txt.backup
+requirements.txt.backup*
