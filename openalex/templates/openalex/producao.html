@@ -1,5 +1,8 @@
 {% extends "common/base.html" %}
 
+{% load openalex_tags %}
+
+
 {% block conteudo %}
         
 <!--
@@ -9,11 +12,20 @@
 </div>
 -->
 
+<div class="row">
+    <div class="col-md-12">
+        {% render_filtros_producao tipo="producao_por_ano" url_grafico="/pesquisa/graficos/producao_por_ano/" grafico_id="plot-producao-ano" spinner_id="spinner-producao" grafico_html=graf_01 plotter_name="openalex" nome_plot="producao_por_ano" %}
+    </div>
+</div>
 
+<!--
 {% url 'openalex:grafico_producao_por_ano' as url_producao_ano %}
+-->
 
 <!-- Citações por ano -->
+ <!--
 {% include "openalex/partials/producao/_plot_producao_por_ano.html" with url_grafico=url_producao_ano grafico_id="producao-ano" spinner_id="spinner-producao-ano" grafico_html=graf_01 %}
+-->
 
 
 <!-- Gráfico - Distribuição temática de documentos UFRJ -->

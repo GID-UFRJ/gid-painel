@@ -1,8 +1,31 @@
-from django.db import models
+from django.db import models #Para criar as classes (models.Model)
 from django.core.exceptions import ValidationError
+from django.db.models import Exists, OuterRef, Case, When, Value, BooleanField #Para trabalhar com querysets
 
 #Nota: Django cria AutoFields automaticamente (nome da coluna = 'id') quando uma PK não é definida. Esse padrão é esperado por outras bibliotecas e resolvi aderir.
 #Também foi preferir usar chaves substitutas/artificiais (surrogate) em vez de naturais, para fins de eficiência e tbm pq elas substituem chaves compostas, para as quais o django não tem um suporte muito desenvolvido
+
+
+class WorkQuerySet(models.QuerySet):
+    def autor_correspondente_ufrj(self):
+        from .models import Authorship
+
+        UFRJ_OPENALEX_ID = 'I122140584'
+        
+        corresp_ufrj = Authorship.objects.filter(
+            work=OuterRef('pk'),
+            is_corresponding=True,
+            authorshipinstitution__institution__institution_id=UFRJ_OPENALEX_ID
+        )
+
+        return self.annotate(
+            autor_correspondente_ufrj=Case(
+                When(Exists(corresp_ufrj), then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField()
+            )
+        )
+
 
 class Year(models.Model):
     year = models.IntegerField(unique=True)
@@ -48,6 +71,10 @@ class Work(models.Model):
     is_oa = models.BooleanField()
     oa_status = models.ForeignKey(OAStatus, on_delete=models.CASCADE)
     referenced_works_count = models.IntegerField()
+    objects = WorkQuerySet.as_manager()
+
+    class Meta:
+            base_manager_name = 'objects'
 
     def __str__(self):
         return self.work_title or self.work_id #Fallback for title

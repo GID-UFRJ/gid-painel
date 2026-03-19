@@ -94,10 +94,6 @@ def pessoal_discentes(request):
         """
         p = PlotsPessoal()
 
-        contexto_cards = {
-            'n_titulados_cards': p.cards_total_alunos_titulados_por_grau(),
-        }
-
         contexto_plots = {
             'discentes_ano_plot': p.generate_plot_html(nome_plot='discentes_por_ano', filtros_selecionados={}),
             'discentes_sunburst_plot': p.generate_plot_html(nome_plot='discentes_por_area_sunburst', filtros_selecionados={}),
@@ -105,7 +101,6 @@ def pessoal_discentes(request):
         }
         
         context = {
-            **contexto_cards,
             **contexto_plots,
         }
         return context
@@ -127,10 +122,6 @@ def pessoal_docentes(request):
         """
         p = PlotsPessoal()
 
-        contexto_cards = {
-            'docentes_card': p.card_total_docentes_ultimo_ano(),
-        }
-
         contexto_plots = {
             'docentes_ano_plot': p.generate_plot_html(nome_plot='docentes_por_ano', filtros_selecionados={}),
             'docentes_sunburst_plot': p.generate_plot_html(nome_plot='docentes_por_area_sunburst', filtros_selecionados={}),
@@ -138,7 +129,6 @@ def pessoal_docentes(request):
         }
         
         context = {
-            **contexto_cards,
             **contexto_plots,
         }
         return context
@@ -184,28 +174,12 @@ def posgrad_ufrj(request):
             }
         ]
 
-        # Note que 'cards_programas_por_modalidade' retorna uma lista,
-        # então vamos juntá-la com os outros cards.
-        card_total = p.card_total_programas_ultimo_ano()
-        cards_modalidade = p.cards_programas_por_modalidade()
-        card_conceito_max = p.card_total_programas_conceito_maximo()
-
-        # Juntamos todos os cards em uma única lista para o template
-        todos_os_cards = ([card_total] if card_total else []) + \
-                         (cards_modalidade or []) + \
-                         ([card_conceito_max] if card_conceito_max else [])
-
-        contexto_cards = {
-            'cards': todos_os_cards
-        }
-
         contexto_plots = {
             'programas_contagem_ano_plot': p.generate_plot_html(nome_plot='programas_contagem_por_ano', filtros_selecionados={}),
         }
         
         context = {
             "abas": abas,
-            **contexto_cards,
             **contexto_plots,
         }
 
@@ -305,7 +279,7 @@ def ppg_detalhe(request, programa_id):
         
         ultimo_ano_qs = AnoPrograma.objects.filter(programa_id=OuterRef('pk')).order_by('-ano__ano_valor')
         
-        # --- ANOTAÇÕES COMPLETAS RESTAURADAS AQUI ---
+        # --- ANOTAÇÕES AQUI ---
         programa = get_object_or_404(
             Programa.objects.annotate(
                 ultimo_ano=Subquery(ultimo_ano_qs.values('ano__ano_valor')[:1]),

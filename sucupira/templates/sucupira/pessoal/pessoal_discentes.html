@@ -8,12 +8,15 @@
         <p class="lead">Análises sobre o corpo discente dos programas de pós-graduação.</p>
     </div>
 
+{% comment %}
     <div class="divisoria">
         {% for card in n_titulados_cards %}
             <img src="data:image/png;base64, {{ card }}" alt="" class='imagemsuperior'/>
         {% endfor %}
     </div>
     <hr>
+{% endcomment %}
+
 
     {# Reutiliza o partial que era a aba de discentes #}
     {% include "sucupira/partials/pessoal/_aba_discentes_conteudo.html" %}

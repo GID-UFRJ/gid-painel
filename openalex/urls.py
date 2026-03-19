@@ -13,4 +13,5 @@ urlpatterns = [
     path("graficos/top-colab", views.grafico_top_colaboracoes, name="grafico_top_colaboracoes"),
     path("impacto/", views.impacto, name="impacto"),
     path("colaboracao/", views.colaboracao, name="colaboracao"),
+    path('graficos/<str:nome_plot>/', views.grafico_generico_producao, name='grafico_generico_openalex'),
 ]

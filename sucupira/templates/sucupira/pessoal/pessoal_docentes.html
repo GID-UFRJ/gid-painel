@@ -8,11 +8,16 @@
         <p class="lead">Análises sobre o corpo docente dos programas de pós-graduação.</p>
     </div>
 
+    {% comment %}
+
     <div class="divisoria">
         {% if docentes_card %}
           <img src="data:image/png;base64, {{ docentes_card }}" alt="" class='imagemsuperior'/>
         {% endif %}
     </div>
+
+    {% endcomment %}
+
     <hr>
 
     {# Reutiliza o partial que era a aba de docentes #}

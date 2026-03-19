@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'common',
     'homepage',
     'sucupira',
-#    'programa',
     'baseGraficos',
     'rankings',
     'openalex',

@@ -13,16 +13,18 @@ def index(request):
 def producao(request):
     p = PlotsProducao()
 
-    return render(request, r'openalex/producao.html', {
-        #'card_01':p.producao_total(),
-        #'card_02':p.producao_total_artigos(),
-        #'card_03':p.producao_artigos_acesso_aberto(),
-        #'card_04':p.producao_total_citacoes(),
-                 
-        'graf_01':p.producao_por_ano(ano_inicial=1990, ano_final=2024),
-        'graf_02': p.distribuicao_tematica_artigos(),
-    }
-)
+    return render(request, 'openalex/producao.html', {
+        # Mudamos a forma de chamar para o padrão do Dispatcher:
+        'graf_01': p.generate_plot_html(
+            nome_plot='producao_por_ano', 
+            filtros_selecionados={'ano_inicial': 1990, 'ano_final': 2024}
+        ),
+        
+        'graf_02': p.generate_plot_html(
+            nome_plot='distribuicao_tematica_artigos', # Certifique-se que este nome está no MAPEAMENTOS
+            filtros_selecionados={}
+        ),
+    })
 
 def grafico_producao_por_ano(request):
     ano_inicial = int(request.GET.get("ano_inicial", 1990))
@@ -142,3 +144,18 @@ def grafico_top_colaboracoes(request):
                   "common/partials/_plot_reativo.html", 
                   {"graf": graf}
                   )
+
+def grafico_generico_producao(request, nome_plot):
+    plotter = PlotsProducao()
+    
+    # IMPORTANTE: Captura TODOS os filtros do formulário HTMX
+    filtros = request.GET.dict() 
+    
+    # O segredo: o método generate_plot_html sabe ler o dicionário 'filtros'
+    # e injetar a anotação .autor_correspondente_ufrj() se necessário.
+    grafico_html = plotter.generate_plot_html(
+        nome_plot=nome_plot,
+        filtros_selecionados=filtros
+    )
+    
+    return HttpResponse(grafico_html)
