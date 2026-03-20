@@ -41,8 +41,19 @@ class HierarchicalPlotStrategy(BasePlotStrategy):
         
         df = pd.DataFrame(list(dados))
 
+        # DEBUG: Veja isso no seu terminal onde roda o runserver
+        print(f"DEBUG SUNBURST: Colunas encontradas: {df.columns.tolist()}")
+        print(f"DEBUG SUNBURST: Total de linhas no DF: {len(df)}")
+
         if df.empty:
             return pd.DataFrame()
+        
+        # O Plotly exige que todos os caminhos da hierarquia sejam strings válidas.
+        # Vamos remover nulos ou substituí-los antes de renomear.
+        campos_originais = list(self.mapeamento["grafico_hierarquico_path"].values())
+        df = df.dropna(subset=campos_originais) # Remove o que for Nulo nos níveis
+        for col in campos_originais:
+            df = df[df[col] != ""]
 
         # Renomeia as colunas do banco para os nomes amigáveis que serão usados no gráfico
         mapa_renomeacao = {v: k for k, v in path_config.items()}

@@ -1,6 +1,7 @@
 from django.db import models #Para criar as classes (models.Model)
 from django.core.exceptions import ValidationError
-from django.db.models import Exists, OuterRef, Case, When, Value, BooleanField #Para trabalhar com querysets
+from django.db.models import Exists, OuterRef, Subquery, Case, When, Value, BooleanField #Para trabalhar com querysets
+from django.db.models.functions import Coalesce    # <--- ESSA LINHA É A QUE FALTA
 
 #Nota: Django cria AutoFields automaticamente (nome da coluna = 'id') quando uma PK não é definida. Esse padrão é esperado por outras bibliotecas e resolvi aderir.
 #Também foi preferir usar chaves substitutas/artificiais (surrogate) em vez de naturais, para fins de eficiência e tbm pq elas substituem chaves compostas, para as quais o django não tem um suporte muito desenvolvido
@@ -24,6 +25,18 @@ class WorkQuerySet(models.QuerySet):
                 default=Value(False),
                 output_field=BooleanField()
             )
+        )
+    
+    def com_topico_principal(self):
+        from .models import WorkTopic
+        
+        # Subquery base ordenada pelo maior score
+        top_topic_qs = WorkTopic.objects.filter(work=OuterRef('pk')).order_by('-score')
+
+        return self.annotate(
+            top_domain=Coalesce(Subquery(top_topic_qs.values('topic__domain_name')[:1]), Value("Não Classificado")),
+            top_field=Coalesce(Subquery(top_topic_qs.values('topic__field_name')[:1]), Value("Não Classificado")),
+            top_subfield=Coalesce(Subquery(top_topic_qs.values('topic__subfield_name')[:1]), Value("Não Classificado")),
         )
 
 

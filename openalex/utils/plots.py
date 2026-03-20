@@ -18,6 +18,15 @@ class PlotsProducao(Dispatcher):
     # saberá quais modelos e campos usar para o OpenAlex.
     MAPEAMENTOS = MAPEAMENTOS_OPENALEX
 
+    def _get_base_queryset(self, tipo_entidade, filtros):
+        queryset, modelo, _ = super()._get_base_queryset(tipo_entidade, filtros)
+    
+        # Se o plot for o temático, precisamos ativar as anotações da Subquery
+        if tipo_entidade == "distribuicao_tematica":
+            queryset = queryset.com_topico_principal()
+            
+        return queryset, modelo, None
+
 class PlotsImpacto(Dispatcher):
     """Gráficos de impacto (citações) do OpenAlex."""
     MAPEAMENTOS = MAPEAMENTOS_OPENALEX

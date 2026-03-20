@@ -45,6 +45,7 @@ def render_filtros_producao(context, tipo, url_grafico, grafico_id, spinner_id, 
             'Acesso Aberto': 'acesso_aberto',
             'Tipo de Documento': 'tipo_documento',
             'Domínio': 'dominio',
+            'Autor Correspondente': 'autor_correspondente',
         }
 
     elif tipo == "distribuicao_tematica":

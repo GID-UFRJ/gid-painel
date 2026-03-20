@@ -11,39 +11,27 @@ def index(request):
 
 # Create your views here.
 def producao(request):
+    print("1. Entrei na View Produção")
     p = PlotsProducao()
 
+
+    html = p.generate_plot_html('distribuicao_tematica')
+    print(f"4. Voltei para a View. Tamanho do HTML: {len(html)}")
+
     return render(request, 'openalex/producao.html', {
-        # Mudamos a forma de chamar para o padrão do Dispatcher:
+        # Em vez de p.producao_por_ano(...), use:
         'graf_01': p.generate_plot_html(
             nome_plot='producao_por_ano', 
             filtros_selecionados={'ano_inicial': 1990, 'ano_final': 2024}
         ),
         
+        # Em vez de p.distribuicao_tematica_artigos(), use o nome que está no seu MAPEAMENTOS:
+        #'graf_02': "<h1>Teste de Renderização</h1>",
         'graf_02': p.generate_plot_html(
-            nome_plot='distribuicao_tematica_artigos', # Certifique-se que este nome está no MAPEAMENTOS
+            nome_plot='distribuicao_tematica', 
             filtros_selecionados={}
         ),
     })
-
-def grafico_producao_por_ano(request):
-    ano_inicial = int(request.GET.get("ano_inicial", 1990))
-    ano_final = int(request.GET.get("ano_final", 2024))
-    tipo_producao = request.GET.get("tipo_producao", "total")
-    tipo_grafico = request.GET.get("tipo_grafico", "barra")
-
-
-    p = PlotsProducao()
-    graf = p.producao_por_ano(ano_inicial=ano_inicial, 
-                              ano_final=ano_final, 
-                              tipo_producao=tipo_producao, 
-                              tipo_grafico=tipo_grafico,
-                              )
-
-    return render( request, 
-                  "homepage/partials/_plot_reativo.html", 
-                  {"graf": graf} 
-                  )
 
 
 def impacto(request):
@@ -56,27 +44,6 @@ def impacto(request):
         #'graf_02':p.top_instituicoes_colaboradoras(internacional=True),
     }
 )
-
-def grafico_citacoes_por_ano(request):
-    ano_inicial = int(request.GET.get("ano_inicial", 1990))
-    ano_final = int(request.GET.get("ano_final", 2024))
-    tipo_producao = request.GET.get("tipo_producao", "total")
-    metrica = request.GET.get("metrica", "total_citacoes")
-    tipo_grafico = request.GET.get("tipo_grafico", "barra")
-
-    p = PlotsImpacto()
-    graf = p.citacoes_por_ano(ano_inicial=ano_inicial, 
-                              ano_final=ano_final, 
-                              tipo_producao=tipo_producao, 
-                              metrica=metrica, 
-                              tipo_grafico=tipo_grafico,
-                              )
-
-    # Renderiza o partial específico para HTMX
-    return render( request, 
-                  "common/partials/_plot_reativo.html", 
-                  {"graf": graf}
-                  )
 
 def colaboracao(request):
     p = PlotsColaboracao()
@@ -96,66 +63,17 @@ def colaboracao(request):
     }
 )
 
-def grafico_colaboracoes_por_ano(request):
-    """
-    Gera um gráfico da produção científica da UFRJ em colaboração com outras 
-    instituições (nacionais ou internacionais) ao longo do tempo.
-
-    A função é acionada por HTMX e aceita os seguintes parâmetros via GET:
-    - ano_inicial, ano_final: Filtra o período de publicação.
-    - tipo_colaboracao: 'nacional' ou 'internacional'.
-    - agrupamento: Como os dados serão divididos/coloridos no gráfico.
-                   Opções: 'total', 'tipo_documento', 'acesso_aberto', 'dominio'.
-    - tipo_grafico: 'barra' ou 'linha'.
-    """
-    # 1. Obter parâmetros do request com valores padrão
-    ano_inicial = int(request.GET.get('ano_inicial', 2010))
-    ano_final = int(request.GET.get('ano_final', 2023))
-    tipo_colaboracao = request.GET.get('tipo_colaboracao', 'nacional')
-    tipo_producao = request.GET.get('tipo_producao', 'total')
-    tipo_grafico = request.GET.get('tipo_grafico', 'barra')
-
-    p = PlotsColaboracao()
-    graf = p.colaboracoes_por_ano(ano_inicial=ano_inicial, 
-                                            ano_final=ano_final, 
-                                            tipo_colaboracao=tipo_colaboracao, 
-                                            tipo_producao=tipo_producao, 
-                                            tipo_grafico=tipo_grafico
-                                            )
-    # Renderiza o partial específico para HTMX
-    return render( request, 
-                  "common/partials/_plot_reativo.html", 
-                  {"graf": graf}
-                  )
-
-
-def grafico_top_colaboracoes(request):
-    n_instituicoes = int(request.GET.get("n_instituicoes", 10))
-    tipo_instituicao = request.GET.get('tipo_instituicao', 'nacional')
-    
-    p = PlotsColaboracao()
-    graf = p.top_instituicoes_colaboradoras(
-                            n_instituicoes=n_instituicoes,
-                            tipo_instituicao=tipo_instituicao,
-                            )
-
-    # Renderiza o partial específico para HTMX
-    return render( request, 
-                  "common/partials/_plot_reativo.html", 
-                  {"graf": graf}
-                  )
 
 def grafico_generico_producao(request, nome_plot):
-    plotter = PlotsProducao()
+    plotter = PlotsProducao() 
     
-    # IMPORTANTE: Captura TODOS os filtros do formulário HTMX
     filtros = request.GET.dict() 
-    
-    # O segredo: o método generate_plot_html sabe ler o dicionário 'filtros'
-    # e injetar a anotação .autor_correspondente_ufrj() se necessário.
-    grafico_html = plotter.generate_plot_html(
-        nome_plot=nome_plot,
-        filtros_selecionados=filtros
-    )
-    
-    return HttpResponse(grafico_html)
+   
+    try:
+        grafico_html = plotter.generate_plot_html(
+            nome_plot=nome_plot,
+            filtros_selecionados=filtros
+        )
+        return HttpResponse(grafico_html)
+    except Exception as e:
+        return HttpResponse(f"<div class='alert alert-danger'>Erro no plot '{nome_plot}': {e}</div>")

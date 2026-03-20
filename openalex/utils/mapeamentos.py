@@ -13,6 +13,8 @@ MAPEAMENTOS_OPENALEX = {
         "eixo_y_campo": "id",
         "eixo_y_nome": "Número de publicações",
         "eixo_y_agregacao": "count",
+        #"paleta_cores": ['#004a80', '#d32f2f', '#b0bec5', '#2ca02c'],
+        "paleta": ['#2ca02c', '#ff7f0e', '#9467bd', '#1f77b4'],
         # Mapeamos os filtros reativos (HTMX) aqui:
         "agrupamentos": {
             "acesso_aberto": "is_oa",
@@ -23,8 +25,6 @@ MAPEAMENTOS_OPENALEX = {
         "filtros": {
             "ano_inicial": "pubyear__year__gte",
             "ano_final": "pubyear__year__lte",
-            # Se você tiver um filtro de tipo de documento:
-            "tipo_producao": "worktype__worktype",
         },
         "filtros_padrao": {},
     },
@@ -33,19 +33,26 @@ MAPEAMENTOS_OPENALEX = {
     "distribuicao_tematica": {
         "__tipo_entidade__": "distribuicao_tematica",
         "nome_plot": "distribuicao_tematica",
-        "estrategia_plot": "hierarquico",
-        "modelo": WorkTopic,
-        "titulo_base": "Distribuição Temática de Artigos",
+        "estrategia_plot": "hierarchical", 
+        "modelo": Work,
+        "titulo_base": "Distribuição Temática (Tópico Principal)",
+    
         "grafico_hierarquico_path": {
-            "Domínio": "topic__domain_name",
-            "Área": "topic__field_name",
-            "Subárea": "topic__subfield_name"
+            "Domínio": "top_domain",   # Nome da anotação no QuerySet
+            "Campo": "top_field",      # Nome da anotação no QuerySet
+            "Subcampo": "top_subfield", # Nome da anotação no QuerySet
         },
-        "grafico_hierarquico_values_campo": "work_id",
+    
+        "grafico_hierarquico_values_campo": "id",
         "grafico_hierarquico_values_nome": "Total de Artigos",
-        "grafico_hierarquico_agregacao": "count_distinct",
-        "filtros_padrao": {
-            "work__worktype__worktype": "article"
+        "grafico_hierarquico_agregacao": "count",
+    
+        "tipo_grafico_padrao": "sunburst",
+        "filtros": {
+            "ano_inicial": "pubyear__year__gte",
+            "ano_final": "pubyear__year__lte",
         },
-    },
+        "filtros_padrao": {},
+    }
+
 }
