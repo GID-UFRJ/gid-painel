@@ -312,18 +312,24 @@ class Dispatcher:
         # ==========================================
     
         fig = func(df, **plot_args)
+
+        layout_args = dict(
+                    autosize=True,
+                    margin=dict(l=40, r=40, t=60, b=40),
+                    title_text=params.get("title", ""),
+                    xaxis_title=params.get("x", ""),
+                    yaxis_title=params.get("y", ""),
+                    legend_title_text=params.get("color", ""),
+                )
+
+        if params.get("orientation") == "h":
+            layout_args["yaxis"] = dict(type="category")
+        else:
+            layout_args["xaxis"] = dict(type="category")
         
-        fig.update_layout(
-            autosize=True,
-            margin=dict(l=40, r=40, t=60, b=40),
-            title_text=params.get("title", ""),
-            xaxis_title=params.get("x", ""),
-            yaxis_title=params.get("y", ""),
-            legend_title_text=params.get("color", ""),
-            xaxis=dict(type="category",
-                        categoryorder="category ascending"),
-        )
-    
+        fig.update_layout(**layout_args) 
+
+
         if tipo_grafico == "barra":
             fig.update_traces(textposition="outside")
     

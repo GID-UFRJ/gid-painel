@@ -1,6 +1,7 @@
 # sucupira/utils/mapeamentos.py
 
 from sucupira.models import Discente, Docente, AnoPrograma, FaixaEtaria
+from django.db.models import Q
 
 # =============================================================================
 # RECEITAS DE GRÁFICOS - Versão Final com Configuração Unificada
@@ -220,11 +221,17 @@ top_paises_discentes = {
     "estrategia_plot": "topn",            # <-- ADICIONADO
     "modelo": Discente,
     "titulo_base": "Top 10 Países de Procedência - Discentes",
+    "eixo_x_nome": "Total de discentes",
+    "eixo_y_nome": "País",
     "ranking_campo_categoria": "pessoa__pais_nacionalidade__pais",
     "ranking_campo_valor": "pessoa_id",
     "ranking_agregacao": "count_distinct",
     "ranking_limite_padrao": 10,
     "filtros": {"limite": None, "ano": "ano__ano_valor"},
+    "filtros_padrao": {
+            "excluir_brasil": ~Q(pessoa__pais_nacionalidade__pais__iexact='Brasil')
+            },
+
 }
 
 top_paises_docentes = {
@@ -234,9 +241,14 @@ top_paises_docentes = {
     "titulo_base": "Top 10 Países de Procedência - Docentes",
     "ranking_campo_categoria": "pessoa__pais_nacionalidade__pais",
     "ranking_campo_valor": "pessoa_id",
+    "eixo_x_nome": "Total de discentes",
+    "eixo_y_nome": "País",
     "ranking_agregacao": "count_distinct",
     "ranking_limite_padrao": 10,
-    "filtros": { "limite": None },
+    "filtros": { "limite": None},
+    "filtros_padrao": {
+                "excluir_brasil": ~Q(pessoa__pais_nacionalidade__pais__iexact='Brasil')
+                },
 }
 
 programas_contagem_por_ano = {

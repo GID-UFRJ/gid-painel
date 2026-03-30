@@ -47,6 +47,14 @@ class TopNStrategy(BasePlotStrategy):
         # Para gráficos de ranking, a ordem importa. Invertemos para que o maior fique no topo do gráfico.
         df = df.iloc[::-1]
 
+        eixo_x_nome = self.mapeamento.get("eixo_x_nome", "Total")
+        eixo_y_nome = self.mapeamento.get("eixo_y_nome", campo_categoria)
+
+        df.rename(columns={
+                    "total": eixo_x_nome,
+                    campo_categoria: eixo_y_nome
+                }, inplace=True)
+
         return df
 
     def generate_plot(self, df: pd.DataFrame, tipo_grafico: str, **kwargs) -> str:
@@ -56,13 +64,18 @@ class TopNStrategy(BasePlotStrategy):
         if df.empty:
             return "<p class='text-center text-muted mt-4'>Nenhum dado encontrado.</p>"
 
+
+        # Resgata os nomes já definidos
+        eixo_x_nome = self.mapeamento.get("eixo_x_nome", "Total")
+        eixo_y_nome = self.mapeamento.get("eixo_y_nome", self.mapeamento["ranking_campo_categoria"])
+
         # Prepara os parâmetros para um gráfico de barras horizontal, ideal para Top N
         params = {
-            "x": "total",
-            "y": self.mapeamento["ranking_campo_categoria"],
+            "x": eixo_x_nome,
+            "y": eixo_y_nome,
             "orientation": 'h', # Gráfico "deitado"
             "title": kwargs.get('titulo_override') or self.mapeamento.get("titulo_base", ""),
-            "text": "total", # Exibe os valores nas barras
+            "text": eixo_x_nome, # Exibe os valores nas barras
         }
 
         # Delega a renderização final para o método auxiliar do "artesão" (BasePlots)
