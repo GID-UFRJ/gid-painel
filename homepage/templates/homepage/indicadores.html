@@ -1,0 +1,88 @@
+{% extends "common/base_index.html" %}
+
+{% load plot_tags %}
+
+{% block conteudo_principal %}
+
+    <h4>Indicadores Gerais</h4>
+
+    <p>
+        Esta página compila vários Indicadores Chave de Desempenho (KPIs)
+        da UFRJ no intuito de sumarizar as informações deste painel de 
+        forma abrangente e acessível.
+    </p>
+
+    <p>
+        Os cartões ao lado exibem o panorama atual da produção científica, dos programas de pós-graduação, 
+        do corpo docente e discente, além da posição institucional nos principais rankings acadêmicos internacionais.
+    </p>
+
+    <p>
+        <strong>Nota:</strong> Para explorar as séries temporais completas e aplicar filtros específicos, 
+        navegue pelos painéis temáticos detalhados disponíveis na barra de navegação ou na página inicial.
+    </p>
+
+{% endblock %} 
+
+{% block conteudo_secundario %}
+
+    <h5 class="mb-3"><i class="fas fa-search"></i> Produção</h5>
+    <hr class="hr-ufrj">
+    
+    <div class="row mb-5 justify-content-center">
+        <div class="col-lg-4 col-md-6 mb-3">{% render_kpi plotter "kpi_total_documentos" %}</div>
+        <div class="col-lg-4 col-md-6 mb-3">{% render_kpi plotter "kpi_total_artigos" %}</div>
+        <div class="col-lg-4 col-md-6 mb-3">{% render_kpi plotter "kpi_total_oa" %}</div>
+        <div class="col-auto mb-3">{% render_kpi plotter "kpi_total_citacoes_artigos" %}</div>
+    </div>
+
+
+    <h5 class="mb-3 mt-4"><i class="fas fa-graduation-cap"></i> Programas de Pós-Graduação (PPGs)</h5>
+    <hr class="hr-ufrj">
+    
+    <div class="row mb-5">
+        <div class="col-lg-3 col-md-6 mb-3">{% render_kpi plotter "kpi_programas_ufrj" %}</div>
+        <div class="col-lg-3 col-md-6 mb-3">{% render_kpi plotter "kpi_programas_academicos" %}</div>
+        <div class="col-lg-3 col-md-6 mb-3">{% render_kpi plotter "kpi_programas_profissionais" %}</div>
+        <div class="col-lg-3 col-md-6 mb-3">{% render_kpi plotter "kpi_programas_nota_7" %}</div>
+        
+        <div class="col-lg-4 col-md-12 mb-3 mt-2">{% render_kpi plotter "kpi_media_titulacao_doutorado" %}</div>
+        <div class="col-lg-4 col-md-12 mb-3 mt-2">{% render_kpi plotter "kpi_media_titulacao_mestrado" %}</div>
+        <div class="col-lg-4 col-md-12 mb-3 mt-2">{% render_kpi plotter "kpi_media_titulacao_profissional" %}</div>
+    </div>
+
+
+    <h5 class="mb-3 mt-4"><i class="fas fa-chalkboard-teacher"></i> Docentes</h5>
+    <hr class="hr-ufrj">
+    
+    <div class="row mb-5">
+        <div class="col-lg-3 col-md-6 mb-3">{% render_kpi plotter "kpi_docentes_ufrj" %}</div>
+        <div class="col-lg-3 col-md-6 mb-3">{% render_kpi plotter "kpi_docentes_bolsistas" %}</div>
+        <div class="col-lg-3 col-md-6 mb-3">{% render_kpi plotter "kpi_docentes_de" %}</div>
+        <div class="col-lg-3 col-md-6 mb-3">{% render_kpi plotter "kpi_docentes_estrangeiros" %}</div>
+    </div>
+
+
+    <h5 class="mb-3 mt-4"><i class="fas fa-user-graduate"></i> Discentes</h5>
+    <hr class="hr-ufrj">
+    
+    <div class="row mb-5">
+        <div class="col-lg-4 col-md-6 mb-3">{% render_kpi plotter "kpi_matriculados_doutorado" %}</div>
+        <div class="col-lg-4 col-md-6 mb-3">{% render_kpi plotter "kpi_matriculados_mestrado" %}</div>
+        <div class="col-lg-4 col-md-6 mb-3">{% render_kpi plotter "kpi_matriculados_profissional" %}</div>
+        
+        <div class="col-lg-4 col-md-6 mb-3 mt-2">{% render_kpi plotter "kpi_titulados_doutorado" %}</div>
+        <div class="col-lg-4 col-md-6 mb-3 mt-2">{% render_kpi plotter "kpi_titulados_mestrado" %}</div>
+        <div class="col-lg-4 col-md-6 mb-3 mt-2">{% render_kpi plotter "kpi_titulados_profissional" %}</div>
+    </div>
+
+
+    <h5 class="mb-3 mt-4"><i class="fas fa-trophy"></i> Rankings</h5>
+    <hr class="hr-ufrj">
+    
+    <div class="row mb-5 justify-content-center">
+        <div class="col-auto mb-3">{% render_kpi plotter "kpi_posicao_the_latam" %}</div>
+        <div class="col-auto mb-3">{% render_kpi plotter "kpi_posicao_qs_latam" %}</div>
+    </div>
+
+{% endblock %}

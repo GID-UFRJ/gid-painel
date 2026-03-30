@@ -137,6 +137,33 @@ main {
     letter-spacing: 1px;
 }
 
+/* Diminuindo tamanho dos cards */
+
+/* 1. Reduz o espaçamento interno (padding) de todos os cartões nesta coluna */
+.conteudo-secundario .card-body {
+    padding: 0.75rem 1rem !important; /* Original costuma ser 1.25rem ou mais */
+}
+
+/* 2. Reduz o tamanho do texto do título do cartão */
+.conteudo-secundario .card-title, 
+.conteudo-secundario h6 {
+    font-size: 0.85rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+/* 3. Reduz o tamanho da fonte do número gigante (ajuste a classe se necessário) */
+.conteudo-secundario .card-text, 
+.conteudo-secundario h2, 
+.conteudo-secundario h3 {
+    font-size: 1.5rem !important; /* Deixa o número mais discreto */
+}
+    
+/* 4. Deixa os ícones dentro do cartão um pouco menores */
+.conteudo-secundario .card-body i {
+    font-size: 1.2rem !important;
+}
+
+
 /* =======================================
    Classe de Botão Personalizada: Azul UFRJ
 ======================================= */

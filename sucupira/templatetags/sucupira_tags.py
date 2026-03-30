@@ -50,7 +50,8 @@ def render_filtros_pessoal(context, tipo, url_grafico, grafico_id, spinner_id, g
             f"{PATH_FILTROS_ATOMicos}_filtro_situacao.html",
         ]
         ctx.update({
-            "grandes_areas": ProgramaGrandeArea.objects.all(), "graus_curso": GrauCurso.objects.all(),
+            "grandes_areas": ProgramaGrandeArea.objects.all(), 
+            "graus_curso": GrauCurso.objects.all(),
             "situacoes": DiscenteSituacao.objects.all(),
         })
         agrupamentos_disponiveis = agrupamentos_disponiveis_individuos

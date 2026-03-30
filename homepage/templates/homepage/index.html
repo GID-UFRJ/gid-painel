@@ -1,7 +1,5 @@
 {% extends "common/base.html" %}
 
-{% load plot_tags %}
-
 {% block conteudo %}
         
 <div class="container p-4">
@@ -24,155 +22,26 @@
                     o Painel está em completa sintonia com o conceito de transparência pública, na mesma direção de outras iniciativas da UFRJ e do governo federal.
                 </p>
                 
-                <p>
-                    Seguem abaixo alguns indicadores sobre a produção científica e pós-graduação da UFRJ
-                    obtida através destas fontes de dados abertas:
-                </p>
-
-                <h4>Produção</h4>
-
-                <hr class="hr-ufrj">
-
-
-                <div class="row mb-4">
-
-                    <div class="col-md-4">
-                        {% render_kpi plotter "kpi_total_documentos" %}
-                    </div>
-
-                    <div class="col-md-4">
-                        {% render_kpi plotter "kpi_total_artigos" %}
-                    </div>
-
-                    <div class="col-md-4">
-                        {% render_kpi plotter "kpi_total_oa" %}
-                    </div>
-
-                    
-                </div>
-
-                <div class="row mb-4">
-
-                    <div class="col-md-6">
-                        {% render_kpi plotter "kpi_total_citacoes_artigos" %}
-                    </div>
-
-                </div>
-
-
-                <h4>PPGs</h4>
-
-                <hr class="hr-ufrj">
-
-                <div class="row mb-4">
-
-                    <div class="col-md-3">
-                        {% render_kpi plotter "kpi_programas_ufrj" %}
-                    </div>
-
-                    <div class="col-md-3">
-                        {% render_kpi plotter "kpi_programas_academicos" %}
-                    </div>
-
-                    <div class="col-md-3">
-                        {% render_kpi plotter "kpi_programas_profissionais" %}
-                    </div>
-
-                    <div class="col-md-3">
-                        {% render_kpi plotter "kpi_programas_nota_7" %}
-                    </div>
-
-                </div>
-
-                <div class="row mb-4">
-
-                    <div class="col-md-4">
-                        {% render_kpi plotter "kpi_media_titulacao_doutorado" %}
-                    </div>
-
-                    <div class="col-md-4">
-                        {% render_kpi plotter "kpi_media_titulacao_mestrado" %}
-                    </div>
-
-                    <div class="col-md-4">
-                        {% render_kpi plotter "kpi_media_titulacao_profissional" %}
-                    </div>
-
-                </div>
-
-
-
-                <h4>Docentes</h4>
-
-                <hr class="hr-ufrj">
-
-                <div class="row mb-4">
-
-                    <div class="col-md-3">
-                        {% render_kpi plotter "kpi_docentes_ufrj" %}
-                    </div>
-
-                    <div class="col-md-3">
-                        {% render_kpi plotter "kpi_docentes_bolsistas" %}
-                    </div>
-                    
-                    <div class="col-md-3">
-                        {% render_kpi plotter "kpi_docentes_de" %}
-                    </div>
-
-                    <div class="col-md-3">
-                        {% render_kpi plotter "kpi_docentes_estrangeiros" %}
-                    </div>
-
-
-                </div>
-
-                <div class="container mt-4">
-                    <h4>Discentes</h4>
-
-                    <hr class="hr-ufrj">
-
-                    <div class="row mb-4">
-                        <div class="col-md-4">{% render_kpi plotter "kpi_matriculados_doutorado" %}</div>
-                        <div class="col-md-4">{% render_kpi plotter "kpi_matriculados_mestrado" %}</div>
-                        <div class="col-md-4">{% render_kpi plotter "kpi_matriculados_profissional" %}</div>
-                    </div>
-                
-                    <div class="row mb-4">
-                        <div class="col-md-4">{% render_kpi plotter "kpi_titulados_doutorado" %}</div>
-                        <div class="col-md-4">{% render_kpi plotter "kpi_titulados_mestrado" %}</div>
-                        <div class="col-md-4">{% render_kpi plotter "kpi_titulados_profissional" %}</div>
-                    </div>
-                </div>
-
-                <h4>Rankings</h4>
-
-                <hr class="hr-ufrj">
-
-                    <div class="row mb-5">
-                        <div class="col-md-4">{% render_kpi plotter "kpi_posicao_the_latam" %}</div>
-                        <div class="col-md-4">{% render_kpi plotter "kpi_posicao_qs_latam" %}</div>
-                    </div>
-
-
-
                 <p class="mt-4 mb-4">
                     Para melhor compreensão de todos, as visualizações completas das séries temporais acerca  da pesquisa e
-                    pós-graduação da UFRJ estão dispostas em quatro painéis de dados específicos sobre:
+                    pós-graduação da UFRJ estão dispostas nas seguintes sessões:
                 </p>
                 
 
-                <div class="d-flex flex-wrap justify-content-between">
-                    <a href="{% url 'openalex:index' %}" class="btn btn-ufrj-blue flex-fill mx-1 my-1">
+                <div class="d-flex flex-wrap justify-content-center">
+                    <a href="{% url 'homepage:indicadores' %}" class="btn btn-ufrj-blue mx-1 my-1">
+                        <i class="fas fa-chart-line"></i> Indicadores Gerais
+                    </a>
+                    <a href="{% url 'openalex:index' %}" class="btn btn-ufrj-blue mx-1 my-1">
                         <i class="fas fa-search"></i> Pesquisa
                     </a>
-                    <a href="{% url 'pessoal:index' %}" class="btn btn-ufrj-blue flex-fill mx-1 my-1">
+                    <a href="{% url 'pessoal:index' %}" class="btn btn-ufrj-blue mx-1 my-1">
                         <i class="fas fa-users"></i> Pós-Graduação: Pessoal
                     </a>
-                    <a href="{% url 'posgrad:index' %}" class="btn btn-ufrj-blue flex-fill mx-1 my-1">
+                    <a href="{% url 'posgrad:index' %}" class="btn btn-ufrj-blue mx-1 my-1">
                          <i class="fas fa-graduation-cap"></i> Pós-Graduação: Programas
                     </a>
-                    <a href="{% url 'rankings:index' %}" class="btn btn-ufrj-blue flex-fill mx-1 my-1">
+                    <a href="{% url 'rankings:index' %}" class="btn btn-ufrj-blue mx-1 my-1">
                         <i class="fas fa-trophy"></i> Rankings
                     </a>
                 </div>
