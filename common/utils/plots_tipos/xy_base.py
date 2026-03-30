@@ -34,7 +34,9 @@ class XYBaseStrategy(BasePlotStrategy):
             agrupamentos_validos = self.mapeamento.get("agrupamentos", {})
             grupo_plotly = None
             if agrupamento and agrupamento in agrupamentos_validos:
-                grupo_plotly = agrupamento.replace('_', ' ').capitalize()
+                # 1. Faz exatamente a mesma busca que fizemos no agregado.py
+                labels = self.mapeamento.get('labels_customizadas', {})
+                grupo_plotly = labels.get(agrupamento, agrupamento.replace('_', ' ').capitalize())
 
             eixo_x_nome = self.mapeamento["eixo_x_nome"]
             eixo_y_nome = self.mapeamento.get("eixo_y_nome", "Total")
@@ -42,7 +44,7 @@ class XYBaseStrategy(BasePlotStrategy):
             titulo_base = kwargs.get('titulo_override') or self.mapeamento['titulo_base']
             titulo_final = f"{titulo_base} por {eixo_x_nome}"
             if grupo_plotly:
-                 titulo_final = f"{titulo_base} por {grupo_plotly}"
+                 titulo_final = f"{titulo_base} - {grupo_plotly}"
 
             category_orders_config = {}
             if grupo_plotly:

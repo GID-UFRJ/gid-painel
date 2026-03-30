@@ -270,6 +270,11 @@ programas_contagem_por_ano = {
         "conceito": "cd_conceito_programa__cd_conceito_programa",
         "in_rede": "in_rede",
     },
+
+    "labels_customizadas": {
+        "in_rede": "PPGs em Rede", 
+        "conceito": "Conceito CAPES",
+    },
 }
 
 

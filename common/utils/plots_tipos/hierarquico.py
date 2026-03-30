@@ -94,6 +94,15 @@ class HierarchicalPlotStrategy(BasePlotStrategy):
         if tipo_grafico == 'sunburst':
             fig.update_traces(textinfo="label+percent entry")
             fig.update_layout(margin=dict(t=50, l=25, r=25, b=25))
+            fig.add_annotation(
+                text="<b>Nota:</b> Para retornar ao gráfico original, clique no centro dele.",
+                xref="paper", yref="paper",
+                x=0.5, y=0, # y=0 coloca o texto exatamente na base do círculo
+                yshift=-30,
+                font=dict(size=12, color="#6c757d"),
+                showarrow=False,
+                xanchor="center"
+            )
 
         # Renderiza o HTML final
         return fig.to_html(full_html=False, include_plotlyjs="cdn", config={"responsive": True})

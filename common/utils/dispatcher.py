@@ -28,12 +28,22 @@ class Dispatcher:
     }
 
     CATEGORY_ORDERS = {
-        'sexo': ['M', 'F', 'D'],
+        'sim_nao': ['Sim', 'Não'], 
+        'sexo': ['Masculino', 'Feminino', 'Desconhecido'],
         'faixa_etaria': [
             '19 OU MENOS', '20 A 24 ANOS', '25 A 29 ANOS', '30 A 34 ANOS',
             '35 A 39 ANOS', '40 A 44 ANOS', '45 A 49 ANOS', '50 A 54 ANOS',
             '55 A 59 ANOS', '60 A 64 ANOS', '65 A 69 ANOS', '70 OU MAIS'
-        ]
+        ],
+        'conceito': ['0', '1', '2', '3', '4', '5', '6', '7']
+    }
+
+    COLOR_MAP = {
+        'Sim': px.colors.qualitative.Plotly[0],   # Azul (#636EFA)
+        'Não': px.colors.qualitative.Plotly[1],   # Vermelho (#EF553B)
+        'Masculino': px.colors.qualitative.Plotly[0], # <- MUDANÇA AQUI
+        'Feminino': px.colors.qualitative.Plotly[1],  # <- MUDANÇA AQUI
+        'Desconhecido': px.colors.qualitative.Plotly[7] # <- MUDANÇA AQUI
     }
 
     PLOT_FUNCS = {
@@ -104,6 +114,22 @@ class Dispatcher:
             return strategy_instance.render()
         
         df = strategy_instance.get_dataframe()
+
+        # ==========================================
+        # TRADUÇÃO GLOBAL de valores 
+        # ==========================================
+        if not df.empty:
+            df.replace({
+                # Tradução de Booleanos
+                True: 'Sim', False: 'Não', 'True': 'Sim', 'False': 'Não',
+                
+                # Tradução de Sexo
+                'M': 'Masculino', 
+                'F': 'Feminino', 
+                'D': 'Desconhecido'
+            }, inplace=True)
+        # ==========================================
+
         tipo_grafico = filtros.get('tipo_grafico', mapeamento.get('tipo_grafico', mapeamento.get('tipo_grafico_padrao', 'barra')))
         return strategy_instance.generate_plot(df, tipo_grafico=tipo_grafico, **kwargs)
 
@@ -242,6 +268,48 @@ class Dispatcher:
         #    # 3. Injeta a paleta antes de criar a figura
         #    plot_args['color_discrete_sequence'] = paleta_final
         ## --------------------------------------------------
+
+        # ==========================================
+        # 1. ORDENAÇÃO DINÂMICA (Sem if/elif gigantes)
+        # ==========================================
+        ordens_finais = {}
+        for col in df.columns:
+            valores_coluna = set(df[col].dropna().astype(str).unique())
+            if not valores_coluna: continue
+
+            # Varre o dicionário CATEGORY_ORDERS. Se achar uma correspondência, aplica.
+            for nome_regra, lista_ordenada in self.CATEGORY_ORDERS.items():
+                set_referencia = set(lista_ordenada)
+                # Se for faixa etária, basta ter interseção. Se for outro, tem que ser subconjunto.
+                if (nome_regra == 'faixa_etaria' and valores_coluna.intersection(set_referencia)) or \
+                   (nome_regra != 'faixa_etaria' and valores_coluna.issubset(set_referencia)):
+                    ordens_finais[col] = lista_ordenada
+                    break # Achou a regra, pula para a próxima coluna
+
+        if ordens_finais:
+            plot_args['category_orders'] = ordens_finais
+
+        # ==========================================
+        # 2. FIXAÇÃO DE CORES ABSOLUTAS
+        # ==========================================
+        # Regra 1: Passa a paleta padrão para TODOS os gráficos (Garante que Dominio use a correta)
+        mapeamento = params.get('mapeamento_completo', {}) or kwargs.get('mapeamento', {})
+        nome_paleta = mapeamento.get('paleta_cores', 'default')
+        plot_args['color_discrete_sequence'] = self.PALETAS.get(nome_paleta, self.PALETAS['default'])
+
+        # Regra 2: Verifica se o gráfico atual usa uma coluna de "cor"
+        nome_coluna_cor = params.get('color')
+        if nome_coluna_cor and nome_coluna_cor in df.columns:
+            df[nome_coluna_cor] = df[nome_coluna_cor].astype(str)
+            valores_cor = set(df[nome_coluna_cor].dropna().unique())
+            chaves_do_mapa = set(self.COLOR_MAP.keys())
+            
+            # O pulo do gato: Só injeta o mapa se a coluna contiver valores como "Sim", "Não", "M", "F"...
+            # Se for a coluna "Dominio", esse IF dá falso e o Plotly nem fica sabendo que o mapa existe!
+            if valores_cor.intersection(chaves_do_mapa):
+                plot_args['color_discrete_map'] = self.COLOR_MAP
+        # ========================================== 
+        # ==========================================
     
         fig = func(df, **plot_args)
         
@@ -268,7 +336,6 @@ class Dispatcher:
     # ==========================================================
     # EXPORTACAO CSV
     # ==========================================================
-
 
     def get_dataframe_for_plot(self, nome_plot: str, filtros_selecionados: dict = None) -> pd.DataFrame:
         """
