@@ -54,6 +54,29 @@ def render_filtros_producao(context, tipo, url_grafico, grafico_id, spinner_id, 
             f"{PATH_FILTROS_ATOMICOS}_filtro_ano_inicial.html",
             f"{PATH_FILTROS_ATOMICOS}_filtro_ano_final.html",
         ]
+    
+    elif tipo == "citacoes_por_ano":
+        lista_de_filtros = [
+            f"{PATH_FILTROS_ATOMICOS}_filtro_ano_inicial.html",
+            f"{PATH_FILTROS_ATOMICOS}_filtro_ano_final.html",
+            f"{PATH_FILTROS_ATOMICOS}_filtro_tipo_grafico.html",
+            f"{PATH_FILTROS_ATOMICOS}_filtro_metrica_impacto.html",
+            f"{PATH_FILTROS_ATOMICOS}_filtro_agrupamento.html",
+        ]
+        
+        # Opções que aparecerão no dropdown de Métricas
+        ctx["metricas_disponiveis"] = {
+            'Total de Citações': 'total_citacoes',
+            'Média de Citações': 'media',
+            'Citações Acumuladas': 'total_citacoes_acumuladas',
+            'Índice H': 'hindex',
+        }
+        
+        # Agrupamentos permitidos para esse gráfico específico
+        agrupamentos_disponiveis = {
+            'Domínio': 'dominio',
+            'Acesso Aberto': 'acesso_aberto',
+        }
 
     ctx['lista_de_filtros'] = lista_de_filtros
     ctx['agrupamentos_disponiveis'] = agrupamentos_disponiveis

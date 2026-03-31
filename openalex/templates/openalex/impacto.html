@@ -1,5 +1,7 @@
 {% extends "common/base.html" %}
 
+{% load openalex_tags %}
+
 {% block conteudo %}
 
 <!--
@@ -9,11 +11,11 @@
 </div>
 -->
 
-{% url 'openalex:grafico_citacoes_por_ano' as url_citacoes_ano %}
 
 
 <!-- Citações por ano -->
-{% include "openalex/partials/impacto/_plot_citacoes_por_ano.html" with url_grafico=url_citacoes_ano grafico_id="citacoes-ano" spinner_id="spinner-citacoes-ano" grafico_html=graf_01 %}
-
+<div class="card-body">
+    {% render_filtros_producao tipo="citacoes_por_ano" url_grafico="/pesquisa/graficos/citacoes_por_ano/" grafico_id="plot-citacoes" spinner_id="spinner-citacoes" grafico_html=graf_01 plotter_name="openalex" nome_plot="citacoes_por_ano" %}
+</div>
 
 {% endblock %}

@@ -1,0 +1,18 @@
+<div class="col-md-3">
+    <label for="{{ grafico_id }}-metrica" class="form-label">Métrica de impacto</label>
+    
+    <select id="{{ grafico_id }}-metrica" name="metrica" class="form-select" hx-get="{{ url_grafico }}" hx-target="#{{ grafico_id }}" hx-indicator="#{{ spinner_id }}">
+        
+        {% for rotulo, valor in metricas_disponiveis.items %}
+            <option value="{{ valor }}" 
+                {% if request.GET.metrica == valor %}
+                    selected
+                {% elif not request.GET.metrica and valor == 'total_citacoes' %}
+                    selected
+                {% endif %}>
+                {{ rotulo }}
+            </option>
+        {% endfor %}
+        
+    </select>
+</div>

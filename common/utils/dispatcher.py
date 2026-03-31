@@ -14,7 +14,7 @@ from .plots_tipos.direto import DirectPlotStrategy
 from .plots_tipos.faixa import RangeAreaStrategy
 from .plots_tipos.kpi import KPIStrategy 
 from .plots_tipos.ranking_kpi import RankingKPIStrategy
-
+from .plots_tipos.metricas_impacto import MetricasImpactoStrategy
 
 class Dispatcher:
     STRATEGY_MAPPING = {
@@ -25,6 +25,7 @@ class Dispatcher:
         'faixa': RangeAreaStrategy,
         'kpi': KPIStrategy,
         'ranking_kpi': RankingKPIStrategy,
+        'impacto': MetricasImpactoStrategy,
     }
 
     CATEGORY_ORDERS = {
@@ -86,13 +87,17 @@ class Dispatcher:
     #    'sunburst': px.colors.qualitative.Pastel,
     #    'default': px.colors.qualitative.Plotly,    # Fallback caso o tipo não exista
     #}
+    
+    MAPEAMENTOS = {}
 
-    def __init__(self, entidade=None):
+    def __init__(self, entidade=None, mapeamentos=None):
         self.entidade = entidade
+        if mapeamentos is not None:
+                    self.MAPEAMENTOS = mapeamentos
 
-    @property
-    def MAPEAMENTOS(self):
-        return getattr(self, 'MAPEAMENTOS', getattr(self, 'mapeamentos', {}))
+    #@property
+    #def MAPEAMENTOS(self):
+    #    return getattr(self, 'MAPEAMENTOS', getattr(self, 'mapeamentos', {}))
 
     def generate_plot_html(self, nome_plot: str, filtros_selecionados: dict = None, **kwargs) -> str:
         print(f"2. Dispatcher tentando o plot: {nome_plot}")
@@ -173,15 +178,15 @@ class Dispatcher:
 
         # 3. LÓGICA DE HOOK GLOBAL
         # Verifica se existe um hook registrado para este APP e este AGRUPAMENTO
-        hooks_do_app = self.QUERYSET_HOOKS.get(app_label, {})
-        metodo_customizado = hooks_do_app.get(agrupamento_slug)
+        #hooks_do_app = self.QUERYSET_HOOKS.get(app_label, {})
+        #metodo_customizado = hooks_do_app.get(agrupamento_slug)
 
-        if metodo_customizado:
-            # Tenta disparar o método dinamicamente no QuerySet
-            func = getattr(queryset, metodo_customizado, None)
-            if func:
-                queryset = func() # Executa o Case/When que você criou
-                print(f"[Dispatcher] Hook '{metodo_customizado}' aplicado para o app '{app_label}'")
+        #if metodo_customizado:
+        #    # Tenta disparar o método dinamicamente no QuerySet
+        #    func = getattr(queryset, metodo_customizado, None)
+        #    if func:
+        #        queryset = func() # Executa o Case/When que você criou
+        #        print(f"[Dispatcher] Hook '{metodo_customizado}' aplicado para o app '{app_label}'")
 
 
 
@@ -223,6 +228,28 @@ class Dispatcher:
         
         print(f"\n[SQL] Query final construída:\n{queryset.query}")
         print("="*50 + "\n")
+
+        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        # A MÁGICA DO HOOK DECLARATIVO
+        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        # 1. Pega a receita do plot atual
+        mapeamento = self.MAPEAMENTOS.get(tipo_entidade, {})
+        
+        # 2. Verifica se a receita exige uma QuerySet customizada
+        nome_do_hook = mapeamento.get('queryset_hook')
+        
+        if nome_do_hook:
+            # Tenta puxar a função (ex: com_topico_principal) de dentro do queryset
+            metodo = getattr(queryset, nome_do_hook, None)
+            
+            if metodo:
+                # Se achou, executa! As anotações (como top_domain) nascem aqui.
+                queryset = metodo()
+                print(f"[Dispatcher] Sucesso: Hook '{nome_do_hook}' aplicado no plot '{tipo_entidade}'")
+            else:
+                # Falha ruidosa: Se o hook estiver na receita, mas não existir no models.py, o sistema avisa na hora!
+                raise AttributeError(f"O hook '{nome_do_hook}' não foi encontrado no QuerySet do modelo.")
+        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         
         return queryset, mapeamento, filtros_finais
 
