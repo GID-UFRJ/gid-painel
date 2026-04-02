@@ -56,4 +56,15 @@ class TopInstituicoesStrategy(TopNStrategy):
         return df
         
     def generate_plot(self, df: pd.DataFrame, tipo_grafico: str, **kwargs) -> str:
-            return super().generate_plot(df, tipo_grafico, **kwargs)
+        coluna_eixo_y = self.mapeamento.get("eixo_y_nome", "Instituição")
+        
+        # 1. Coloca o nome oficial completo no topo do hover em negrito
+        kwargs['hover_name'] = 'Nome Completo'
+        
+        # 2. Esconde o nome duplicado e a sigla das linhas de baixo
+        kwargs['hover_data'] = {
+            'Nome Completo': False, 
+            coluna_eixo_y: False
+        }
+        
+        return super().generate_plot(df, tipo_grafico, **kwargs)

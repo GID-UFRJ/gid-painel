@@ -249,6 +249,8 @@ class Dispatcher:
         return s
 
     def _gerar_grafico(self, df: pd.DataFrame, tipo_grafico: str, params: dict, pronto_para_plot: bool = True, **kwargs):
+        print(f"\n[DEBUG 2 - DISPATCHER] Kwargs recebidos do TopN: {kwargs}")
+
         func = self.PLOT_FUNCS.get(tipo_grafico)
         if not func:
             raise ValueError(f"Gráfico '{tipo_grafico}' não suportado.")
@@ -264,6 +266,9 @@ class Dispatcher:
         plot_args = self.PLOT_CONFIGS.get(tipo_grafico, {}).copy()
         plot_args.update({k: v for k, v in params.items() if v is not None})
     
+        print(f"[DEBUG 3 - PLOTLY] Argumentos finais mesclados no plot_args: {plot_args}")
+
+
         ## --- INJEÇÃO DE PALETAS (O que estava faltando) ---
         #if params.get('color'):
         #    # 1. Tenta pegar o mapeamento que foi passado no dispatcher

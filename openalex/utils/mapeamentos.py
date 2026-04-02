@@ -157,5 +157,10 @@ MAPEAMENTOS_OPENALEX = {
                 "excluir_ufrj": ~Q(institution_id="I122140584"),
             },
 
+            "hover_config": {
+                "custom_data_cols": ["Nome Completo"],
+                "template": "<b>%{customdata[0]}</b><br>Colaborações: %{x}<extra></extra>"
+            },
+
         },
 }
