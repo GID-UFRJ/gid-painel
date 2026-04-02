@@ -1,4 +1,5 @@
-from ..models import Work, WorkTopic
+from ..models import Work, WorkTopic, Institution
+from django.db.models import Q
 
 MAPEAMENTOS_OPENALEX = {
     # 1. Total de publicações por ano
@@ -30,7 +31,7 @@ MAPEAMENTOS_OPENALEX = {
         "filtros_padrao": {},
         "labels_customizadas": {
             "dominio": "Domínio",
-    },
+        },
     },
 
     # 2. Distribuição temática por artigo
@@ -93,7 +94,68 @@ MAPEAMENTOS_OPENALEX = {
 
         "labels_customizadas": {
             "dominio": "Domínio",
+        },
     },
-}
 
+    # 1. Evolução da Colaboração 
+    "evolucao_colaboracao": {
+        "__tipo_entidade__": "evolucao_colaboracao",
+        "nome_plot": "evolucao_colaboracao",
+        "estrategia_plot": "evolucao_colaboracao",
+        "modelo": Work,
+        "queryset_hook": "com_status_colaboracao", # <- NOVO HOOK AQUI
+        "titulo_base": "Evolução de Colaborações",
+        "eixo_x_campo": "pubyear__year",
+        "eixo_x_nome": "Ano de Publicação",
+        "campo_valor": "id",
+        "agregacao": "count",
+        "eixo_y_nome": "Número de Publicações",
+        "eixo_y_agregacao": "count_distinct",
+        "filtros": {
+            "ano_inicial": "pubyear__year__gte",
+            "ano_final": "pubyear__year__lte",
+            "tem_colab_nacional": "tem_colab_nacional",         # <- FILTRO MAPEADO
+            "tem_colab_internacional": "tem_colab_internacional", # <- FILTRO MAPEADO
+        },
+        "agrupamentos": {
+            "acesso_aberto": "is_oa",
+            "tipo_documento": "worktype__worktype",
+            "dominio": "worktopic__topic__domain_name",
+        },
+        "labels_customizadas": {
+            "acesso_aberto": "Acesso Aberto",
+            "tipo_documento": "Tipo de Documento",
+            "dominio": "Domínio"
+        }
+    },
+
+    # 2. Top Instituições (Usa a nova Strategy e o modelo Institution!)
+    "top_instituicoes": {
+            "__tipo_entidade__": "top_instituicoes",
+            "nome_plot": "top_instituicoes",
+            "estrategia_plot": "top_instituicoes",
+            "modelo": Institution, # O modelo base do ranking
+            "titulo_base": "Top Instituições Colaboradoras",
+
+            # --- CONFIGURAÇÕES OBRIGATÓRIAS DO TOP N ---
+            "ranking_campo_categoria": "institution_name", # O campo que vai aparecer no eixo Y (os nomes)
+            "ranking_campo_valor": "authorshipinstitution__authorship__work__id", # O que vamos contar (os trabalhos)
+            "ranking_agregacao": "count_distinct", # Conta trabalhos únicos
+
+            # Eixos para a renderização visual do Plotly
+            "eixo_x_nome": "Número de Colaborações",
+            "eixo_y_nome": "Instituição",
+
+            "filtros": {
+                # Avisa o Dispatcher para não jogar essa chave fora
+                "tipo_colaboracao": "tipo_colaboracao",
+            },
+
+            # O UFRJ_ID (se precisar excluir a própria UFRJ do ranking de colaborações)
+            "filtros_padrao": {
+                # Descomente e ajuste se não quiser que a UFRJ apareça em 1º lugar no próprio painel
+                "excluir_ufrj": ~Q(institution_id="I122140584"),
+            },
+
+        },
 }

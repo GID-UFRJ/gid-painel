@@ -77,6 +77,70 @@ def render_filtros_producao(context, tipo, url_grafico, grafico_id, spinner_id, 
             'Domínio': 'dominio',
             'Acesso Aberto': 'acesso_aberto',
         }
+    
+    elif tipo == "evolucao_colaboracao":
+        lista_de_filtros = [
+            f"{PATH_FILTROS_ATOMICOS}_filtro_ano_inicial.html",
+            f"{PATH_FILTROS_ATOMICOS}_filtro_ano_final.html",
+            f"{PATH_FILTROS_ATOMICOS}_filtro_tipo_grafico.html",
+            f"{PATH_FILTROS_ATOMICOS}_filtro_agrupamento.html",
+        ]
+        
+        # Agrupamentos permitidos para Evolução de Colaboração
+        agrupamentos_disponiveis = {
+            'Domínio': 'dominio',
+            'Acesso Aberto': 'acesso_aberto',
+            'Tipo de Documento': 'tipo_documento',
+        }
+
+        request = context['request']
+
+        ctx["filtros_genericos"] = [
+            {
+                "id": "abrangencia_evolucao", # Sufixo ID
+                "name": "tipo_colaboracao", 
+                "label": "Abrangência",
+                "col_class": "col-md-3",
+                "opcoes": {
+                    'Nacional': 'nacional',
+                    'Internacional': 'internacional',
+                },
+                "selecionado": request.GET.get('tipo_colaboracao', 'nacional') 
+            }
+        ]
+
+    elif tipo == "top_instituicoes":
+            # Pegamos a URL atual para saber o que o usuário escolheu
+            request = context['request']
+            
+            ctx["filtros_genericos"] = [
+                {
+                    "id": "abrangencia", # Sufixo do ID do HTML
+                    "name": "tipo_colaboracao", # O parâmetro que vai pra URL
+                    "label": "Abrangência",
+                    "col_class": "col-md-3",
+                    "opcoes": {
+                        'Nacional': 'nacional',
+                        'Internacional': 'internacional',
+                    },
+                    # Pega o valor da URL, se não existir, usa 'nacional' como padrão
+                    "selecionado": request.GET.get('tipo_colaboracao', 'nacional') 
+                },
+                {
+                    "id": "limite",
+                    "name": "limite",
+                    "label": "Mostrar",
+                    "col_class": "col-md-2",
+                    "opcoes": {
+                        'Top 5': '5',
+                        'Top 10': '10',
+                        'Top 20': '20',
+                        'Top 50': '50',
+                    },
+                    # Pega o valor da URL, se não existir, usa '10' como padrão
+                    "selecionado": request.GET.get('limite', '10')
+                }
+            ]
 
     ctx['lista_de_filtros'] = lista_de_filtros
     ctx['agrupamentos_disponiveis'] = agrupamentos_disponiveis

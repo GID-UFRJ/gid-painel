@@ -15,6 +15,8 @@ from .plots_tipos.faixa import RangeAreaStrategy
 from .plots_tipos.kpi import KPIStrategy 
 from .plots_tipos.ranking_kpi import RankingKPIStrategy
 from .plots_tipos.metricas_impacto import MetricasImpactoStrategy
+from .plots_tipos.top_instituicoes import TopInstituicoesStrategy
+from .plots_tipos.evolucao_colaboracao import EvolucaoColaboracaoStrategy
 
 class Dispatcher:
     STRATEGY_MAPPING = {
@@ -26,6 +28,8 @@ class Dispatcher:
         'kpi': KPIStrategy,
         'ranking_kpi': RankingKPIStrategy,
         'impacto': MetricasImpactoStrategy,
+        'top_instituicoes': TopInstituicoesStrategy,    
+        'evolucao_colaboracao': EvolucaoColaboracaoStrategy, 
     }
 
     CATEGORY_ORDERS = {
@@ -156,7 +160,7 @@ class Dispatcher:
         mapeamento['__tipo_entidade__'] = tipo_entidade
         return mapeamento
 
-    def _get_base_queryset(self, tipo_entidade: str, filtros_usuario: dict):
+    def _get_base_queryset(self, tipo_entidade: str, filtros_usuario: dict): ###ESSE METODO PODE SER SIMPLIFICADO....
         """
         Versão unificada: Suporta objetos Q, listas e possui logs de depuração.
         """
@@ -167,7 +171,23 @@ class Dispatcher:
         filtros_finais = mapeamento.get("filtros_padrao", {}).copy()
         filtros_finais.update(filtros_usuario or {})
 
+
         queryset = modelo.objects.all()
+
+        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        # A MÁGICA DO HOOK (A Primeira Solução)
+        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        nome_do_hook = mapeamento.get("queryset_hook")
+        
+        # Procura o método diretamente dentro do objeto queryset
+        if nome_do_hook and hasattr(queryset, nome_do_hook):
+            # Se achou, executa a função (ex: com_contagem_colaboradores())
+            queryset = getattr(queryset, nome_do_hook)()
+        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        filtros_padrao = mapa_filtros_config.get("default")
+        if filtros_padrao:
+            queryset = queryset.filter(**filtros_padrao)
 
         # 1. Identificamos o app (ex: 'openalex' ou 'sucupira')
         # Podemos inferir pelo caminho do modelo ou passar explicitamente
@@ -175,20 +195,6 @@ class Dispatcher:
     
         # 2. Buscamos o valor do agrupamento enviado pela UI
         agrupamento_slug = (filtros_usuario or {}).get('agrupamento')
-
-        # 3. LÓGICA DE HOOK GLOBAL
-        # Verifica se existe um hook registrado para este APP e este AGRUPAMENTO
-        #hooks_do_app = self.QUERYSET_HOOKS.get(app_label, {})
-        #metodo_customizado = hooks_do_app.get(agrupamento_slug)
-
-        #if metodo_customizado:
-        #    # Tenta disparar o método dinamicamente no QuerySet
-        #    func = getattr(queryset, metodo_customizado, None)
-        #    if func:
-        #        queryset = func() # Executa o Case/When que você criou
-        #        print(f"[Dispatcher] Hook '{metodo_customizado}' aplicado para o app '{app_label}'")
-
-
 
         print("\n" + "="*50)
         print("--- DEPURAÇÃO EM _get_base_queryset ---")
@@ -228,28 +234,6 @@ class Dispatcher:
         
         print(f"\n[SQL] Query final construída:\n{queryset.query}")
         print("="*50 + "\n")
-
-        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        # A MÁGICA DO HOOK DECLARATIVO
-        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        # 1. Pega a receita do plot atual
-        mapeamento = self.MAPEAMENTOS.get(tipo_entidade, {})
-        
-        # 2. Verifica se a receita exige uma QuerySet customizada
-        nome_do_hook = mapeamento.get('queryset_hook')
-        
-        if nome_do_hook:
-            # Tenta puxar a função (ex: com_topico_principal) de dentro do queryset
-            metodo = getattr(queryset, nome_do_hook, None)
-            
-            if metodo:
-                # Se achou, executa! As anotações (como top_domain) nascem aqui.
-                queryset = metodo()
-                print(f"[Dispatcher] Sucesso: Hook '{nome_do_hook}' aplicado no plot '{tipo_entidade}'")
-            else:
-                # Falha ruidosa: Se o hook estiver na receita, mas não existir no models.py, o sistema avisa na hora!
-                raise AttributeError(f"O hook '{nome_do_hook}' não foi encontrado no QuerySet do modelo.")
-        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         
         return queryset, mapeamento, filtros_finais
 

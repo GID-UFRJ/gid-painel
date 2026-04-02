@@ -38,6 +38,34 @@ class WorkQuerySet(models.QuerySet):
             top_field=Coalesce(Subquery(top_topic_qs.values('topic__field_name')[:1]), Value("Não Classificado")),
             top_subfield=Coalesce(Subquery(top_topic_qs.values('topic__subfield_name')[:1]), Value("Não Classificado")),
         )
+    
+    def com_status_colaboracao(self):
+        # Importe o modelo localmente como você já faz
+        from .models import AuthorshipInstitution
+        UFRJ_ID = 'I122140584'
+    
+        # Subquery: Existe alguma instituição BR nesse trabalho que não seja a UFRJ?
+        parceiro_br = AuthorshipInstitution.objects.filter(
+            authorship__work=OuterRef('pk'),
+            institution__country_code='BR'
+        ).exclude(
+            institution__institution_id=UFRJ_ID
+        )
+    
+        # Subquery: Existe alguma instituição nesse trabalho que não seja BR?
+        parceiro_int = AuthorshipInstitution.objects.filter(
+            authorship__work=OuterRef('pk'),
+            institution__country_code__isnull=False
+        ).exclude(
+            institution__country_code='BR'
+        )
+    
+        # Anotamos booleanos! Isso é super rápido e não quebra o GROUP BY
+        return self.annotate(
+            tem_colab_nacional=Exists(parceiro_br),
+            tem_colab_internacional=Exists(parceiro_int)
+        )
+        
 
 
 class Year(models.Model):

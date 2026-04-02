@@ -52,7 +52,7 @@ def impacto(request):
 
     # Definimos os filtros iniciais para quando o usuário abre a página
     filtros_iniciais_grafico = {
-        'ano_inicial': 1990,
+        'ano_inicial': 2013,
         'ano_final': 2024,
         'metrica': 'total_citacoes' # O gráfico já nasce exibindo o total
     }
@@ -66,6 +66,45 @@ def impacto(request):
     }
 
     return render(request, 'openalex/impacto.html', context)
+
+
+
+def colaboracao(request):
+    """
+    View responsável por carregar a página de Colaboração pela PRIMEIRA VEZ.
+    """
+    print("1. Entrei na View Colaboração")
+    
+    p = Dispatcher(mapeamentos=MAPEAMENTOS_OPENALEX)
+
+    # Filtros iniciais para os gráficos nascerem preenchidos
+    filtros_evolucao = {
+        'ano_inicial': 2013, 
+        'ano_final': 2024,
+        # Você pode escolher se a página nasce mostrando Nacional ou Internacional
+    }
+    
+    filtros_top = {
+        'tipo_colaboracao': 'nacional', # Nasce mostrando BR
+        'limite': 10 # Nasce como Top 10
+    }
+
+    context = {
+        # 1. Gráfico de Evolução (Atualizado para o novo nome unificado)
+        'graf_01': p.generate_plot_html(
+            nome_plot='evolucao_colaboracao',  # <--- AQUI ESTAVA O NOME ANTIGO
+            filtros_selecionados=filtros_evolucao
+        ),
+        
+        # 2. Gráfico de Top Instituições
+        'graf_02': p.generate_plot_html(
+            nome_plot='top_instituicoes', 
+            filtros_selecionados=filtros_top
+        ),
+    }
+
+    return render(request, 'openalex/colaboracao.html', context)
+
 
 #def impacto(request):
 #    p = PlotsImpacto()
@@ -104,12 +143,12 @@ def impacto(request):
 #    }
 #    return render(request, 'common/manutencao.html', context)
 
-def colaboracao(request):
-    context = {
-        'titulo_pagina': 'Colaboração',
-        'mensagem': 'Esta página está em manutenção. Estamos trabalhando na nova arquitetura do backend.'
-    }
-    return render(request, 'common/manutencao.html', context)
+#def colaboracao(request):
+#    context = {
+#        'titulo_pagina': 'Colaboração',
+#        'mensagem': 'Esta página está em manutenção. Estamos trabalhando na nova arquitetura do backend.'
+#    }
+#    return render(request, 'common/manutencao.html', context)
 
 
 #def grafico_generico_producao(request, nome_plot):
