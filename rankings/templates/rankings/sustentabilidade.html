@@ -15,8 +15,8 @@
             {# Configuração do gráfico #}
             {% url 'rankings:grafico_generico' nome_plot='evolucao_sustentabilidade' as url_sustentabilidade %}
             
-            {# Chamada da Tag (tipo="sustentabilidade") #}
-            {% render_filtros_rankings "sustentabilidade" url_sustentabilidade "plot-sust" "spin-sust" evolucao_sustentabilidade_plot %}
+            {# Chamada da Tag AGORA COM NOME DO PLOT E PLOTTER #}
+            {% render_filtros_rankings "sustentabilidade" url_sustentabilidade "plot-sust" "spin-sust" evolucao_sustentabilidade_plot plotter_name="rankings" nome_plot="sustentabilidade_faixa" %}
         </div>
     </div>
 {% endblock %}

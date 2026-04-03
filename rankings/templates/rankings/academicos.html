@@ -13,9 +13,9 @@
         <div class="card-body">
             {# Configuração do gráfico #}
             {% url 'rankings:grafico_generico' nome_plot='evolucao_academico' as url_academico %}
-            
-            {# Chamada da Tag (tipo="academico") #}
-            {% render_filtros_rankings "academico" url_academico "plot-academico" "spin-academico" evolucao_academico_plot %}
+        
+            {# Chamada da Tag AGORA COM NOME DO PLOT E PLOTTER #}
+            {% render_filtros_rankings "academico" url_academico "plot-academico" "spin-academico" evolucao_academico_plot plotter_name="rankings" nome_plot="academico_faixa" %}
         </div>
     </div>
 {% endblock %}

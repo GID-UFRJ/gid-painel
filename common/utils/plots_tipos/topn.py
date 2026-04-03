@@ -4,6 +4,7 @@ import pandas as pd
 from django.db.models import Count, Sum
 from .base_plot import BasePlotStrategy
 
+ ##Idealmente, seria bom fazer essa classe herdar de XYBase em vez de BasePlot
 class TopNStrategy(BasePlotStrategy):
     """
     ESTRATÉGIA ESPECÍFICA PARA GRÁFICOS DO TIPO "TOP N"
