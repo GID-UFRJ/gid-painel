@@ -43,13 +43,6 @@ class Dispatcher:
         'conceito': ['0', '1', '2', '3', '4', '5', '6', '7']
     }
 
-    COLOR_MAP = {
-        'Sim': px.colors.qualitative.Plotly[0],   # Azul (#636EFA)
-        'Não': px.colors.qualitative.Plotly[1],   # Vermelho (#EF553B)
-        'Masculino': px.colors.qualitative.Plotly[0], # <- MUDANÇA AQUI
-        'Feminino': px.colors.qualitative.Plotly[1],  # <- MUDANÇA AQUI
-        'Desconhecido': px.colors.qualitative.Plotly[7] # <- MUDANÇA AQUI
-    }
 
     PLOT_FUNCS = {
         "barra": px.bar, "linha": px.line, "pizza": px.pie,
@@ -58,28 +51,40 @@ class Dispatcher:
 
     PLOT_CONFIGS = {"barra": {"text_auto": True, "barmode": "relative"}, "linha": {"markers": True}}
 
-    # Dicionário que registra os querysets presentes no models.py de cada app
-    QUERYSET_HOOKS = {
-        'openalex': {
-            'autor_correspondente': 'autor_correspondente_ufrj',
-            'distribuicao_tematica': 'com_topico_principal',
-        },
-        'sucupira': {
-            # 'bolsistas': 'apenas_bolsistas', (Exemplo futuro)
-        }
-    }
-
     PALETAS = {
         # Uma paleta "qualitativa" (para categorias distintas)
-        'default': px.colors.qualitative.Plotly, # Cores padrão do Plotly
+        'default': px.colors.qualitative.Safe, # Cores padrão do Plotly
         
-        # Uma paleta "sequencial" (ótima para True/False, Sim/Não, Escalas)
-        # O UFRJ usa azul, então podemos usar um gradiente de azul e cinza/vermelho
-        'openalex': ['#004a80', '#b0bec5', '#d32f2f'], # Azul UFRJ, Cinza, Vermelho
-        
-        # Outras paletas para o futuro
-        'sucupira': px.colors.qualitative.G10,
-        'impacto': px.colors.sequential.Blues,
+        # Paletas colorblind
+        'okabe_ito': [
+                    '#E69F00', # [0] Laranja
+                    '#56B4E9', # [1] Azul Céu
+                    '#009E73', # [2] Verde Azulado
+                    '#F0E442', # [3] Amarelo
+                    '#0072B2', # [4] Azul Escuro
+                    '#D55E00', # [5] Vermelhão
+                    '#CC79A7', # [6] Rosa Púrpura
+                ],
+
+        'tableau_10': [
+            '#4E79A7', # [0] Azul Escuro
+            '#F28E2B', # [1] Laranja
+            '#E15759', # [2] Vermelho
+            '#76B7B2', # [3] Ciano / Teal
+            '#59A14F', # [4] Verde
+            '#EDC949', # [5] Amarelo
+            '#AF7AA1', # [6] Roxo Púrpura
+            '#FF9DA7', # [7] Rosa Claro
+            '#9C755F', # [8] Marrom
+        ],
+    }
+
+    COLOR_MAP = {
+        #'Sim': px.colors.qualitative.Plotly[0],   # Azul (#636EFA)
+        #'Não': px.colors.qualitative.Plotly[1],   # Vermelho (#EF553B)
+        #'Masculino': px.colors.qualitative.Plotly[0], # <- MUDANÇA AQUI
+        #'Feminino': px.colors.qualitative.Plotly[1],  # <- MUDANÇA AQUI
+        #'Desconhecido': px.colors.qualitative.Plotly[7] # <- MUDANÇA AQUI
     }
 
     # PALETAS DE CORES
@@ -331,25 +336,57 @@ class Dispatcher:
         if ordens_finais:
             plot_args['category_orders'] = ordens_finais
 
+
+
+        ## --- INJEÇÃO DE PALETAS (O que estava faltando) ---
+        #if params.get('color'):
+        #    # 1. Tenta pegar o mapeamento que foi passado no dispatcher
+        #    mapeamento = params.get('mapeamento_completo', {}) or kwargs.get('mapeamento', {})
+        #    
+        #    # 2. Define a paleta seguindo a hierarquia: Mapeamento > Tipo > Default
+        #    paleta_final = (
+        #        mapeamento.get('paleta_cores') or 
+        #        self.PALETAS.get(tipo_grafico) or 
+        #        self.PALETAS.get('default')
+        #    )
+        #    
+        #    # 3. Injeta a paleta antes de criar a figura
+        #    plot_args['color_discrete_sequence'] = paleta_final
+        ## --------------------------------------------------
+
+        # ==========================================
+        # 2. FIXAÇÃO DE CORES (Sequência + Mapa Fixo)
+        # ==========================================
+        # Regra 1: Passa a paleta sequencial (Aplica as 9 cores acessíveis)
+        mapeamento = params.get('mapeamento_completo', {}) or kwargs.get('mapeamento', {})
+        nome_paleta = mapeamento.get('paleta', 'tableau_10') # Default seguro
+        plot_args['color_discrete_sequence'] = self.PALETAS.get(nome_paleta, self.PALETAS['tableau_10'])
+
+        # Regra 2: Passa o mapa fixo GERAL para o gráfico
+        # O Plotly usará as cores do COLOR_MAP para as chaves que baterem (ex: 'Outros', 'Sim'), 
+        # e usará o color_discrete_sequence para o resto (ex: 'Engenharias', 'Física').
+        plot_args['color_discrete_map'] = self.COLOR_MAP
+        # ==========================================
+
         # ==========================================
         # 2. FIXAÇÃO DE CORES ABSOLUTAS
         # ==========================================
         # Regra 1: Passa a paleta padrão para TODOS os gráficos (Garante que Dominio use a correta)
-        mapeamento = params.get('mapeamento_completo', {}) or kwargs.get('mapeamento', {})
-        nome_paleta = mapeamento.get('paleta_cores', 'default')
-        plot_args['color_discrete_sequence'] = self.PALETAS.get(nome_paleta, self.PALETAS['default'])
+        #mapeamento = params.get('mapeamento_completo', {}) or kwargs.get('mapeamento', {})
+        #nome_paleta = mapeamento.get('paleta_cores', 'default')
+        #plot_args['color_discrete_sequence'] = self.PALETAS.get(nome_paleta, self.PALETAS['default'])
 
-        # Regra 2: Verifica se o gráfico atual usa uma coluna de "cor"
-        nome_coluna_cor = params.get('color')
-        if nome_coluna_cor and nome_coluna_cor in df.columns:
-            df[nome_coluna_cor] = df[nome_coluna_cor].astype(str)
-            valores_cor = set(df[nome_coluna_cor].dropna().unique())
-            chaves_do_mapa = set(self.COLOR_MAP.keys())
-            
-            # O pulo do gato: Só injeta o mapa se a coluna contiver valores como "Sim", "Não", "M", "F"...
-            # Se for a coluna "Dominio", esse IF dá falso e o Plotly nem fica sabendo que o mapa existe!
-            if valores_cor.intersection(chaves_do_mapa):
-                plot_args['color_discrete_map'] = self.COLOR_MAP
+        ## Regra 2: Verifica se o gráfico atual usa uma coluna de "cor"
+        #nome_coluna_cor = params.get('color')
+        #if nome_coluna_cor and nome_coluna_cor in df.columns:
+        #    df[nome_coluna_cor] = df[nome_coluna_cor].astype(str)
+        #    valores_cor = set(df[nome_coluna_cor].dropna().unique())
+        #    chaves_do_mapa = set(self.COLOR_MAP.keys())
+        #    
+        #    # O pulo do gato: Só injeta o mapa se a coluna contiver valores como "Sim", "Não", "M", "F"...
+        #    # Se for a coluna "Dominio", esse IF dá falso e o Plotly nem fica sabendo que o mapa existe!
+        #    if valores_cor.intersection(chaves_do_mapa):
+        #        plot_args['color_discrete_map'] = self.COLOR_MAP
         # ========================================== 
         # ==========================================
     
