@@ -175,14 +175,40 @@ class Dispatcher:
         queryset = modelo.objects.all()
 
         # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        # A MÁGICA DO HOOK (A Primeira Solução)
+        # EXECUÇÃO DE QUERIES CUSTOMIZADAS NO ORM (Obrigatórias e Condicionais)
         # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        nome_do_hook = mapeamento.get("queryset_hook")
+        # 1. Carrega as queries obrigatórias
+        queries_config = mapeamento.get("queries_obrigatorias", [])
         
-        # Procura o método diretamente dentro do objeto queryset
-        if nome_do_hook and hasattr(queryset, nome_do_hook):
-            # Se achou, executa a função (ex: com_contagem_colaboradores())
-            queryset = getattr(queryset, nome_do_hook)()
+        if isinstance(queries_config, str):
+            lista_hooks = [queries_config]
+        elif isinstance(queries_config, list):
+            lista_hooks = queries_config.copy()
+        else:
+            lista_hooks = []
+
+        # 2. Injeta as queries condicionais (se o gatilho for acionado) -> utilizadas em conjunto com agrupamentos
+        # Poderiam ser adicionadas como queries obrigatórias, mas seriam realizadas a cada novo request (menos performático)
+        agrupamento_slug = (filtros_usuario or {}).get('agrupamento')
+        condicionais = mapeamento.get("queries_condicionais", {})
+
+        if agrupamento_slug and agrupamento_slug in condicionais:
+            hook_especifico = condicionais[agrupamento_slug]
+            
+            # Suporta tanto se a condicional for uma string quanto uma lista
+            if isinstance(hook_especifico, str) and hook_especifico not in lista_hooks:
+                lista_hooks.append(hook_especifico)
+            elif isinstance(hook_especifico, list):
+                for h in hook_especifico:
+                    if h not in lista_hooks:
+                        lista_hooks.append(h)
+
+        # 3. Aplica todos os métodos em sequência no QuerySet original
+        for nome_do_hook in lista_hooks:
+            if hasattr(queryset, nome_do_hook):
+                queryset = getattr(queryset, nome_do_hook)()
+            else:
+                print(f"[Aviso] QuerySet Method '{nome_do_hook}' não encontrado no modelo {modelo.__name__}.")
         # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
         filtros_padrao = mapa_filtros_config.get("default")

@@ -8,7 +8,6 @@ MAPEAMENTOS_OPENALEX = {
         "nome_plot": "producao_por_ano",
         "estrategia_plot": "aggregated",
         "modelo": Work,
-        "queryset_hook": "autor_correspondente_ufrj",
         "titulo_base": "Total de publicações por ano",
         "eixo_x_campo": "pubyear__year",
         "eixo_x_nome": "Ano",
@@ -20,7 +19,8 @@ MAPEAMENTOS_OPENALEX = {
         # Mapeamos os filtros reativos (HTMX) aqui:
         "agrupamentos": {
             "acesso_aberto": "is_oa",
-            "tipo_documento": "worktype__worktype",
+            #"tipo_documento": "worktype__worktype",
+            "tipo_documento": "tipo_documento_limpo",
             "dominio": "worktopic__topic__domain_name",
             "autor_correspondente": "autor_correspondente_ufrj",
         },
@@ -32,6 +32,10 @@ MAPEAMENTOS_OPENALEX = {
         "labels_customizadas": {
             "dominio": "Domínio",
         },
+        "queries_condicionais": {
+            "tipo_documento": "com_tipo_documento_agrupado",
+            "autor_correspondente": "autor_correspondente_ufrj"
+        },
     },
 
     # 2. Distribuição temática por artigo
@@ -40,7 +44,10 @@ MAPEAMENTOS_OPENALEX = {
         "nome_plot": "distribuicao_tematica",
         "estrategia_plot": "hierarchical", 
         "modelo": Work,
-        "queryset_hook": "com_topico_principal",
+        "queries_obrigatorias": [
+            "com_topico_principal", # A filtragem por tópico principal
+        ],
+
         "titulo_base": "Distribuição Temática (Tópico Principal)",
     
         "grafico_hierarquico_path": {
@@ -59,6 +66,7 @@ MAPEAMENTOS_OPENALEX = {
             "ano_final": "pubyear__year__lte",
         },
         "filtros_padrao": {},
+
     },
 
     "citacoes_por_ano" : {
@@ -103,7 +111,7 @@ MAPEAMENTOS_OPENALEX = {
         "nome_plot": "evolucao_colaboracao",
         "estrategia_plot": "evolucao_colaboracao",
         "modelo": Work,
-        "queryset_hook": "com_status_colaboracao", # <- NOVO HOOK AQUI
+        "queries_obrigatorias": ["com_status_colaboracao"], # <- NOVO HOOK AQUI
         "titulo_base": "Evolução de Colaborações",
         "eixo_x_campo": "pubyear__year",
         "eixo_x_nome": "Ano de Publicação",
@@ -119,14 +127,19 @@ MAPEAMENTOS_OPENALEX = {
         },
         "agrupamentos": {
             "acesso_aberto": "is_oa",
-            "tipo_documento": "worktype__worktype",
+            #"tipo_documento": "worktype__worktype",
+            "tipo_documento": "tipo_documento_limpo",
             "dominio": "worktopic__topic__domain_name",
         },
         "labels_customizadas": {
             "acesso_aberto": "Acesso Aberto",
             "tipo_documento": "Tipo de Documento",
             "dominio": "Domínio"
-        }
+        },
+        "queries_condicionais": {
+            "tipo_documento": "com_tipo_documento_agrupado",
+        },
+
     },
 
     # 2. Top Instituições (Usa a nova Strategy e o modelo Institution!)

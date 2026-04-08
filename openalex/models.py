@@ -1,7 +1,7 @@
 from django.db import models #Para criar as classes (models.Model)
 from django.core.exceptions import ValidationError
-from django.db.models import Exists, OuterRef, Subquery, Case, When, Value, BooleanField #Para trabalhar com querysets
-from django.db.models.functions import Coalesce    # <--- ESSA LINHA É A QUE FALTA
+from django.db.models import Exists, OuterRef, Subquery, Case, When, Value, BooleanField, Count, CharField #Para trabalhar com querysets
+from django.db.models.functions import Coalesce    
 
 #Nota: Django cria AutoFields automaticamente (nome da coluna = 'id') quando uma PK não é definida. Esse padrão é esperado por outras bibliotecas e resolvi aderir.
 #Também foi preferir usar chaves substitutas/artificiais (surrogate) em vez de naturais, para fins de eficiência e tbm pq elas substituem chaves compostas, para as quais o django não tem um suporte muito desenvolvido
@@ -24,6 +24,34 @@ class WorkQuerySet(models.QuerySet):
                 When(Exists(corresp_ufrj), then=Value(True)),
                 default=Value(False),
                 output_field=BooleanField()
+            )
+        )
+
+    def com_tipo_documento_agrupado(self):
+        """
+        Calcula os tipos de documento com mais publicações globais. 
+        Mantém o nome original deles, e transforma todos os outros em 'Outros'.
+        """
+        # 1. Pede ao banco para achar os 9 maiores tipos globais
+        top_tipos = (
+            self.values('worktype__worktype')
+            .annotate(total=Count('id'))
+            .order_by('-total')[:6] #altere o numero de categorias aqui
+        )
+        
+        # 2. Extrai apenas os nomes para uma lista (ignorando nulos)
+        lista_top = [
+            item['worktype__worktype'] 
+            for item in top_tipos 
+            if item['worktype__worktype']
+        ]
+
+        # 3. Retorna a query anotando a NOVA coluna limpa
+        return self.annotate(
+            tipo_documento_limpo=Case(
+                When(worktype__worktype__in=lista_top, then='worktype__worktype'),
+                default=Value('others'), #valor dado aos agrupados
+                output_field=CharField()
             )
         )
     
