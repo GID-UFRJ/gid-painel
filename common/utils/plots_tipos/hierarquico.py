@@ -75,15 +75,30 @@ class HierarchicalPlotStrategy(BasePlotStrategy):
         # --- Construção dos Parâmetros Específicos para o Gráfico ---
         titulo_override = kwargs.get('titulo_override')
         titulo = titulo_override or self.mapeamento.get("titulo_base", "")
+
+        path_list = list(self.mapeamento["grafico_hierarquico_path"].keys())
         
         # Parâmetros para gráficos hierárquicos são diferentes (path, values)
         params = {
             "path": list(self.mapeamento["grafico_hierarquico_path"].keys()), # Usa os nomes amigáveis
             "values": self.mapeamento.get("grafico_hierarquico_values_nome", "Total"),
             "title": titulo,
+
+            # --- INJEÇÃO DE CORES PARA SUNBURST/TREEMAP ---
+            # 1. Informa ao Plotly que as cores devem basear-se no PRIMEIRO NÍVEL do caminho
+            # (Ex: se o centro for "Grande Área" e a borda "Subárea", pinta pela Grande Área)
+            "color": path_list[0] if path_list else None,
         }
+
+        # 2. Busca a paleta escolhida (ex: 'tableau_10') do mapeamento
+        nome_paleta = self.mapeamento.get('paleta', 'tableau_10')
         
-        # Pega a função de plotagem correta (ex: px.sunburst) do "artesão" (BasePlots)
+        # 3. Busca o mapa fixo e a sequência lá do Dispatcher
+        if hasattr(self.plotter, 'PALETAS') and hasattr(self.plotter, 'COLOR_MAP'):
+            params['color_discrete_sequence'] = self.plotter.PALETAS.get(nome_paleta, self.plotter.PALETAS['tableau_10'])
+            params['color_discrete_map'] = self.plotter.COLOR_MAP
+        
+        # Pega a função de plotagem correta (ex: px.sunburst) do BasePlots
         func = self.plotter.PLOT_FUNCS.get(tipo_grafico)
         if not func:
             raise ValueError(f"Tipo de gráfico '{tipo_grafico}' não suportado.")

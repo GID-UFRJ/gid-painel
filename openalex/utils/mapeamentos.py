@@ -65,7 +65,9 @@ MAPEAMENTOS_OPENALEX = {
             "ano_inicial": "pubyear__year__gte",
             "ano_final": "pubyear__year__lte",
         },
-        "filtros_padrao": {},
+        "filtros_padrao": {
+            "ignorar_nulos": Q(worktopic__isnull=False)
+        },
 
     },
 

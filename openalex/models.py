@@ -62,9 +62,9 @@ class WorkQuerySet(models.QuerySet):
         top_topic_qs = WorkTopic.objects.filter(work=OuterRef('pk')).order_by('-score')
 
         return self.annotate(
-            top_domain=Coalesce(Subquery(top_topic_qs.values('topic__domain_name')[:1]), Value("Não Classificado")),
-            top_field=Coalesce(Subquery(top_topic_qs.values('topic__field_name')[:1]), Value("Não Classificado")),
-            top_subfield=Coalesce(Subquery(top_topic_qs.values('topic__subfield_name')[:1]), Value("Não Classificado")),
+            top_domain=Coalesce(Subquery(top_topic_qs.values('topic__domain_name')[:1]), Value("Unclassified")),
+            top_field=Coalesce(Subquery(top_topic_qs.values('topic__field_name')[:1]), Value("Unclassified")),
+            top_subfield=Coalesce(Subquery(top_topic_qs.values('topic__subfield_name')[:1]), Value("Unclassified")),
         )
     
     def com_status_colaboracao(self):
