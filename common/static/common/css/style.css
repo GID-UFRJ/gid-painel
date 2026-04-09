@@ -195,9 +195,8 @@ main {
 
 
 /* ===================================================
-   Navbar
+   Navbar principal
    =================================================== */
-
 
 /* Navbar em si */
 
@@ -236,7 +235,6 @@ main {
   text-transform: uppercase;
 }
 
-
 /* ===================================================
    estilos de menu off-canvas - para a barra de navegação
    =================================================== */
@@ -272,7 +270,6 @@ main {
     border-top: 5px solid #003366;
     opacity: 1;
 }
-
 
 /* ---------------------------------------
    SEÇÃO 2: LINK E BOTÃO TOGGLE 
@@ -347,7 +344,7 @@ main {
     color: #cd2653; 
 }
 
-/* Estilo para a seta girar */
+/* Estilo para a seta girar no CLIQUE */
 .custom-toggle-btn[aria-expanded="true"] .fa-chevron-down {
     transform: rotate(180deg);
     transition: transform 0.3s ease-in-out;
@@ -356,6 +353,61 @@ main {
     transform: rotate(0deg);
     transition: transform 0.3s ease-in-out;
 }
+
+
+/* ---------------------------------------
+   SEÇÃO 4: HOVER FLUTUANTE (FLYOUT) - APENAS DESKTOP
+------------------------------------------ */
+
+@media (min-width: 992px) {
+    /* 1. Remove a trava de corte da barra lateral para o menu poder "vazar" à esquerda */
+    .offcanvas-body {
+        overflow: visible !important;
+    }
+
+    /* 2. Define o grupo como ponto de origem para a caixa flutuante */
+    .nav-item-group {
+        position: relative;
+    }
+
+    /* 3. Cria a caixa voadora (herdando a cor #f8f8f8 dos seus sub-itens) */
+    .nav-item-group .collapse {
+        position: absolute;
+        top: 0;
+        right: 100%;             /* Posiciona à esquerda da barra */
+        width: 250px;            
+        background-color: #f8f8f8; 
+        box-shadow: -5px 5px 15px rgba(0,0,0,0.1); 
+        border: 1px solid #ddd;  /* Borda combinando com o seu design */
+        border-right: none;      /* Cola na barra principal */
+        border-radius: 8px 0 0 8px; 
+        z-index: 1060;           
+        display: none;           /* Oculto por padrão */
+    }
+
+    /* 4. Dispara a caixa voadora ao passar o mouse */
+    .nav-item-group:hover .collapse {
+        display: block !important;
+    }
+
+    /* 5. Gira a setinha para a ESQUERDA no hover (sobrepondo a animação de clique) */
+    .nav-item-group:hover .custom-toggle-btn .fa-chevron-down {
+        transform: rotate(90deg) !important; 
+    }
+
+    /* 6. Ajustes finos nas bordas dos sub-itens DENTRO da caixa voadora */
+    .nav-item-group .collapse .sub-item {
+        border-bottom: 1px solid #ddd;
+    }
+    .nav-item-group .collapse .sub-item:first-child {
+        border-radius: 8px 0 0 0; /* Arredonda o topo esquerdo do primeiro item */
+    }
+    .nav-item-group .collapse .sub-item:last-child {
+        border-bottom: none;
+        border-radius: 0 0 0 8px; /* Arredonda a base esquerda do último item */
+    }
+}
+
 
 /* =======================================
    Breadcrumbs: Estilo Chevron com Fundo Colorido
@@ -475,4 +527,91 @@ main {
     max-width: 250px;
     margin: 0 auto;       /* centraliza */
     white-space: normal;  /* força quebras de linha */
+}
+
+/*NAVBAR CONFIGURACAO ADICIONAL*/
+/* Aplica o hover apenas em telas maiores que 992px (Desktop) */
+@media (min-width: 992px) {
+    /* Mostra o submenu quando o mouse estiver no pai ou no próprio submenu */
+    .custom-menu-links-parent:hover + .collapse,
+    .collapse:hover {
+        display: block !important;
+    }
+
+    /* Opcional: rotaciona a setinha automaticamente no hover */
+    .custom-menu-links-parent:hover .custom-toggle-btn i {
+        transform: rotate(180deg);
+        transition: transform 0.3s ease;
+    }
+}
+
+/* 1. Abre as opções quando o mouse passar por cima da div "Pesquisa" (ou "Pós-Graduação") */
+.custom-menu-links-parent:hover + .collapse {
+    display: block !important;
+}
+
+/* 2. Mantém as opções abertas enquanto o mouse estiver navegando por elas ("Produção", "Impacto"...) */
+.collapse:hover {
+    display: block !important;
+}
+
+.custom-menu-links-parent:hover .custom-toggle-btn i,
+.collapse:hover ~ .custom-menu-links-parent .custom-toggle-btn i {
+    transform: rotate(180deg);
+    transition: transform 0.3s ease;
+}
+
+.custom-toggle-btn i {
+    transition: transform 0.3s ease;
+}
+
+/* Aplica o efeito APENAS EM DESKTOPS (>992px) para não quebrar o celular */
+@media (min-width: 992px) {
+    
+    /* 1. Permite que o submenu "vaze" para fora da barra lateral sem ser cortado */
+    .offcanvas-body {
+        overflow: visible !important;
+    }
+
+    /* 2. Transforma cada grupo na "âncora" para o submenu flutuante */
+    .nav-item-group {
+        position: relative;
+    }
+
+    /* 3. Configura a nova caixa flutuante à esquerda */
+    .nav-item-group .collapse {
+        position: absolute;
+        top: 0;           /* Alinha o topo da caixa com o botão */
+        right: 100%;      /* Joga a caixa 100% para a ESQUERDA da barra lateral */
+        width: 250px;     /* Define a largura do submenu flutuante */
+        
+        /* Estética da caixa flutuante */
+        background-color: #ffffff;
+        box-shadow: -5px 5px 15px rgba(0,0,0,0.1); /* Sombra elegante à esquerda */
+        border: 1px solid #e0e0e0;
+        border-right: none;          /* Cola na barra principal sem linha de divisão */
+        border-radius: 8px 0 0 8px;  /* Arredonda apenas os cantos esquerdos */
+        z-index: 1060;               /* Garante que fique por cima do resto do site */
+        
+        display: none;    /* Esconde por padrão */
+    }
+
+    /* 4. Mostra o submenu quando o mouse passa no grupo */
+    .nav-item-group:hover .collapse {
+        display: block !important;
+    }
+
+    /* 5. Estiliza os itens de dentro da nova caixa para ficarem alinhados */
+    .nav-item-group .collapse .sub-item {
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .nav-item-group .collapse .sub-item:last-child {
+        border-bottom: none;
+    }
+
+    /* 6. Vira a setinha para a ESQUERDA (já que o menu abre para lá!) */
+    .nav-item-group:hover .custom-toggle-btn i {
+        transform: rotate(90deg); /* Transforma o chevron-down em chevron-left */
+    }
 }

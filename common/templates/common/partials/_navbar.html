@@ -8,17 +8,24 @@
             <span class="navbar-title d-none d-sm-inline">PÓS-GRADUAÇÃO E PESQUISA DA UFRJ EM NÚMEROS</span>
         </a>
         
-        <button class="navbar-toggler" type="button" 
+        <button class="navbar-toggler d-flex align-items-center" 
+                type="button" 
                 data-bs-toggle="offcanvas" 
                 data-bs-target="#offCanvasMenu" 
                 aria-controls="offCanvasMenu" 
-                aria-label="Toggle navigation">
+                aria-label="Abrir Menu Principal"
+                style="border: none; padding-right: 0;">
+            
+            <span class="navbar-title d-none d-sm-block me-2" 
+                  style="color: #ffffff; font-weight: 500; font-size: 1.1rem; letter-spacing: 1px;">
+                MENU PRINCIPAL
+            </span>
+            
             <span class="navbar-toggler-icon"></span>
         </button>
+
     </div>
 </nav>
-
-{% load static %}
 
 <div class="offcanvas offcanvas-end" tabindex="-1" id="offCanvasMenu" aria-labelledby="offCanvasMenuLabel">
     
@@ -39,77 +46,85 @@
                 Indicadores Gerais
             </a>
             
-            <div class="list-group-item custom-menu-links-parent d-flex justify-content-between align-items-center">
-                <a href="{% url 'openalex:index' %}" class="list-group-item-link">
-                    Pesquisa
-                </a>
-                <button class="btn btn-sm p-0 custom-toggle-btn" 
-                        type="button" 
-                        data-bs-toggle="collapse" 
-                        data-bs-target="#collapsePesquisa" 
-                        aria-expanded="false" 
-                        aria-controls="collapsePesquisa">
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-            </div>
-            <div class="collapse" id="collapsePesquisa">
-                <a href="{% url 'openalex:producao' %}" class="list-group-item list-group-item-action sub-item">Produção</a>
-                <a href="{% url 'openalex:impacto' %}" class="list-group-item list-group-item-action sub-item">Impacto</a>
-                <a href="{% url 'openalex:colaboracao' %}" class="list-group-item list-group-item-action sub-item">Colaboração</a>
+            <div class="nav-item-group">
+                <div class="list-group-item custom-menu-links-parent d-flex justify-content-between align-items-center">
+                    <a href="{% url 'openalex:index' %}" class="list-group-item-link">
+                        Pesquisa
+                    </a>
+                    <button class="btn btn-sm p-0 custom-toggle-btn" 
+                            type="button" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#collapsePesquisa" 
+                            aria-expanded="false" 
+                            aria-controls="collapsePesquisa">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="collapse" id="collapsePesquisa">
+                    <a href="{% url 'openalex:producao' %}" class="list-group-item list-group-item-action sub-item">Produção</a>
+                    <a href="{% url 'openalex:impacto' %}" class="list-group-item list-group-item-action sub-item">Impacto</a>
+                    <a href="{% url 'openalex:colaboracao' %}" class="list-group-item list-group-item-action sub-item">Colaboração</a>
+                </div>
             </div>
             
-            <div class="list-group-item custom-menu-links-parent d-flex justify-content-between align-items-center">
-                <a href="{% url 'pessoal:index' %}" class="list-group-item-link">
-                    Pós-Graduação: Pessoal
-                </a>
-                <button class="btn btn-sm p-0 custom-toggle-btn" 
-                        type="button" 
-                        data-bs-toggle="collapse" 
-                        data-bs-target="#collapsePessoal" 
-                        aria-expanded="false" 
-                        aria-controls="collapsePessoal">
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-            </div>
-            <div class="collapse" id="collapsePessoal">
-                <a href="{% url 'pessoal:pessoal_discentes' %}" class="list-group-item list-group-item-action sub-item">Discentes</a>
-                <a href="{% url 'pessoal:pessoal_docentes' %}" class="list-group-item list-group-item-action sub-item">Docentes</a>
-            </div>
-
-            <div class="list-group-item custom-menu-links-parent d-flex justify-content-between align-items-center">
-                <a href="{% url 'posgrad:index' %}" class="list-group-item-link">
-                    Pós-Graduação: Programas
-                </a>
-                <button class="btn btn-sm p-0 custom-toggle-btn" 
-                        type="button" 
-                        data-bs-toggle="collapse" 
-                        data-bs-target="#collapsePosgrad" 
-                        aria-expanded="false" 
-                        aria-controls="collapsePosgrad">
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-            </div>
-            <div class="collapse" id="collapsePosgrad">
-                 <a href="{% url 'posgrad:posgrad_ufrj' %}" class="list-group-item list-group-item-action sub-item">Geral</a>
-                 <a href="{% url 'posgrad:ppgs' %}" class="list-group-item list-group-item-action sub-item">Individual</a>
+            <div class="nav-item-group">
+                <div class="list-group-item custom-menu-links-parent d-flex justify-content-between align-items-center">
+                    <a href="{% url 'pessoal:index' %}" class="list-group-item-link">
+                        Pós-Graduação: Pessoal
+                    </a>
+                    <button class="btn btn-sm p-0 custom-toggle-btn" 
+                            type="button" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#collapsePessoal" 
+                            aria-expanded="false" 
+                            aria-controls="collapsePessoal">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="collapse" id="collapsePessoal">
+                    <a href="{% url 'pessoal:pessoal_discentes' %}" class="list-group-item list-group-item-action sub-item">Discentes</a>
+                    <a href="{% url 'pessoal:pessoal_docentes' %}" class="list-group-item list-group-item-action sub-item">Docentes</a>
+                </div>
             </div>
 
-            <div class="list-group-item custom-menu-links-parent d-flex justify-content-between align-items-center">
-                <a href="{% url 'rankings:index' %}" class="list-group-item-link">
-                    Rankings
-                </a>
-                <button class="btn btn-sm p-0 custom-toggle-btn" 
-                        type="button" 
-                        data-bs-toggle="collapse" 
-                        data-bs-target="#collapseRankings" 
-                        aria-expanded="false" 
-                        aria-controls="collapseRankings">
-                    <i class="fas fa-chevron-down"></i>
-                </button>
+            <div class="nav-item-group">
+                <div class="list-group-item custom-menu-links-parent d-flex justify-content-between align-items-center">
+                    <a href="{% url 'posgrad:index' %}" class="list-group-item-link">
+                        Pós-Graduação: Programas
+                    </a>
+                    <button class="btn btn-sm p-0 custom-toggle-btn" 
+                            type="button" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#collapsePosgrad" 
+                            aria-expanded="false" 
+                            aria-controls="collapsePosgrad">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="collapse" id="collapsePosgrad">
+                     <a href="{% url 'posgrad:posgrad_ufrj' %}" class="list-group-item list-group-item-action sub-item">Geral</a>
+                     <a href="{% url 'posgrad:ppgs' %}" class="list-group-item list-group-item-action sub-item">Individual</a>
+                </div>
             </div>
-            <div class="collapse" id="collapseRankings">
-                <a href="{% url 'rankings:academicos' %}" class="list-group-item list-group-item-action sub-item">Acadêmicos</a>
-                <a href="{% url 'rankings:sustentabilidade' %}" class="list-group-item list-group-item-action sub-item">Sustentabilidade</a>
+
+            <div class="nav-item-group">
+                <div class="list-group-item custom-menu-links-parent d-flex justify-content-between align-items-center">
+                    <a href="{% url 'rankings:index' %}" class="list-group-item-link">
+                        Rankings
+                    </a>
+                    <button class="btn btn-sm p-0 custom-toggle-btn" 
+                            type="button" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#collapseRankings" 
+                            aria-expanded="false" 
+                            aria-controls="collapseRankings">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="collapse" id="collapseRankings">
+                    <a href="{% url 'rankings:academicos' %}" class="list-group-item list-group-item-action sub-item">Acadêmicos</a>
+                    <a href="{% url 'rankings:sustentabilidade' %}" class="list-group-item list-group-item-action sub-item">Sustentabilidade</a>
+                </div>
             </div>
 
             {% for item in menu_items %}
@@ -131,3 +146,5 @@
 
     </div>
 </div>
+
+<script src="{% static 'common/js/navbar.js' %}"></script>
