@@ -4,21 +4,11 @@
 <div class="container mt-4">
     
     <div class="mb-4">
-        <h1>Painel Pessoal: Docentes</h1>
+        <h1>Pessoal: Docentes</h1>
         <p class="lead">Análises sobre o corpo docente dos programas de pós-graduação.</p>
     </div>
 
-    {% comment %}
-
-    <div class="divisoria">
-        {% if docentes_card %}
-          <img src="data:image/png;base64, {{ docentes_card }}" alt="" class='imagemsuperior'/>
-        {% endif %}
-    </div>
-
-    {% endcomment %}
-
-    <hr>
+    <hr class="my-2">
 
     {# Reutiliza o partial que era a aba de docentes #}
     {% include "sucupira/partials/pessoal/_aba_docentes_conteudo.html" %}

@@ -164,25 +164,10 @@ def posgrad_ufrj(request):
         """
         p = PlotsPpgUfrj()
 
-        abas = [
-            {
-                "id": "ppgs_ufrj",
-                "label": "PPGs UFRJ",
-                "icone": "fas fa-graduation-cap",
-                "titulo": "Análise dos PPGs da UFRJ",
-                "template_name": "sucupira/partials/posgrad/posgrad_ufrj/_aba_ppgs_ufrj_conteudo.html"
-            }
-        ]
-
-        contexto_plots = {
+        context = {
             'programas_contagem_ano_plot': p.generate_plot_html(nome_plot='programas_contagem_por_ano', filtros_selecionados={}),
         }
         
-        context = {
-            "abas": abas,
-            **contexto_plots,
-        }
-
         return context
 
     context = get_cached_context()
