@@ -1,7 +1,7 @@
 <div class="col-md-3">
     <label for="{{ grafico_id }}-metrica" class="form-label">Métrica de impacto</label>
     
-    <select id="{{ grafico_id }}-metrica" name="metrica" class="form-select" hx-get="{{ url_grafico }}" hx-target="#{{ grafico_id }}" hx-indicator="#{{ spinner_id }}">
+    <select id="{{ grafico_id }}-metrica" name="metrica" class="form-select">
         
         {% for rotulo, valor in metricas_disponiveis.items %}
             <option value="{{ valor }}" 

@@ -1,7 +1,7 @@
 <div class="{{ filtro.col_class|default:'col-md-3' }}">
     <label for="{{ grafico_id }}-{{ filtro.id }}" class="form-label">{{ filtro.label }}</label>
     
-    <select id="{{ grafico_id }}-{{ filtro.id }}" name="{{ filtro.name }}" class="form-select" hx-get="{{ url_grafico }}" hx-target="#{{ grafico_id }}" hx-indicator="#{{ spinner_id }}">
+    <select id="{{ grafico_id }}-{{ filtro.id }}" name="{{ filtro.name }}" class="form-select">
         
         {% for rotulo, valor in filtro.opcoes.items %}
             <option value="{{ valor }}" {% if filtro.selecionado == valor %}selected{% endif %}>
