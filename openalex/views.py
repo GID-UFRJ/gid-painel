@@ -18,13 +18,11 @@ def producao(request):
     """
     print("1. Entrei na View Produção")
     
-    # 1. Instanciamos o Dispatcher genérico
-    p = Dispatcher()
+    # 1. Instanciamos o Dispatcher com os mapeamentos
+    p = Dispatcher(mapeamentos=MAPEAMENTOS_OPENALEX)
     
-    # 2. Acoplamos o "Cérebro" (O dicionário de receitas)
-    p.MAPEAMENTOS = MAPEAMENTOS_OPENALEX
 
-    # 3. Geramos os gráficos
+    # 2. Geramos os gráficos
     html_producao_ano = p.generate_plot_html(
         nome_plot='producao_por_ano', 
         filtros_selecionados={'ano_inicial': 1990, 'ano_final': 2024}
@@ -37,10 +35,11 @@ def producao(request):
 
     print(f"4. Voltei para a View. Tamanho do HTML (Temática): {len(html_distribuicao)}")
 
-    # 4. Mandamos para o template
+    # 3. Mandamos para o template
     return render(request, 'openalex/producao.html', {
         'graf_01': html_producao_ano,
         'graf_02': html_distribuicao,
+        'plotter': p, #Usado APENAS para mostrar o sumário dos plots
     })
 
 def impacto(request):

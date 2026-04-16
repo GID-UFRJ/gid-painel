@@ -48,3 +48,31 @@ def render_abas(context, abas, abas_id="default-abas"):
         'abas_id': abas_id,
     }) # adiciona o contexto das abas
     return ctx
+
+
+@register.simple_tag(takes_context=True)
+def registrar_grafico(context, nome_plot):
+    """
+    Registra um gráfico no contexto da página para a criação do Sumário Automático.
+    Busca o título base diretamente do plotter injetado pela View.
+    """
+    if 'graficos_registrados' not in context:
+        context['graficos_registrados'] = []
+    
+    # Título de fallback (ex: "producao_por_ano" vira "Producao Por Ano")
+    titulo_base = nome_plot.replace('_', ' ').title()
+    
+    # Tenta pegar o título real do mapeamento através do plotter
+    plotter = context.get('plotter')
+    if plotter:
+        mapeamento = plotter._get_mapeamento_by_public_name(nome_plot)
+        if mapeamento and "titulo_base" in mapeamento:
+            titulo_base = mapeamento["titulo_base"]
+    
+    context['graficos_registrados'].append({
+        'id': f"ancora-{nome_plot}",
+        'nome': nome_plot,
+        'titulo': titulo_base
+    })
+    
+    return ""

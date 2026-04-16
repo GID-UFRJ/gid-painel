@@ -1,16 +1,17 @@
 {% extends "common/base.html" %}
 
+{% load common_tags %}
 {% load openalex_tags %}
 
 
 {% block conteudo %}
         
-<!--
-<div class='divisoria'>
-    <img src = "data:image/png;base64, {{ card_01 }}" alt="" class='imagemsuperior'>
-    <img src = "data:image/png;base64, {{ card_02 }}" alt="" class='imagemsuperior'>
-</div>
--->
+{# 1. Registro (Sempre no topo) #}
+{% registrar_grafico "producao_por_ano" %}
+{% registrar_grafico "distribuicao_tematica" %}
+
+{# 2. O Sumário Automático #}
+{% include 'common/partials/_indice_graficos.html' %}
 
 <div class="row">
     <div class="col-md-12">

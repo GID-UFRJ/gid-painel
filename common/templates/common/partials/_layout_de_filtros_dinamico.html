@@ -2,26 +2,30 @@
 
 {% extends "common/partials/_grafico_com_filtros.html" %}
 
+i
 {% block filtros %}
-<div class="row g-3 align-items-end">
-    {# Este loop irá renderizar cada filtro que a templatetag selecionou, na ordem definida #}
-    {% for filtro_template in lista_de_filtros %}
-        {% include filtro_template %}
-    {% endfor %}
-
-    {% if filtros_genericos %}
-        {% for config_filtro in filtros_genericos %}
-            {% include "common/partials/filtros/_filtro_generico.html" with filtro=config_filtro %}
+<div id="ancora-{{ nome_plot }}" class="container mt-4">
+    
+    <div class="row g-3 align-items-end">
+        {# Este loop irá renderizar cada filtro que a templatetag selecionou, na ordem definida #}
+        {% for filtro_template in lista_de_filtros %}
+            {% include filtro_template %}
         {% endfor %}
-    {% endif %}
-</div>
 
-<div class="d-flex justify-content-end mt-3">
-    <a x-bind:href="downloadUrl"
-       class="btn btn-success" 
-       title="Baixar dados como CSV">
-        <i class="fas fa-file-csv me-2"></i> Baixar CSV
-    </a>
+        {% if filtros_genericos %}
+            {% for config_filtro in filtros_genericos %}
+                {% include "common/partials/filtros/_filtro_generico.html" with filtro=config_filtro %}
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="d-flex justify-content-end mt-3">
+        <a x-bind:href="downloadUrl"
+           class="btn btn-success" 
+           title="Baixar dados como CSV">
+            <i class="fas fa-file-csv me-2"></i> Baixar CSV
+        </a>
+    </div>
 </div>
 
 {% endblock %}

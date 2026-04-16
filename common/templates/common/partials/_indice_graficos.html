@@ -1,0 +1,19 @@
+{# common/partials/_indice_graficos.html #}
+
+{% if graficos_registrados %}
+<div class="card shadow-sm mb-4 border-0 bg-light">
+    <div class="card-body">
+        <div class="d-flex align-items-center flex-wrap gap-2">
+            <span class="fw-bold text-muted me-2">
+                <i class="fas fa-list-ul me-1"></i> Ir para:
+            </span>
+            
+            {% for grafico in graficos_registrados %}
+                <a href="#{{ grafico.id }}" class="btn btn-sm btn-outline-primary rounded-pill">
+                    {{ grafico.titulo }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}

@@ -447,3 +447,11 @@ class Dispatcher:
 
         # 4. Retorna o DataFrame bruto processado
         return strategy_instance.get_dataframe()
+    
+
+    # ==========================================================
+    # TITULO DO PLOT (PARA O )
+    # ==========================================================
+
+    def get_titulo_plot(self, nome_plot):
+        return self._get_mapeamento_by_public_name(nome_plot).get("titulo_base")
