@@ -1,16 +1,11 @@
 {% extends "common/base.html" %}
 
-{% load common_tags %}
 {% load openalex_tags %}
-
 
 {% block conteudo %}
         
-{# 1. Registro (Sempre no topo) #}
-{% registrar_grafico "producao_por_ano" %}
-{% registrar_grafico "distribuicao_tematica" %}
 
-{# 2. O Sumário Automático #}
+{# O Sumário Automático #}
 {% include 'common/partials/_indice_graficos.html' %}
 
 <div class="row">

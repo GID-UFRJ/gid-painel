@@ -1,19 +1,16 @@
 # common/utils/export_helpers.py
 from django.http import HttpResponse 
-from sucupira.utils.plots import PlotsPessoal, PlotsPpgDetalhe, PlotsPpgUfrj
-from openalex.utils.plots import PlotsProducao
-from rankings.utils.plots import PlotsRankings
 
-#NOTA: Esses helpers são usados na view do app common, para centralizar a exportacao dos dados (em csv) de todos os gráficos 
-#A view e url que tomam conta dessa exportacao estão no próprio app 'common'
+# Importe os Dicionários Mestres
+from openalex.utils.mapeamentos import MAPEAMENTOS_TODOS as MAP_OPENALEX
+# from sucupira.utils.mapeamentos import MAPEAMENTOS_TODOS as MAP_SUCUPIRA
+# from rankings.utils.mapeamentos import MAPEAMENTOS_TODOS as MAP_RANKINGS
 
-# Mapeamento das classes dos plots
-PLOTTER_MAPPING = {
-    'pessoal': PlotsPessoal,
-    'ppg_detalhe': PlotsPpgDetalhe,
-    'posgrad_ufrj': PlotsPpgUfrj,
-    'rankings': PlotsRankings,
-    'openalex': PlotsProducao,
+# Mapeamento de App -> Dicionário
+DICIONARIOS_MAPEAMENTO = {
+    'openalex': MAP_OPENALEX,
+    # 'sucupira': MAP_SUCUPIRA,
+    # 'rankings': MAP_RANKINGS,
 }
 
 def get_csv_response(df, filename):

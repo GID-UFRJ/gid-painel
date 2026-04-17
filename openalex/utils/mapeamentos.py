@@ -1,7 +1,10 @@
 from ..models import Work, WorkTopic, Institution
 from django.db.models import Q
 
-MAPEAMENTOS_OPENALEX = {
+# ==========================================
+# 1. PAINEL DE PRODUÇÃO
+# ==========================================
+MAPEAMENTOS_PRODUCAO = {
     # 1. Total de publicações por ano
     "producao_por_ano": {
         "__tipo_entidade__": "producao_por_ano",
@@ -70,7 +73,13 @@ MAPEAMENTOS_OPENALEX = {
         },
 
     },
+}
 
+# ==========================================
+# 2. PAINEL DE IMPACTO
+# ==========================================
+
+MAPEAMENTOS_IMPACTO = {
     "citacoes_por_ano" : {
         "nome_plot": "citacoes_por_ano",
         "estrategia_plot": "impacto",  # Aponta para a nossa nova Strategy
@@ -106,7 +115,12 @@ MAPEAMENTOS_OPENALEX = {
             "dominio": "Domínio",
         },
     },
+}
 
+# ==========================================
+# 3. PAINEL DE COLABORAÇÃO
+# ==========================================
+MAPEAMENTOS_COLABORACAO = {
     # 1. Evolução da Colaboração 
     "evolucao_colaboracao": {
         "__tipo_entidade__": "evolucao_colaboracao",
@@ -178,4 +192,13 @@ MAPEAMENTOS_OPENALEX = {
             },
 
         },
+}
+
+# ==========================================
+# DICIONARIO COM TODOS OS MAPEAMENTOS (PARA)
+# ==========================================
+MAPEAMENTOS_TODOS = {
+    **MAPEAMENTOS_PRODUCAO,
+    **MAPEAMENTOS_IMPACTO,
+    **MAPEAMENTOS_COLABORACAO
 }

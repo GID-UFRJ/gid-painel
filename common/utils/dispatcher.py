@@ -148,8 +148,23 @@ class Dispatcher:
         return strategy_instance.generate_plot(df, tipo_grafico=tipo_grafico, **kwargs)
 
     # ==========================================================
-    # LÓGICA DE FILTROS E QUERIES (UNIFICADA E ROBUSTA)
+    # LÓGICA DE FILTROS E QUERIES 
     # ==========================================================
+
+    #Nome do plot = nome do mapeamento no dicionário
+    #def _get_mapeamento_by_public_name(self, nome_plot: str) -> dict | None:
+    #    # Busca instantânea (O(1)) usando a chave do dicionário
+    #    mapeamento = self.MAPEAMENTOS.get(nome_plot) 
+    #    
+    #    if mapeamento:
+    #        # Injeta as variáveis dinamicamente apenas em tempo de execução.
+    #        # Assim, as suas Strategies ainda podem acessar self.mapeamento['nome_plot'] se precisarem!
+    #        mapeamento['nome_plot'] = nome_plot
+    #        mapeamento['__tipo_entidade__'] = nome_plot 
+    #        
+    #        return mapeamento
+    #        
+    #    return None
 
     def _get_mapeamento_by_public_name(self, nome_plot: str) -> dict | None:
         for tipo_entidade, mapeamento in self.MAPEAMENTOS.items():
@@ -450,8 +465,25 @@ class Dispatcher:
     
 
     # ==========================================================
-    # TITULO DO PLOT (PARA O )
+    # TITULO DO PLOT (PARA O SUMARIO)
     # ==========================================================
 
     def get_titulo_plot(self, nome_plot):
         return self._get_mapeamento_by_public_name(nome_plot).get("titulo_base")
+
+
+    @property
+    def lista_sumario(self):
+        """
+        Lê o mapeamento atual e devolve uma lista pronta para o Índice HTML.
+        Só inclui gráficos válidos e já formata os títulos.
+        """
+        sumario = []
+        for nome_plot, config in self.MAPEAMENTOS.items():
+            # Pega o título base ou formata o nome da chave como fallback
+            titulo = config.get("titulo_base", nome_plot.replace('_', ' ').title())
+            sumario.append({
+                'id': f"ancora-{nome_plot}",
+                'titulo': titulo
+            })
+        return sumario

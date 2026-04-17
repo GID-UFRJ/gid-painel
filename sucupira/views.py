@@ -23,64 +23,6 @@ def index(request):
 
 
 
-# ==============================================================================
-# VIEWS PARA A SEÇÃO "PESSOAL PPG" (GERAL)
-# ==============================================================================
-
-#def pessoal_ppg(request):
-#    """
-#    Renderiza a página principal do dashboard "Pessoal", com cache para performance.
-#    """
-#    @cache_context_data(key_prefix='pessoal_ppg', timeout=3600)
-#    def get_cached_context():
-#        """
-#        Gera e cacheia o contexto completo, usando a nova arquitetura de orquestração
-#        para criar os plots iniciais.
-#        """
-#        p = PlotsPessoal()
-#
-#        abas = [
-#            {
-#                "id": "discentes",
-#                "label": "Discentes",
-#                "icone": "fas fa-user-graduate",
-#                "titulo": "Análise de Discentes",
-#                "template_name": "sucupira/partials/pessoal/_aba_discentes_conteudo.html"
-#            },
-#            {
-#                "id": "docentes",
-#                "label": "Docentes",
-#                "icone": "fas fa-chalkboard-teacher",
-#                "titulo": "Análise de Docentes",
-#                "template_name": "sucupira/partials/pessoal/_aba_docentes_conteudo.html"
-#            },
-#        ]
-#
-#        contexto_cards = {
-#            'n_titulados_cards': p.cards_total_alunos_titulados_por_grau(),
-#            'docentes_card': p.card_total_docentes_ultimo_ano(),
-#        }
-#
-#        contexto_plots = {
-#            'discentes_ano_plot': p.generate_plot_html(nome_plot='discentes_por_ano', filtros_selecionados={}),
-#            'discentes_sunburst_plot': p.generate_plot_html(nome_plot='discentes_por_area_sunburst', filtros_selecionados={}),
-#            'top_paises_discentes_plot': p.generate_plot_html(nome_plot='top_paises_discentes', filtros_selecionados={}),
-#            'docentes_ano_plot': p.generate_plot_html(nome_plot='docentes_por_ano', filtros_selecionados={}),
-#            'docentes_sunburst_plot': p.generate_plot_html(nome_plot='docentes_por_area_sunburst', filtros_selecionados={}),
-#            'top_paises_docentes_plot': p.generate_plot_html(nome_plot='top_paises_docentes', filtros_selecionados={}),
-#        }
-#        
-#        context = {
-#            "abas": abas,
-#            **contexto_cards,
-#            **contexto_plots,
-#        }
-#        return context
-#
-#    context = get_cached_context()
-#    return render(request, r'sucupira/pessoal/pessoal_ppg.html', context)
-
-
 def pessoal_discentes(request):
     """
     Renderiza a página de análise de Discentes.

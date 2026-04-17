@@ -1,39 +1,39 @@
-import pandas as pd
-import plotly.express as px
-from plotly.io import to_html
-import numpy as np
-from ..models import Work, Year, WorkTopic, Institution, Authorship, AuthorshipInstitution
-from .misc import calculate_h_index, gerar_sigla, renomear_siglas_duplicadas
-from django.db.models import F, Q, Count, Sum, Min, Avg, Max, Subquery, OuterRef, Case, When, Value, CharField, Exists
-from gid.utils_scripts_graficos import cores, grafico_barra, grafico_kpi
-from gid.utils_scripts_graficos_plotly import grafico_linha_plotly, grafico_barra_plotly, grafico_barra_plotly2
-
-
-from common.utils.dispatcher import Dispatcher # O "motor" central
-from .mapeamentos import MAPEAMENTOS_OPENALEX # As regras do OpenAlex
-
-class PlotsProducao(Dispatcher):
-    """Gráficos de produção científica (OpenAlex)."""
-    # Ao definir o atributo MAPEAMENTOS aqui, o Dispatcher base
-    # saberá quais modelos e campos usar para o OpenAlex.
-    MAPEAMENTOS = MAPEAMENTOS_OPENALEX
-
-    def _get_base_queryset(self, tipo_entidade, filtros):
-        queryset, modelo, _ = super()._get_base_queryset(tipo_entidade, filtros)
-    
-        # Se o plot for o temático, precisamos ativar as anotações da Subquery
-        if tipo_entidade == "distribuicao_tematica":
-            queryset = queryset.com_topico_principal()
-            
-        return queryset, modelo, None
-
-class PlotsImpacto(Dispatcher):
-    """Gráficos de impacto (citações) do OpenAlex."""
-    MAPEAMENTOS = MAPEAMENTOS_OPENALEX
-
-class PlotsColaboracao(Dispatcher):
-    """Gráficos de colaboração do OpenAlex."""
-    MAPEAMENTOS = MAPEAMENTOS_OPENALEX
+#import pandas as pd
+#import plotly.express as px
+#from plotly.io import to_html
+#import numpy as np
+#from ..models import Work, Year, WorkTopic, Institution, Authorship, AuthorshipInstitution
+#from .misc import calculate_h_index, gerar_sigla, renomear_siglas_duplicadas
+#from django.db.models import F, Q, Count, Sum, Min, Avg, Max, Subquery, OuterRef, Case, When, Value, CharField, Exists
+#from gid.utils_scripts_graficos import cores, grafico_barra, grafico_kpi
+#from gid.utils_scripts_graficos_plotly import grafico_linha_plotly, grafico_barra_plotly, grafico_barra_plotly2
+#
+#
+#from common.utils.dispatcher import Dispatcher # O "motor" central
+#from .mapeamentos import MAPEAMENTOS_OPENALEX # As regras do OpenAlex
+#
+#class PlotsProducao(Dispatcher):
+#    """Gráficos de produção científica (OpenAlex)."""
+#    # Ao definir o atributo MAPEAMENTOS aqui, o Dispatcher base
+#    # saberá quais modelos e campos usar para o OpenAlex.
+#    MAPEAMENTOS = MAPEAMENTOS_OPENALEX
+#
+#    def _get_base_queryset(self, tipo_entidade, filtros):
+#        queryset, modelo, _ = super()._get_base_queryset(tipo_entidade, filtros)
+#    
+#        # Se o plot for o temático, precisamos ativar as anotações da Subquery
+#        if tipo_entidade == "distribuicao_tematica":
+#            queryset = queryset.com_topico_principal()
+#            
+#        return queryset, modelo, None
+#
+#class PlotsImpacto(Dispatcher):
+#    """Gráficos de impacto (citações) do OpenAlex."""
+#    MAPEAMENTOS = MAPEAMENTOS_OPENALEX
+#
+#class PlotsColaboracao(Dispatcher):
+#    """Gráficos de colaboração do OpenAlex."""
+#    MAPEAMENTOS = MAPEAMENTOS_OPENALEX
 
 
 

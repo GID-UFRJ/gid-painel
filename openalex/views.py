@@ -1,7 +1,7 @@
 from django.shortcuts import render
 #from .utils.plots import PlotsProducao, PlotsImpacto, PlotsColaboracao
 from common.utils.dispatcher import Dispatcher
-from .utils.mapeamentos import MAPEAMENTOS_OPENALEX
+from .utils.mapeamentos import MAPEAMENTOS_PRODUCAO, MAPEAMENTOS_IMPACTO, MAPEAMENTOS_COLABORACAO, MAPEAMENTOS_TODOS
 
 # Create your views here.
 from django.http import HttpResponse
@@ -19,7 +19,7 @@ def producao(request):
     print("1. Entrei na View Produção")
     
     # 1. Instanciamos o Dispatcher com os mapeamentos
-    p = Dispatcher(mapeamentos=MAPEAMENTOS_OPENALEX)
+    p = Dispatcher(mapeamentos=MAPEAMENTOS_PRODUCAO)
     
 
     # 2. Geramos os gráficos
@@ -46,8 +46,7 @@ def impacto(request):
     """
     View responsável por carregar a página de Impacto pela PRIMEIRA VEZ.
     """
-    p = Dispatcher()
-    p.MAPEAMENTOS = MAPEAMENTOS_OPENALEX
+    p = Dispatcher(mapeamentos=MAPEAMENTOS_IMPACTO)
 
     # Definimos os filtros iniciais para quando o usuário abre a página
     filtros_iniciais_grafico = {
@@ -74,7 +73,7 @@ def colaboracao(request):
     """
     print("1. Entrei na View Colaboração")
     
-    p = Dispatcher(mapeamentos=MAPEAMENTOS_OPENALEX)
+    p = Dispatcher(mapeamentos=MAPEAMENTOS_COLABORACAO)
 
     # Filtros iniciais para os gráficos nascerem preenchidos
     filtros_evolucao = {
@@ -105,73 +104,13 @@ def colaboracao(request):
     return render(request, 'openalex/colaboracao.html', context)
 
 
-#def impacto(request):
-#    p = PlotsImpacto()
-#    return render(request, r'openalex/impacto.html', {
-#        #'card_01':p.producao_total_citacoes(),
-#        #'card_02':p.producao_total_hindex(),
-#
-#        'graf_01':p.citacoes_por_ano(ano_inicial=1990, ano_final=2024),
-#        #'graf_02':p.top_instituicoes_colaboradoras(internacional=True),
-#    }
-#)
-#
-#def colaboracao(request):
-#    p = PlotsColaboracao()
-#
-#    return render(request, r'openalex/colaboracao.html', {
-#        #'card_01':p.producao_colaboracao_nacional(),
-#        #'card_02':p.producao_colaboracao_internacional(),
-#
-#        'graf_01':p.colaboracoes_por_ano(),
-#        'graf_02':p.top_instituicoes_colaboradoras(n_instituicoes=10, tipo_instituicao='nacional'),
-#        #'graf_02':p.top_instituicoes_colaboradoras(internacional=True),
-#        #'graf_02':p.producao_por_ano_worktype(ano_inicial=1990, ano_final=2024),
-#        #'graf_03':p.producao_por_ano_worktype(ano_inicial=1990, 
-#        #                                      ano_final=2024,
-#        #                                      tipo_plot='barra'),
-#        #'graf_04': p.distribuicao_tematica_artigos(),
-#    }
-#)
-
-
-#def impacto(request):
-#    context = {
-#        'titulo_pagina': 'Impacto',
-#        'mensagem': 'Esta página está em manutenção. Estamos trabalhando na nova arquitetura do backend.'
-#    }
-#    return render(request, 'common/manutencao.html', context)
-
-#def colaboracao(request):
-#    context = {
-#        'titulo_pagina': 'Colaboração',
-#        'mensagem': 'Esta página está em manutenção. Estamos trabalhando na nova arquitetura do backend.'
-#    }
-#    return render(request, 'common/manutencao.html', context)
-
-
-#def grafico_generico_producao(request, nome_plot):
-#    plotter = PlotsProducao() 
-#    
-#    filtros = request.GET.dict() 
-#   
-#    try:
-#        grafico_html = plotter.generate_plot_html(
-#            nome_plot=nome_plot,
-#            filtros_selecionados=filtros
-#        )
-#        return HttpResponse(grafico_html)
-#    except Exception as e:
-#        return HttpResponse(f"<div class='alert alert-danger'>Erro no plot '{nome_plot}': {e}</div>")
-
-
 def grafico_generico_openalex(request, nome_plot):
     """
     View acionada pelo HTMX. Recebe requisições via AJAX quando o usuário 
     muda um dropdown (ex: muda de 'Total' para 'Índice H').
     """
-    p = Dispatcher()
-    p.MAPEAMENTOS = MAPEAMENTOS_OPENALEX
+
+    p = Dispatcher(mapeamentos=MAPEAMENTOS_TODOS)
 
     # 1. Pega todos os filtros da URL (ex: ?ano_inicial=2000&metrica=hindex)
     filtros_selecionados = request.GET.dict()
