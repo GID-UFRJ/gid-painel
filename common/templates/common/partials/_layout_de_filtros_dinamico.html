@@ -7,6 +7,12 @@ i
 <div id="ancora-{{ nome_plot }}" class="container mt-4">
     
     <div class="row g-3 align-items-end">
+
+        {# Este input garante que o ID do programa (página dos ppgs individuais) vá no URL do CSV #}
+        {% if programa_id %}
+            <input type="hidden" name="programa_id" value="{{ programa_id }}">
+        {% endif %}
+
         {# Este loop irá renderizar cada filtro que a templatetag selecionou, na ordem definida #}
         {% for filtro_template in lista_de_filtros %}
             {% include filtro_template %}

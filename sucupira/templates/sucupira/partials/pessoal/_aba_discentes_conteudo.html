@@ -3,17 +3,17 @@
 {% load sucupira_tags %}
 
 {# Gráfico 1: Discentes por Ano #}
-{% url 'sucupira:grafico_generico_pessoal' nome_plot='discentes_por_ano' as url_discentes_ano %}
+{% url 'pessoal:htmx_grafico_sucupira' nome_plot='discentes_por_ano' as url_discentes_ano %}
 {% render_filtros_pessoal "discentes" url_grafico=url_discentes_ano grafico_id="discentes-ano" spinner_id="spinner-discentes-ano" grafico_html=discentes_ano_plot plotter_name="pessoal" nome_plot="discentes_por_ano" %}
 
 <hr class="my-5">
 
 {# Gráfico 2: Discentes por Área (Sunburst) #}
-{% url 'sucupira:grafico_generico_pessoal' nome_plot='discentes_por_area_sunburst' as url_discentes_sunburst %}
+{% url 'pessoal:htmx_grafico_sucupira' nome_plot='discentes_por_area_sunburst' as url_discentes_sunburst %}
 {% render_filtros_pessoal "sunburst" url_grafico=url_discentes_sunburst grafico_id="discentes-sunburst" spinner_id="spinner-discentes-sunburst" grafico_html=discentes_sunburst_plot plotter_name="pessoal" nome_plot="discentes_por_area_sunburst" %}
 
 <hr class="my-5">
 
 {# Gráfico 3: Top Países de Discentes #}
-{% url 'sucupira:grafico_generico_pessoal' nome_plot='top_paises_discentes' as url_top_discentes %}
+{% url 'pessoal:htmx_grafico_sucupira' nome_plot='top_paises_discentes' as url_top_discentes %}
 {% render_filtros_pessoal "top_paises_discentes" url_grafico=url_top_discentes grafico_id="top-paises-discentes" spinner_id="spinner-top-paises-discentes" grafico_html=top_paises_discentes_plot plotter_name="pessoal" nome_plot="top_paises_discentes" %}

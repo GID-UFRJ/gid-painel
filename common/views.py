@@ -12,7 +12,7 @@ def download_csv_generic(request, plotter_name: str, **kwargs):
     nome_plot = kwargs.pop('nome_plot', None)
     
     # 2. Instancia o motor BASE passando o dicionário alvo
-    plotter = Dispatcher(mapeamentos=mapeamento_alvo, **kwargs)
+    plotter = Dispatcher(mapeamentos=mapeamento_alvo)
     
     filtros = request.GET.dict().copy()
     filtros.update(kwargs)

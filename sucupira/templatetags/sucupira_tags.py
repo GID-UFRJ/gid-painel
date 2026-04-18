@@ -31,7 +31,8 @@ def render_filtros_pessoal(context, tipo, url_grafico, grafico_id, spinner_id, g
            "grafico_id": grafico_id, 
            "spinner_id": spinner_id, 
            "grafico_html": grafico_html,
-           "plotter_name": plotter_name,
+           #"plotter_name": plotter_name,
+           "plotter_name": "sucupira",
            "nome_plot": nome_plot,
            "programa_id": None,
              }
@@ -104,7 +105,8 @@ def render_filtros_posgrad_ufrj(context, tipo, url_grafico, grafico_id, spinner_
            "grafico_id": grafico_id, 
            "spinner_id": spinner_id, 
            "grafico_html": grafico_html,
-           "plotter_name": plotter_name,
+           #"plotter_name": plotter_name,
+           "plotter_name": "sucupira",
            "nome_plot": nome_plot,
            "programa_id": None,
              }
@@ -149,7 +151,8 @@ def render_filtros_ppg_detalhe(context, tipo, url_grafico, grafico_id, spinner_i
     Monta o formulário de filtros para a seção "PPG Detalhe" compondo filtros atômicos.
     """
     ctx = { "url_grafico": url_grafico, "grafico_id": grafico_id, "spinner_id": spinner_id, "grafico_html": grafico_html,
-           "plotter_name": plotter_name, 
+            #"plotter_name": plotter_name, 
+            "plotter_name": "sucupira",
             "nome_plot": nome_plot, 
             "programa_id": programa_id
        }  
@@ -189,6 +192,8 @@ def render_filtros_ppg_detalhe(context, tipo, url_grafico, grafico_id, spinner_i
             f"{PATH_FILTROS_ATOMicos}_filtro_agrupamento.html", f"{PATH_FILTROS_ATOMicos}_filtro_grau_curso.html",
         ]
         ctx.update({"graus_curso": GrauCurso.objects.all()})
+        agrupamentos_disponiveis = agrupamentos_disponiveis_individuos
+
     
     elif tipo == "conceito_programa":
         lista_de_filtros = [

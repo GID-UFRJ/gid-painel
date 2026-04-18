@@ -17,8 +17,8 @@
     <hr class="my-2">
 
 
-    {# Define a URL para a view genérica que servirá as atualizações HTMX #}
-    {% url 'sucupira:grafico_generico_posgrad_ufrj' nome_plot='programas_contagem_por_ano' as url_programas_contagem %} 
+    {# A URL FOI ATUALIZADA AQUI PARA APONTAR PARA A SUPER VIEW #}
+    {% url 'sucupira:htmx_grafico_sucupira' nome_plot='programas_contagem_por_ano' as url_programas_contagem %} 
 
     {# Chama a templatetag, passando todos os argumentos necessários #}
     {% render_filtros_posgrad_ufrj "programas_contagem" url_grafico=url_programas_contagem grafico_id="programas-contagem-ano" spinner_id="spinner-programas-contagem-ano" grafico_html=programas_contagem_ano_plot plotter_name="posgrad_ufrj" nome_plot="programas_contagem_por_ano" %}
