@@ -2,6 +2,9 @@
 
 {% load sucupira_tags %}
 
+{% include "common/partials/_indice_graficos.html" with lista_sumario=plotter.sumario_agrupado.programa %}
+
+
 <div class="d-flex align-items-center mb-3 justify-content-center">
     <h3 class="mb-0 me-2">Evolução do Conceito CAPES</h3>
     <a class="text-secondary" data-bs-toggle="collapse" href="#explicacaoConceito" role="button" aria-expanded="false" aria-controls="explicacaoConceito">

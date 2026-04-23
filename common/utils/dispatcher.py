@@ -5,6 +5,7 @@ import unicodedata
 import re
 from django.db.models import Q, Count, Sum, Avg, Max
 from django.utils.text import slugify
+from collections import defaultdict
 
 # Importação das Estratégias
 from .plots_tipos.agregado import AggregatedPlotStrategy
@@ -465,25 +466,24 @@ class Dispatcher:
     
 
     # ==========================================================
-    # TITULO DO PLOT (PARA O SUMARIO)
+    # LISTA DE ITENS PARA O SUMARIO
     # ==========================================================
 
-    def get_titulo_plot(self, nome_plot):
-        return self._get_mapeamento_by_public_name(nome_plot).get("titulo_base")
-
-
     @property
-    def lista_sumario(self):
+    def sumario_agrupado(self):
         """
-        Lê o mapeamento atual e devolve uma lista pronta para o Índice HTML.
-        Só inclui gráficos válidos e já formata os títulos.
+        Agrupa os índices (âncoras e títulos) pela chave 'grupo' do dicionário.
+        Retorna: {'geral': [...], 'discentes': [...], 'docentes': [...]}
         """
-        sumario = []
-        for nome_plot, config in self.MAPEAMENTOS.items():
-            # Pega o título base ou formata o nome da chave como fallback
-            titulo = config.get("titulo_base", nome_plot.replace('_', ' ').title())
-            sumario.append({
-                'id': f"ancora-{nome_plot}",
-                'titulo': titulo
+        sumarios = defaultdict(list)
+        sumarios["geral"] = [] #Cria o di
+        for chave, config in self.MAPEAMENTOS.items():
+            grupo = config.get("grupo_plot", "geral") 
+            titulo = config.get("titulo_base", "Gráfico")
+            
+            sumarios[grupo].append({
+                "id": f"ancora-{chave}",
+                "titulo": titulo
             })
-        return sumario
+            
+        return dict(sumarios)

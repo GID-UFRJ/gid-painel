@@ -190,6 +190,7 @@ MAPEAMENTOS_PPG_INDIVIDUAL = {
         "nome_plot": "discentes_por_ano_ppg",         # <-- ADICIONADO
         "estrategia_plot": "aggregated",      # <-- ADICIONADO
         "modelo": Discente,
+        "grupo_plot": "discentes",
         "titulo_base": "Discentes do Programa",
         "eixo_x_campo": "ano__ano_valor",
         "eixo_x_nome": "Ano",
@@ -216,6 +217,7 @@ MAPEAMENTOS_PPG_INDIVIDUAL = {
         "nome_plot": "docentes_por_ano_ppg",         # <-- ADICIONADO
         "estrategia_plot": "aggregated",      # <-- ADICIONADO
         "modelo": Docente,
+        "grupo_plot": "docentes",
         "titulo_base": "Docentes do Programa",
         "eixo_x_campo": "ano__ano_valor",
         "eixo_x_nome": "Ano",
@@ -241,6 +243,7 @@ MAPEAMENTOS_PPG_INDIVIDUAL = {
     "conceito_programa_por_ano" : {
         "nome_plot": "conceito_programa_por_ano", # <-- ADICIONADO
         "estrategia_plot": "direct",      # <-- ADICIONADO
+        "grupo_plot": "programa",
         "tipo_grafico_padrao": "linha",
         "modelo": AnoPrograma,
         "titulo_base": "Evolução do Conceito CAPES do Programa",
@@ -266,6 +269,7 @@ MAPEAMENTOS_PPG_INDIVIDUAL = {
     "media_titulacao_por_ano" : {
         "nome_plot": "media_titulacao_por_ano",  # <-- ADICIONADO
         "estrategia_plot": "aggregated",      # <-- ADICIONADO
+        "grupo_plot": "discentes",
         "modelo": Discente,
         "titulo_base": "Tempo Médio para Titulação",
         "eixo_x_campo": "ano__ano_valor",
