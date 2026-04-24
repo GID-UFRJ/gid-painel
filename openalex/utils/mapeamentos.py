@@ -128,7 +128,7 @@ MAPEAMENTOS_COLABORACAO = {
         "estrategia_plot": "evolucao_colaboracao",
         "modelo": Work,
         "queries_obrigatorias": ["com_status_colaboracao"], # <- NOVO HOOK AQUI
-        "titulo_base": "Evolução de Colaborações",
+        "titulo_base": "Colaborações por Ano",
         "eixo_x_campo": "pubyear__year",
         "eixo_x_nome": "Ano de Publicação",
         "campo_valor": "id",

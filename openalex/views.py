@@ -59,8 +59,9 @@ def impacto(request):
         # Gráfico Principal (Passamos os filtros iniciais)
         'graf_01': p.generate_plot_html(
             nome_plot='citacoes_por_ano', 
-            filtros_selecionados=filtros_iniciais_grafico
+            filtros_selecionados=filtros_iniciais_grafico,
         ),
+        'plotter': p, #Usado APENAS para mostrar o sumário dos plots
     }
 
     return render(request, 'openalex/impacto.html', context)
@@ -99,6 +100,7 @@ def colaboracao(request):
             nome_plot='top_instituicoes', 
             filtros_selecionados=filtros_top
         ),
+        'plotter': p, #Usado APENAS para mostrar o sumário dos plots
     }
 
     return render(request, 'openalex/colaboracao.html', context)
