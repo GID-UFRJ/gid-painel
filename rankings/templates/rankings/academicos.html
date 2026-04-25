@@ -2,6 +2,9 @@
 {% load rankings_tags %}
 
 {% block conteudo %}
+
+    {% include 'common/partials/_indice_graficos.html' %}
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Rankings Acadêmicos</h1>
         <a href="{% url 'rankings:index' %}" class="btn btn-outline-secondary btn-sm">
@@ -11,10 +14,10 @@
 
     <div class="card border-0 shadow">
         <div class="card-body">
-            {# Configuração do gráfico #}
-            {% url 'rankings:grafico_generico' nome_plot='evolucao_academico' as url_academico %}
+            {# 1. Mude 'evolucao_academico' para 'academico_faixa' #}
+            {% url 'rankings:grafico_generico' nome_plot='academico_faixa' as url_academico %}
         
-            {# Chamada da Tag AGORA COM NOME DO PLOT E PLOTTER #}
+            {# 2. Agora o url_academico e o nome_plot estão em sintonia #}
             {% render_filtros_rankings "academico" url_academico "plot-academico" "spin-academico" evolucao_academico_plot plotter_name="rankings" nome_plot="academico_faixa" %}
         </div>
     </div>

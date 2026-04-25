@@ -25,24 +25,24 @@ class RangeAreaStrategy(XYBaseStrategy):
         Trata explicitamente o caso de filtro 'None'/'Empty' para buscar campos nulos.
         Aplica filtros padrão do mapeamento para evitar duplicidade de nomes (QS Acadêmico vs QS Sustentabilidade).
         """
-        # --- 1. TRATAMENTO DE FILTROS ESPECIAIS (ODS NULO) ---
         filtros_modificados = self.filtros.copy()
 
-        valor_ods = filtros_modificados.get('ods')
-        filtrar_apenas_nulos = False
-
-        if valor_ods == 'None' or valor_ods == '':
-            if 'ods' in filtros_modificados:
-                del filtros_modificados['ods']
-            filtrar_apenas_nulos = True
-
-        # --- 2. MERGE DE DEFAULTS (A CORREÇÃO PARA O SEU PROBLEMA) ---
-        # Garante que filtros como 'tipo_ranking' definidos no mapeamentos.py
-        # sejam aplicados se não estiverem presentes na requisição.
+        # --- 1. MERGE DE DEFAULTS ---
+        # Garante que temos todos os valores antes de testá-os
         defaults = self.mapeamento.get("filtros_padrao", {})
         for chave, valor in defaults.items():
             if chave not in filtros_modificados:
                 filtros_modificados[chave] = valor
+
+        # --- 2. TRATAMENTO DE FILTROS ESPECIAIS (ODS NULO) ---
+        valor_ods = filtros_modificados.get('ods')
+        filtrar_apenas_nulos = False
+
+        # Como os defaults já foram mesclados, se o mapeamento mandar 'None', ele cai aqui!
+        if valor_ods == 'None' or valor_ods == '':
+            if 'ods' in filtros_modificados:
+                del filtros_modificados['ods']
+            filtrar_apenas_nulos = True
 
         # --- 3. QUERY BASE ---
         queryset, _, _ = self.plotter._get_base_queryset(
@@ -53,6 +53,7 @@ class RangeAreaStrategy(XYBaseStrategy):
         # --- 4. APLICAÇÃO DO FILTRO ISNULL ---
         if filtrar_apenas_nulos:
             queryset = queryset.filter(ods__isnull=True)
+
 
         # --- 5. PREPARAÇÃO DOS CAMPOS ---
         eixo_x = self.mapeamento["eixo_x_campo"]
