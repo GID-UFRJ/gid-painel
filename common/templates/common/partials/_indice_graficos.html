@@ -1,25 +1,47 @@
 {# common/partials/_indice_graficos.html #}
 
-{# Só renderiza se o lista_sumario (gerado pelo dispatcher) existir E tiver 2 ou mais gráficos #}
+{% load static %}
 
-{% with target_list=lista_sumario|default:plotter.sumario_agrupado.geral %}
+{# PROTEÇÃO: Só executa se houver gráficos para mostrar #}
+{% if lista_sumario or plotter %}
 
-    {% if target_list and target_list|length >= 2 %}
-    <div class="card shadow-sm mb-4 border-0 bg-light" style="position: sticky; top: 20px; z-index: 1000;">
-        <div class="card-body py-2">
-            <div class="d-flex align-items-center flex-wrap gap-2">
-                <span class="fw-bold text-muted me-2">
-                    <i class="fas fa-list-ul me-1"></i> Ir para:
-                </span>
-                
-                {% for grafico in target_list %}
-                    <a href="#{{ grafico.id }}" class="btn btn-sm btn-outline-primary rounded-pill">
-                        {{ grafico.titulo }}
-                    </a>
-                {% endfor %}
+    {% with target_list=lista_sumario|default:plotter.sumario_agrupado.geral %}
+
+        {# Apenas renderiza card se tiver dois ou mais plots no target_list (faz sentido, mas é menos consistente) #}
+        {# % if target_list and target_list|length >= 2 % #}
+
+        {# Apenas renderiza card se tiver algum plot no target_list (mais consistente) #}
+        {% if target_list %}
+        
+        <div class="card shadow-sm mb-4 border-0 bg-light mx-1" style="position: sticky; top: 0px; z-index: 1000;">
+            <div class="card-body py-2 px-4">
+                <div class="d-flex align-items-center flex-wrap gap-2 w-100">
+                    
+                    <span class="fw-bold text-muted me-2">
+                        <i class="fas fa-list-ul me-1"></i> Ir para:
+                    </span>
+                    
+                    {% for grafico in target_list %}
+                        <a href="#{{ grafico.id }}" class="btn btn-sm btn-outline-primary rounded-pill indice-link">
+                            {{ grafico.titulo }}
+                        </a>
+                    {% endfor %}
+
+                    <div class="ms-auto">
+                        <a href="#" id="btn-voltar-topo" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;" 
+                           class="btn btn-sm btn-outline-secondary rounded-pill px-3" 
+                           title="Voltar ao início">
+                            <i class="fas fa-arrow-up me-1"></i> Topo
+                        </a>
+                    </div>
+
+                </div>
             </div>
         </div>
-    </div>
-    {% endif %}
+        {% endif %}
 
-{% endwith %}
+    {% endwith %}
+
+    <script src="{% static 'common/js/indice.js' %}"></script>
+
+{% endif %}
