@@ -5,7 +5,7 @@ from .agregado import AggregatedPlotStrategy
 
 class EvolucaoColaboracaoStrategy(AggregatedPlotStrategy):
         
-    def get_dataframe(self) -> pd.DataFrame:
+    def _get_raw_dataframe(self) -> pd.DataFrame:
         valor_bruto = self.filtros.pop("tipo_colaboracao", "nacional")
         if isinstance(valor_bruto, (list, tuple)):
             valor_bruto = valor_bruto[0] if valor_bruto else "nacional"
@@ -19,7 +19,7 @@ class EvolucaoColaboracaoStrategy(AggregatedPlotStrategy):
         else:
             self.filtros["tem_colab_nacional"] = True
 
-        df = super().get_dataframe()
+        df = super().get_processed_dataframe()
 
         if df.empty:
             return df

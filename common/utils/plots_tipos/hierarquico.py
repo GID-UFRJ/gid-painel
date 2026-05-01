@@ -12,7 +12,7 @@ class HierarchicalPlotStrategy(BasePlotStrategy):
     gerar visualizações que mostram essa estrutura hierárquica.
     """
 
-    def get_dataframe(self) -> pd.DataFrame:
+    def _get_raw_dataframe(self) -> pd.DataFrame:
         """
         Implementação para buscar e preparar dados para um gráfico hierárquico.
         """

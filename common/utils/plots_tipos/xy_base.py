@@ -16,7 +16,7 @@ class XYBaseStrategy(BasePlotStrategy):
     é o que diferencia as estratégias filhas (agregada vs. direta).
     """
     @abstractmethod
-    def get_dataframe(self) -> pd.DataFrame:
+    def _get_raw_dataframe(self) -> pd.DataFrame:
         """As classes filhas devem implementar sua própria forma de buscar dados."""
         raise NotImplementedError
 

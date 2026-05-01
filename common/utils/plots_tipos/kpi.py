@@ -18,7 +18,7 @@ class KPIStrategy(BaseKPIStrategy):
     Utiliza 'mostrar_periodo' como fonte para filtragem automática do último ano.
     """
 
-    def get_dataframe(self) -> pd.DataFrame:
+    def _get_raw_dataframe(self) -> pd.DataFrame:
         data = self.get_kpi_data()
         return pd.DataFrame([data])
 

@@ -19,7 +19,7 @@ class RangeAreaStrategy(XYBaseStrategy):
     - Tooltips individuais limpos.
     """
 
-    def get_dataframe(self) -> pd.DataFrame:
+    def _get_raw_dataframe(self) -> pd.DataFrame:
         """
         Busca os dados considerando dois campos Y (min e max) em vez de um.
         Trata explicitamente o caso de filtro 'None'/'Empty' para buscar campos nulos.

@@ -1,5 +1,6 @@
 from ..models import Work, WorkTopic, Institution
 from django.db.models import Q
+from .traducoes import OPENALEX_TRADUCOES
 
 # ==========================================
 # 1. PAINEL DE PRODUÇÃO
@@ -71,6 +72,8 @@ MAPEAMENTOS_PRODUCAO = {
         "filtros_padrao": {
             "ignorar_nulos": Q(worktopic__isnull=False)
         },
+
+        'substituicoes': OPENALEX_TRADUCOES
 
     },
 }

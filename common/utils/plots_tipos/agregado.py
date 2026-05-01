@@ -7,7 +7,7 @@ class AggregatedPlotStrategy(XYBaseStrategy):
     """
     Estratégia para plots agregados.
     """
-    def get_dataframe(self) -> pd.DataFrame:
+    def _get_raw_dataframe(self) -> pd.DataFrame:
         """
         [MÉTODO ATUALIZADO]
         Agora, ao calcular uma média (avg), também calcula a contagem (count)

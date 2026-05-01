@@ -128,10 +128,10 @@ class Dispatcher:
         if hasattr(strategy_instance, 'render'):
             return strategy_instance.render()
         
-        df = strategy_instance.get_dataframe()
+        df = strategy_instance.get_processed_dataframe()
 
         # ==========================================
-        # TRADUÇÃO GLOBAL de valores 
+        # TRADUÇÃO GLOBAL de valores - Camada de apresentacao dos dados (Não altera os valores do csv exportado)
         # ==========================================
         if not df.empty:
             df.replace({
@@ -462,7 +462,7 @@ class Dispatcher:
         strategy_instance = StrategyClass(mapeamento, filtros, self)
 
         # 4. Retorna o DataFrame bruto processado
-        return strategy_instance.get_dataframe()
+        return strategy_instance.get_processed_dataframe()
     
 
     # ==========================================================

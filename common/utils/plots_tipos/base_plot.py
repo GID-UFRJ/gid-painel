@@ -14,12 +14,28 @@ class BasePlotStrategy(ABC):
         self.plotter = plotter
 
     @abstractmethod
-    def get_dataframe(self) -> pd.DataFrame:
+    def _get_raw_dataframe(self) -> pd.DataFrame:
         """
-        Deve retornar um DataFrame do Pandas com os dados processados 
-        conforme os filtros e o mapeamento.
+        MÉTODO INTERNO: As classes filhas implementam as queries e retornam um 
+        DataFrame do Pandas com os dados processados conforme os filtros e o mapeamento.
         """
         pass
+
+    def get_processed_dataframe(self) -> pd.DataFrame:
+        """
+        MÉTODO PÚBLICO: Retorna o dado processado. É este método que será chamado para a exportação de CSV e geracao dos plots.
+        """
+        df = self._get_raw_dataframe()
+
+        if df.empty:
+            return df
+
+        # Aplica APENAS as traduções estruturais definidas no dicionário (ex: domínios, áreas)
+        traducoes_especificas = self.mapeamento.get('substituicoes')
+        if traducoes_especificas:
+            df.replace(traducoes_especificas, inplace=True)
+
+        return df
 
     @abstractmethod
     def generate_plot(self, df: pd.DataFrame, **kwargs):

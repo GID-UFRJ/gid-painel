@@ -13,7 +13,7 @@ class TopNStrategy(BasePlotStrategy):
     primeiros resultados para exibição em um gráfico de barras.
     """
 
-    def get_dataframe(self) -> pd.DataFrame:
+    def _get_raw_dataframe(self) -> pd.DataFrame:
         """
         Busca e prepara os dados para um gráfico Top N.
         """

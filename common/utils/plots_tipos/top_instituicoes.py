@@ -8,7 +8,7 @@ class TopInstituicoesStrategy(TopNStrategy):
     de negócio específica de siglas de instituições no final.
     """
 
-    def get_dataframe(self) -> pd.DataFrame:
+    def _get_raw_dataframe(self) -> pd.DataFrame:
         from django.db.models import Q
 
         # =======================================================
@@ -32,7 +32,7 @@ class TopInstituicoesStrategy(TopNStrategy):
         # =======================================================
         # 2. BUSCA NO BANCO DE DADOS
         # =======================================================
-        df = super().get_dataframe()
+        df = super().get_processed_dataframe()
 
         if df.empty: 
             return df

@@ -8,7 +8,7 @@ class MetricasImpactoStrategy(XYBaseStrategy):
     que exigem processamento em memória via Pandas.
     """
 
-    def get_dataframe(self) -> pd.DataFrame:
+    def _get_raw_dataframe(self) -> pd.DataFrame:
             queryset, _, _ = self.plotter._get_base_queryset(self.mapeamento['nome_plot'], self.filtros)
 
             # --- 1. SETUP DE VARIÁVEIS ---
