@@ -76,7 +76,7 @@ class MetricasImpactoStrategy(XYBaseStrategy):
             # Aplica toda a renomeação de uma só vez
             return df_final.rename(columns=colunas_renomear)
 
-    def generate_plot(self, df: pd.DataFrame, tipo_grafico: str, **kwargs) -> str:
+    def _build_figure(self, df: pd.DataFrame, tipo_grafico: str, **kwargs) -> str:
             """
             Intercepta a renderização para avisar a classe pai (XYBase) 
             qual é o nome dinâmico correto do Eixo Y.

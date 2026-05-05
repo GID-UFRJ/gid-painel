@@ -65,7 +65,7 @@ class HierarchicalPlotStrategy(BasePlotStrategy):
 
         return df
 
-    def generate_plot(self, df: pd.DataFrame, tipo_grafico: str, **kwargs) -> str:
+    def _build_figure(self, df: pd.DataFrame, tipo_grafico: str, **kwargs) -> str:
         """
         Implementação para pegar o DataFrame hierárquico e gerar o HTML do gráfico.
         """

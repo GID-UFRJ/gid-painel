@@ -93,7 +93,7 @@ class RangeAreaStrategy(XYBaseStrategy):
         df.rename(columns=rename_map, inplace=True)
         return df
 
-    def generate_plot(self, df: pd.DataFrame, **kwargs) -> str:
+    def _build_figure(self, df: pd.DataFrame, **kwargs) -> str:
         if df.empty:
             return "<p class='text-center text-muted mt-4'>Nenhum dado encontrado.</p>"
 

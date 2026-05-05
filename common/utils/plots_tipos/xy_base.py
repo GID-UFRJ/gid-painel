@@ -20,7 +20,7 @@ class XYBaseStrategy(BasePlotStrategy):
         """As classes filhas devem implementar sua própria forma de buscar dados."""
         raise NotImplementedError
 
-    def generate_plot(self, df: pd.DataFrame, tipo_grafico: str, **kwargs) -> str:
+    def _build_figure(self, df: pd.DataFrame, tipo_grafico: str, **kwargs) -> str:
             """
             [VERSÃO FINAL E CORRIGIDA]
             Prepara TODOS os parâmetros, gera o gráfico base e, em seguida, aplica

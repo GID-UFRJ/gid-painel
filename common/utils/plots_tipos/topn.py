@@ -54,7 +54,7 @@ class TopNStrategy(BasePlotStrategy):
 
         return df
 
-    def generate_plot(self, df: pd.DataFrame, tipo_grafico: str, **kwargs) -> str:
+    def _build_figure(self, df: pd.DataFrame, tipo_grafico: str, **kwargs) -> str:
         """
         Gera o HTML do gráfico Top N, agora com suporte nativo ao hover_config!
         """

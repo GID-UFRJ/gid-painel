@@ -104,6 +104,6 @@ class KPIStrategy(BaseKPIStrategy):
             "sufixo": mapeamento.get("sufixo", ""),
         }
 
-    def generate_plot(self, df: pd.DataFrame = None, **kwargs) -> str:
+    def _build_figure(self, df: pd.DataFrame = None, **kwargs) -> str:
         context = self.get_kpi_data()
         return render_to_string("common/partials/_card_kpi.html", context)

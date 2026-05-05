@@ -27,7 +27,7 @@ class EvolucaoColaboracaoStrategy(AggregatedPlotStrategy):
 
         return df
 
-    def generate_plot(self, df: pd.DataFrame, tipo_grafico: str, **kwargs) -> str:
+    def _build_figure(self, df: pd.DataFrame, tipo_grafico: str, **kwargs) -> str:
         tipo = getattr(self, '_tipo_selecionado', 'nacional')
         kwargs['titulo_override'] = "Colaborações Internacionais por Ano" if tipo == 'internacional' else "Colaborações Nacionais por Ano"
         return super().generate_plot(df, tipo_grafico, **kwargs)

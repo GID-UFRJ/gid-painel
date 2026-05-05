@@ -55,7 +55,7 @@ class TopInstituicoesStrategy(TopNStrategy):
     
         return df
         
-    def generate_plot(self, df: pd.DataFrame, tipo_grafico: str, **kwargs) -> str:
+    def _build_figure(self, df: pd.DataFrame, tipo_grafico: str, **kwargs) -> str:
         coluna_eixo_y = self.mapeamento.get("eixo_y_nome", "Instituição")
         
         # 1. Coloca o nome oficial completo no topo do hover em negrito

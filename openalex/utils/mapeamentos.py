@@ -35,6 +35,7 @@ MAPEAMENTOS_PRODUCAO = {
         "filtros_padrao": {},
         "labels_customizadas": {
             "dominio": "Domínio",
+            "autor_correspondente": "Autor correspondente da UFRJ",
         },
         "queries_condicionais": {
             "tipo_documento": "com_tipo_documento_agrupado",

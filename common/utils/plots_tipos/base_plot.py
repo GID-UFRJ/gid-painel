@@ -13,14 +13,9 @@ class BasePlotStrategy(ABC):
         self.filtros = filtros if filtros is not None else {}
         self.plotter = plotter
 
-    @abstractmethod
-    def _get_raw_dataframe(self) -> pd.DataFrame:
-        """
-        MÉTODO INTERNO: As classes filhas implementam as queries e retornam um 
-        DataFrame do Pandas com os dados processados conforme os filtros e o mapeamento.
-        """
-        pass
-
+    # ==========================================================
+    # PIPELINE DE DADOS (DATAFRAME)
+    # ==========================================================
     def get_processed_dataframe(self) -> pd.DataFrame:
         """
         MÉTODO PÚBLICO: Retorna o dado processado. É este método que será chamado para a exportação de CSV e geracao dos plots.
@@ -38,9 +33,27 @@ class BasePlotStrategy(ABC):
         return df
 
     @abstractmethod
+    def _get_raw_dataframe(self) -> pd.DataFrame:
+        """
+        MÉTODO INTERNO: As classes filhas implementam as queries e retornam um 
+        DataFrame do Pandas com os dados processados conforme os filtros e o mapeamento.
+        """
+        pass
+
+    # ==========================================================
+    # PIPELINE VISUAL (PLOTS)
+    # ==========================================================
     def generate_plot(self, df: pd.DataFrame, **kwargs):
         """
-        Recebe o DataFrame e retorna a representação visual do gráfico
-        (geralmente um JSON para Plotly/Chart.js ou HTML).
+        MÉTODO PÚBLICO: Orquestra a injeção de cores e configurações globais
+        antes de mandar a classe filha renderizar o gráfico.
+        """
+        return self._build_figure(df, **kwargs)
+
+    @abstractmethod
+    def _build_figure(self, df: pd.DataFrame, **kwargs):
+        """
+        MÉTODO INTERNO: Recebe o DataFrame e os parâmetros enriquecidos pela 
+        BasePlotStrategy e retorna a representação visual final.
         """
         pass
