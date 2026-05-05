@@ -90,4 +90,4 @@ class MetricasImpactoStrategy(XYBaseStrategy):
             kwargs["eixo_y_override"] = nome_eixo_y
             
             # 3. Chama o garçom (a classe pai XYBaseStrategy) passando o recado!
-            return super().generate_plot(df, tipo_grafico, **kwargs)
+            return super()._build_figure(df, tipo_grafico, **kwargs)

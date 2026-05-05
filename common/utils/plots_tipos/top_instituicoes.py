@@ -67,4 +67,4 @@ class TopInstituicoesStrategy(TopNStrategy):
             coluna_eixo_y: False
         }
         
-        return super().generate_plot(df, tipo_grafico, **kwargs)
+        return super()._build_figure(df, tipo_grafico, **kwargs)
