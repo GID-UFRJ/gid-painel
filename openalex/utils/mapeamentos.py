@@ -19,7 +19,7 @@ MAPEAMENTOS_PRODUCAO = {
         "eixo_y_nome": "Número de publicações",
         "eixo_y_agregacao": "count",
         #"paleta_cores": ['#004a80', '#d32f2f', '#b0bec5', '#2ca02c'],
-        "paleta": ['#2ca02c', '#ff7f0e', '#9467bd', '#1f77b4'],
+        #"paleta": ['#2ca02c', '#ff7f0e', '#9467bd', '#1f77b4'],
         # Mapeamos os filtros reativos (HTMX) aqui:
         "agrupamentos": {
             "acesso_aberto": "is_oa",
@@ -40,6 +40,8 @@ MAPEAMENTOS_PRODUCAO = {
             "tipo_documento": "com_tipo_documento_agrupado",
             "autor_correspondente": "autor_correspondente_ufrj"
         },
+
+        'substituicoes': OPENALEX_TRADUCOES
     },
 
     # 2. Distribuição temática por artigo
@@ -117,6 +119,8 @@ MAPEAMENTOS_IMPACTO = {
         "labels_customizadas": {
             "dominio": "Domínio",
         },
+
+        'substituicoes': OPENALEX_TRADUCOES
     },
 }
 
@@ -151,7 +155,7 @@ MAPEAMENTOS_COLABORACAO = {
             "dominio": "worktopic__topic__domain_name",
         },
         "labels_customizadas": {
-            "acesso_aberto": "Acesso Aberto",
+            "acesso_aberto": "Acesso aberto",
             "tipo_documento": "Tipo de Documento",
             "dominio": "Domínio"
         },
@@ -159,6 +163,7 @@ MAPEAMENTOS_COLABORACAO = {
             "tipo_documento": "com_tipo_documento_agrupado",
         },
 
+        'substituicoes': OPENALEX_TRADUCOES
     },
 
     # 2. Top Instituições (Usa a nova Strategy e o modelo Institution!)

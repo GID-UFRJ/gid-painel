@@ -1,6 +1,19 @@
 # traducoes.py (ou constants.py)
 
 OPENALEX_TRADUCOES = {
+    'Tipo documento': {
+        'article': 'Artigo',
+        'book-chapter': 'Capítulo de Livro',
+        'book': 'Livro',
+        'review': 'Artigo de Revisão',
+        'editorial': 'Editorial',
+        'letter': 'Carta',
+        'erratum': 'Errata',
+        'dataset': 'Conjunto de Dados',
+        'preprint': 'Preprint',
+        'others': 'Outros',
+    },
+
     # ==========================================
     # 1. DOMÍNIOS (4 Níveis Principais)
     # ==========================================

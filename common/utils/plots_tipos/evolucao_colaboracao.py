@@ -19,19 +19,11 @@ class EvolucaoColaboracaoStrategy(AggregatedPlotStrategy):
         else:
             self.filtros["tem_colab_nacional"] = True
 
-        df = super().get_processed_dataframe()
+        df = super()._get_raw_dataframe()
 
         if df.empty:
             return df
 
-        agrupamento = self.filtros.get("agrupamento")
-        if agrupamento == "acesso_aberto":
-            coluna_grupo = self.mapeamento.get('labels_customizadas', {}).get("acesso_aberto", "Acesso Aberto")
-            if coluna_grupo in df.columns:
-                df[coluna_grupo] = df[coluna_grupo].map({
-                    True: 'Acesso Aberto', False: 'Acesso Fechado',
-                    'True': 'Acesso Aberto', 'False': 'Acesso Fechado'
-                })
 
         return df
 

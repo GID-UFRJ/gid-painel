@@ -32,7 +32,7 @@ class TopInstituicoesStrategy(TopNStrategy):
         # =======================================================
         # 2. BUSCA NO BANCO DE DADOS
         # =======================================================
-        df = super().get_processed_dataframe()
+        df = super()._get_raw_dataframe()
 
         if df.empty: 
             return df
