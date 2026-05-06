@@ -239,7 +239,7 @@ class Command(BaseCommand):
                     defaults={
                         'st_ingressante': row['ST_INGRESSANTE'].upper() == 'S',
                         'situacao': situacao,
-                        'qt_mes_titulacao': int(row['QT_MES_TITULACAO'] or 0),
+                        'qt_mes_titulacao': int(row['QT_MES_TITULACAO'] or 0), #Espera um integer
                         'faixa_etaria': faixa_etaria,
                     }
                 )
