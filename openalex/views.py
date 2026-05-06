@@ -25,7 +25,7 @@ def producao(request):
     # 2. Geramos os gráficos
     html_producao_ano = p.generate_plot_html(
         nome_plot='producao_por_ano', 
-        filtros_selecionados={'ano_inicial': 1990, 'ano_final': 2024}
+        filtros_selecionados={'ano_inicial': 2013, 'ano_final': 2024}
     )
     
     html_distribuicao = p.generate_plot_html(
