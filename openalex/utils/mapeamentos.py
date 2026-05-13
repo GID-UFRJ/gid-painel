@@ -68,6 +68,7 @@ MAPEAMENTOS_PRODUCAO = {
         "grafico_hierarquico_agregacao": "count",
     
         "tipo_grafico_padrao": "sunburst",
+
         "filtros": {
             "ano_inicial": "pubyear__year__gte",
             "ano_final": "pubyear__year__lte",
@@ -76,7 +77,8 @@ MAPEAMENTOS_PRODUCAO = {
             "ignorar_nulos": Q(worktopic__isnull=False)
         },
 
-        'substituicoes': OPENALEX_TRADUCOES
+        'substituicoes': OPENALEX_TRADUCOES,
+        "colorir_alfabeticamente_por": "Domínio",
 
     },
 }
