@@ -25,6 +25,7 @@ class RangeAreaStrategy(XYBaseStrategy):
         Trata explicitamente o caso de filtro 'None'/'Empty' para buscar campos nulos.
         Aplica filtros padrão do mapeamento para evitar duplicidade de nomes (QS Acadêmico vs QS Sustentabilidade).
         """
+
         filtros_modificados = self.filtros.copy()
 
         # --- 1. MERGE DE DEFAULTS ---
@@ -33,16 +34,17 @@ class RangeAreaStrategy(XYBaseStrategy):
             if chave not in filtros_modificados:
                 filtros_modificados[chave] = valor
 
-        # --- 2. BLINDAGEM DO ODS ---
-        # Tenta pegar o valor de qualquer jeito que o motor possa ter enviado
-        valor_ods = filtros_modificados.get('ods__codigo') or filtros_modificados.get('ods')
+        # --- 2. BLINDAGEM DO ODS (Totalmente Dinâmica) ---
+        # Acha dinamicamente a chave da URL (ex: 'ods') que mapeia para 'ods__codigo'
+        chave_ods = next((k for k, v in self.mapeamento.get("filtros", {}).items() if v == "ods__codigo"), None)
 
-        # Se for vazio, string vazia, ou "None", nós padronizamos para None
-        if valor_ods in ['None', '', None]:
-            valor_ods = None
-            # Limpamos o dicionário para a query base não tentar filtrar por vazio
-            filtros_modificados.pop('ods__codigo', None)
-            filtros_modificados.pop('ods', None)
+        valor_ods = None
+        if chave_ods:
+            valor_ods = filtros_modificados.get(chave_ods)
+            # Se for vazio, string vazia, ou "None", nós padronizamos para None
+            if valor_ods in ['None', '', None]:
+                valor_ods = None
+                filtros_modificados.pop(chave_ods, None) # Limpa usando a chave dinâmica
 
         # --- 3. QUERY BASE ---
         queryset, _, _ = self.plotter._get_base_queryset(
@@ -51,9 +53,8 @@ class RangeAreaStrategy(XYBaseStrategy):
         )
 
         # --- 4. A CURA DO ZIGUE-ZAGUE ---
-        # Se NÃO tem um ODS selecionado, nós TEMOS que filtrar só os nulos (Visão Geral),
-        # caso contrário ele plota os 17 ODSs no mesmo ano formando linhas verticais.
-        if not valor_ods:
+        # Se a estratégia tiver ODS (chave_ods existe) E o usuário não filtrou nada, trava no Geral
+        if chave_ods and not valor_ods:
             queryset = queryset.filter(ods__isnull=True)
 
         # --- 5. PREPARAÇÃO DOS CAMPOS (O resto continua igual...) ---
