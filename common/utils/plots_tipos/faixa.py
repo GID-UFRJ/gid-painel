@@ -28,21 +28,21 @@ class RangeAreaStrategy(XYBaseStrategy):
         filtros_modificados = self.filtros.copy()
 
         # --- 1. MERGE DE DEFAULTS ---
-        # Garante que temos todos os valores antes de testá-os
         defaults = self.mapeamento.get("filtros_padrao", {})
         for chave, valor in defaults.items():
             if chave not in filtros_modificados:
                 filtros_modificados[chave] = valor
 
-        # --- 2. TRATAMENTO DE FILTROS ESPECIAIS (ODS NULO) ---
-        valor_ods = filtros_modificados.get('ods')
-        filtrar_apenas_nulos = False
+        # --- 2. BLINDAGEM DO ODS ---
+        # Tenta pegar o valor de qualquer jeito que o motor possa ter enviado
+        valor_ods = filtros_modificados.get('ods__codigo') or filtros_modificados.get('ods')
 
-        # Como os defaults já foram mesclados, se o mapeamento mandar 'None', ele cai aqui!
-        if valor_ods == 'None' or valor_ods == '':
-            if 'ods' in filtros_modificados:
-                del filtros_modificados['ods']
-            filtrar_apenas_nulos = True
+        # Se for vazio, string vazia, ou "None", nós padronizamos para None
+        if valor_ods in ['None', '', None]:
+            valor_ods = None
+            # Limpamos o dicionário para a query base não tentar filtrar por vazio
+            filtros_modificados.pop('ods__codigo', None)
+            filtros_modificados.pop('ods', None)
 
         # --- 3. QUERY BASE ---
         queryset, _, _ = self.plotter._get_base_queryset(
@@ -50,12 +50,13 @@ class RangeAreaStrategy(XYBaseStrategy):
             filtros_modificados
         )
 
-        # --- 4. APLICAÇÃO DO FILTRO ISNULL ---
-        if filtrar_apenas_nulos:
+        # --- 4. A CURA DO ZIGUE-ZAGUE ---
+        # Se NÃO tem um ODS selecionado, nós TEMOS que filtrar só os nulos (Visão Geral),
+        # caso contrário ele plota os 17 ODSs no mesmo ano formando linhas verticais.
+        if not valor_ods:
             queryset = queryset.filter(ods__isnull=True)
 
-
-        # --- 5. PREPARAÇÃO DOS CAMPOS ---
+        # --- 5. PREPARAÇÃO DOS CAMPOS (O resto continua igual...) ---
         eixo_x = self.mapeamento["eixo_x_campo"]
         y_min = self.mapeamento["eixo_y_min"]
         y_max = self.mapeamento["eixo_y_max"]

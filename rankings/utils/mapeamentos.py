@@ -57,7 +57,7 @@ ranking_sustentabilidade_faixa.update({
     "filtros_padrao": {
         "tipo_ranking": "SUSTENTABILIDADE",
         "ranking_nome": "THE IMPACT", 
-        "ods__isnull": True,
+        #"ods__isnull": True,
         "ano_inicial": 2019,
         "ano_final": ano_atual,
         "escopo": "MUNDO",
