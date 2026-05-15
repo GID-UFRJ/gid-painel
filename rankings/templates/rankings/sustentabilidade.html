@@ -4,25 +4,20 @@
 
 {% block conteudo %}
 
+<div class="container mt-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="mb-4">
         <h1>Rankings de Sustentabilidade</h1>
-        <a href="{% url 'rankings:index' %}" class="btn btn-outline-secondary btn-sm">
-            <i class="fas fa-arrow-left"></i> Voltar
-        </a>
+        {# <p class="lead">Dados sobre os Programas de Pós-Graduação da UFRJ considerados em conjunto.</p> #}
     </div>
 
-    <div class="card border-0 shadow">
-        <div class="card-body">
-            {# Configuração do gráfico - NOME ATUALIZADO AQUI #}
-            {% url 'rankings:grafico_generico' nome_plot='sustentabilidade_faixa' as url_sustentabilidade %}
-            
-            {# Chamada da Tag #}
-            {% render_filtros_rankings "sustentabilidade" url_sustentabilidade "plot-sust" "spin-sust" evolucao_sustentabilidade_plot plotter_name="rankings" nome_plot="sustentabilidade_faixa" %}
-        </div>
-    </div>
-{% endblock %}
+    <hr class="my-2">
 
-{% block extra_js %}
-    <script src="{% static 'common/js/rankings.js' %}"></script>
+    {# Configuração do gráfico - NOME ATUALIZADO AQUI #}
+    {% url 'rankings:grafico_generico' nome_plot='sustentabilidade_faixa' as url_sustentabilidade %}
+    
+    {# Chamada da Tag #}
+    {% render_filtros_rankings "sustentabilidade" url_sustentabilidade "plot-sust" "spin-sust" evolucao_sustentabilidade_plot plotter_name="rankings" nome_plot="sustentabilidade_faixa" %}
+
+</div>
 {% endblock %}

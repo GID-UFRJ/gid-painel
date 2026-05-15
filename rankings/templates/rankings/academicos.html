@@ -3,20 +3,20 @@
 
 {% block conteudo %}
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container mt-4">
+
+    <div class="mb-4">
         <h1>Rankings Acadêmicos</h1>
-        <a href="{% url 'rankings:index' %}" class="btn btn-outline-secondary btn-sm">
-            <i class="fas fa-arrow-left"></i> Voltar
-        </a>
+        {# <p class="lead">Dados sobre os Programas de Pós-Graduação da UFRJ considerados em conjunto.</p> #}
     </div>
 
-    <div class="card border-0 shadow">
-        <div class="card-body">
-            {# 1. Mude 'evolucao_academico' para 'academico_faixa' #}
-            {% url 'rankings:grafico_generico' nome_plot='academico_faixa' as url_academico %}
-        
-            {# 2. Agora o url_academico e o nome_plot estão em sintonia #}
-            {% render_filtros_rankings "academico" url_academico "plot-academico" "spin-academico" evolucao_academico_plot plotter_name="rankings" nome_plot="academico_faixa" %}
-        </div>
-    </div>
+    <hr class="my-2">
+
+    {# 1. Mude 'evolucao_academico' para 'academico_faixa' #}
+    {% url 'rankings:grafico_generico' nome_plot='academico_faixa' as url_academico %}
+
+    {# 2. Agora o url_academico e o nome_plot estão em sintonia #}
+    {% render_filtros_rankings "academico" url_academico "plot-academico" "spin-academico" evolucao_academico_plot plotter_name="rankings" nome_plot="academico_faixa" %}
+
+</div>
 {% endblock %}
