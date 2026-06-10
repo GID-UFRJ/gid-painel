@@ -37,9 +37,9 @@ class Dispatcher:
         'sim_nao': ['Sim', 'Não'], 
         'sexo': ['Masculino', 'Feminino', 'Desconhecido'],
         'faixa_etaria': [
-            '19 OU MENOS', '20 A 24 ANOS', '25 A 29 ANOS', '30 A 34 ANOS',
+            'ATÉ 24 ANOS', '25 A 29 ANOS', '30 A 34 ANOS',
             '35 A 39 ANOS', '40 A 44 ANOS', '45 A 49 ANOS', '50 A 54 ANOS',
-            '55 A 59 ANOS', '60 A 64 ANOS', '65 A 69 ANOS', '70 OU MAIS'
+            '55 A 59 ANOS', '60 A 64 ANOS', '65 OU MAIS'
         ],
         'conceito': ['0', '1', '2', '3', '4', '5', '6', '7']
     }
@@ -77,6 +77,7 @@ class Dispatcher:
             '#AF7AA1', # [6] Roxo Púrpura
             '#FF9DA7', # [7] Rosa Claro
             '#9C755F', # [8] Marrom
+            '#BAB0AC', # [9] Cinza
         ],
     }
 

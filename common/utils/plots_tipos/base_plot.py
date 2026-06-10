@@ -30,6 +30,35 @@ class BasePlotStrategy(ABC):
         if traducoes_especificas:
             df.replace(traducoes_especificas, inplace=True)
 
+            if self.mapeamento.get('reagrupar_apos_substituicao', False):
+                
+                nome_y_agregado = self.mapeamento.get('eixo_y_nome')
+                nome_y_ranking = self.mapeamento.get('ranking_campo_valor_alias')
+                nome_y_hierarquico = self.mapeamento.get('grafico_hierarquico_values_nome', 'Total')
+                
+                tipo_agregacao = self.mapeamento.get('eixo_y_agregacao', self.mapeamento.get('grafico_hierarquico_agregacao', 'count')).lower()
+                
+                possiveis_metricas = [nome_y_agregado, nome_y_ranking, nome_y_hierarquico, 'Contagem', 'total']
+                colunas_para_somar = [col for col in possiveis_metricas if col and col in df.columns]
+                
+                if colunas_para_somar:
+                    colunas_agrupamento = [col for col in df.columns if col not in colunas_para_somar]
+                    
+                    try:
+                        for col in colunas_para_somar:
+                            df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+                            
+                        if 'avg' in tipo_agregacao and 'Contagem' in df.columns and nome_y_agregado:
+                            df['_soma_bruta'] = df[nome_y_agregado] * df['Contagem']
+                            df = df.groupby(colunas_agrupamento, as_index=False)[['_soma_bruta', 'Contagem']].sum()
+                            df[nome_y_agregado] = df['_soma_bruta'] / df['Contagem']
+                            df.drop(columns=['_soma_bruta'], inplace=True)
+                        else:
+                            df = df.groupby(colunas_agrupamento, as_index=False)[colunas_para_somar].sum()
+                            
+                    except Exception as e:
+                        print(f"⚠️ Erro ao tentar reagrupar DataFrame: {e}")
+
         return df
 
     @abstractmethod

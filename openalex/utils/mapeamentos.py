@@ -194,7 +194,12 @@ MAPEAMENTOS_COLABORACAO = {
             # O UFRJ_ID (se precisar excluir a própria UFRJ do ranking de colaborações)
             "filtros_padrao": {
                 # Descomente e ajuste se não quiser que a UFRJ apareça em 1º lugar no próprio painel
-                "excluir_ufrj": ~Q(institution_id="I122140584"),
+                "excluir_ufrj": ~Q(institution_id__in=[
+                    "I122140584",
+                    "I4210138087",
+                    "I4210148226"                
+                    ]
+                ),
             },
 
             "hover_config": {

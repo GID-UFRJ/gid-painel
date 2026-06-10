@@ -2,6 +2,7 @@
 
 from sucupira.models import Discente, Docente, AnoPrograma, FaixaEtaria
 from django.db.models import Q
+from .traducoes import SUCUPIRA_TRADUCOES
 
 # =============================================================================
 # RECEITAS DE GRÁFICOS - Versão Final com Configuração Unificada
@@ -35,6 +36,10 @@ MAPEAMENTOS_DISCENTES = {
             "nacionalidade": "pessoa__tipo_nacionalidade__ds_tipo_nacionalidade",
             "faixa_etaria": "faixa_etaria__ds_faixa_etaria",
         },
+
+        'substituicoes': SUCUPIRA_TRADUCOES,
+        'reagrupar_apos_substituicao': True,
+
     },
 
     "discentes_por_area_sunburst" : {
@@ -101,6 +106,10 @@ MAPEAMENTOS_DOCENTES = {
             "nacionalidade": "pessoa__tipo_nacionalidade__ds_tipo_nacionalidade",
             "faixa_etaria": "faixa_etaria__ds_faixa_etaria",
         },
+
+        'substituicoes': SUCUPIRA_TRADUCOES,
+        'reagrupar_apos_substituicao': True,
+
     },
 
 
