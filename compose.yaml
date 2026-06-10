@@ -15,6 +15,8 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT}
+      # Dump para atualizacao
+      - DUMP_URL=${DUMP_URL}
     volumes:
       # Certifique-se de que o diretório de arquivos estáticos esteja montado
       # para o Caddy poder servi-los diretamente.
@@ -22,6 +24,8 @@ services:
       - ./importar:/app/importar
       - .:/app #acrescentado posteriormente.
       - ./dump:/app/dump #também acrescentei
+    ports: 
+      - 8001:${DJANGO_PORT}
     depends_on:
       postgres:
         condition: service_healthy # Espera o DB estar saudável
@@ -45,6 +49,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    ports: 
+      - 5433:5432
     restart: "on-failure"
 
   redis:
@@ -117,6 +123,20 @@ services:
       gid-painel:
         condition: service_started # Caddy precisa que o Django esteja rodando
     restart: "unless-stopped" # Reinicia sempre, a menos que seja parado explicitamente
+
+  watchtower:
+      image: nickfedor/watchtower:latest
+      restart: always
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+      environment:
+        - TZ=America/Sao_Paulo
+        # Busca atualizacao todo domingo 3 da manhã
+        - WATCHTOWER_SCHEDULE=0 0 3 * * 0 
+        # Liga a faxina automática!
+        - WATCHTOWER_CLEANUP=true
+
+
 
 volumes:
   static_volume:

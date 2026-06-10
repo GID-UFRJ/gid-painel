@@ -1,0 +1,16 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+    <div style="margin-bottom: 30px; background: #fff; padding: 20px; border-left: 5px solid #79aec8; box-shadow: 0 1px 3px rgba(0,0,0,.1);">
+        <h2 style="margin-top: 0; color: #333;">Sincronização de Dados</h2>
+        <p style="font-size: 14px; color: #666; margin-bottom: 15px;">
+            Clique no botão abaixo para descarregar a base de dados pública mais recente e atualizar os indicadores do painel. A operação ocorre em segundo plano.
+        </p>
+        <a href="{% url 'sincronizar_dados' %}" 
+           style="background-color: #417690; color: white; padding: 10px 15px; font-weight: bold; border-radius: 4px; text-decoration: none; display: inline-block;">
+           ⬇️ Sincronizar Base de Dados
+        </a>
+    </div>
+
+    {{ block.super }}
+{% endblock %}

@@ -16,8 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from common.views import sincronizar_view
 
 urlpatterns = [
+    path('admin/sincronizar/', sincronizar_view, name='sincronizar_dados'),
     path('admin/', admin.site.urls),
     path('', include('common.urls')), # Verifique se esta linha existe
     path('', include('homepage.urls', namespace='homepage')),
