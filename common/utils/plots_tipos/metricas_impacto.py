@@ -36,6 +36,7 @@ class MetricasImpactoStrategy(XYBaseStrategy):
             operacoes = {
                 'total_citacoes': lambda: df.groupby(grupo_cols)[campo_valor].sum(),
                 'media': lambda: df.groupby(grupo_cols)[campo_valor].mean().round(2),
+                'mediana': lambda: df.groupby(grupo_cols)[campo_valor].median().round(2),
                 'hindex': lambda: df.groupby(grupo_cols)[campo_valor].apply(calculate_h_index),
                 'total_citacoes_acumuladas': lambda: df.groupby(grupo_cols)[campo_valor].sum().groupby(level=campo_grupo).cumsum() if campo_grupo else df.groupby(grupo_cols)[campo_valor].sum().cumsum()
             }

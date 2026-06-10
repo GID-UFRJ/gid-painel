@@ -68,6 +68,7 @@ def render_filtros_producao(context, tipo, url_grafico, grafico_id, spinner_id, 
         ctx["metricas_disponiveis"] = {
             'Total de Citações': 'total_citacoes',
             'Média de Citações': 'media',
+            'Mediana de Citações': 'mediana',
             'Citações Acumuladas': 'total_citacoes_acumuladas',
             'Índice H': 'hindex',
         }
