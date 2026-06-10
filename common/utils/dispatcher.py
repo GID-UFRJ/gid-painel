@@ -18,6 +18,7 @@ from .plots_tipos.ranking_kpi import RankingKPIStrategy
 from .plots_tipos.metricas_impacto import MetricasImpactoStrategy
 from .plots_tipos.top_instituicoes import TopInstituicoesStrategy
 from .plots_tipos.evolucao_colaboracao import EvolucaoColaboracaoStrategy
+from .plots_tipos.distribuicao import DistribuicaoStrategy
 
 class Dispatcher:
     STRATEGY_MAPPING = {
@@ -31,6 +32,7 @@ class Dispatcher:
         'impacto': MetricasImpactoStrategy,
         'top_instituicoes': TopInstituicoesStrategy,    
         'evolucao_colaboracao': EvolucaoColaboracaoStrategy, 
+        'distribuicao': DistribuicaoStrategy
     }
 
     CATEGORY_ORDERS = {

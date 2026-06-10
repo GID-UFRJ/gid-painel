@@ -111,37 +111,53 @@ def render_filtros_producao(context, tipo, url_grafico, grafico_id, spinner_id, 
         ]
 
     elif tipo == "top_instituicoes":
-            # Pegamos a URL atual para saber o que o usuário escolheu
-            request = context['request']
-            
-            ctx["filtros_genericos"] = [
-                {
-                    "id": "abrangencia", # Sufixo do ID do HTML
-                    "name": "tipo_colaboracao", # O parâmetro que vai pra URL
-                    "label": "Abrangência",
-                    "col_class": "col-md-3",
-                    "opcoes": {
-                        'Nacional': 'nacional',
-                        'Internacional': 'internacional',
-                    },
-                    # Pega o valor da URL, se não existir, usa 'nacional' como padrão
-                    "selecionado": request.GET.get('tipo_colaboracao', 'nacional') 
+        # Pegamos a URL atual para saber o que o usuário escolheu
+        request = context['request']
+        
+        ctx["filtros_genericos"] = [
+            {
+                "id": "abrangencia", # Sufixo do ID do HTML
+                "name": "tipo_colaboracao", # O parâmetro que vai pra URL
+                "label": "Abrangência",
+                "col_class": "col-md-3",
+                "opcoes": {
+                    'Nacional': 'nacional',
+                    'Internacional': 'internacional',
                 },
-                {
-                    "id": "limite",
-                    "name": "limite",
-                    "label": "Mostrar",
-                    "col_class": "col-md-2",
-                    "opcoes": {
-                        'Top 5': '5',
-                        'Top 10': '10',
-                        'Top 20': '20',
-                        'Top 50': '50',
-                    },
-                    # Pega o valor da URL, se não existir, usa '10' como padrão
-                    "selecionado": request.GET.get('limite', '10')
-                }
-            ]
+                # Pega o valor da URL, se não existir, usa 'nacional' como padrão
+                "selecionado": request.GET.get('tipo_colaboracao', 'nacional') 
+            },
+            {
+                "id": "limite",
+                "name": "limite",
+                "label": "Mostrar",
+                "col_class": "col-md-2",
+                "opcoes": {
+                    'Top 5': '5',
+                    'Top 10': '10',
+                    'Top 20': '20',
+                    'Top 50': '50',
+                },
+                # Pega o valor da URL, se não existir, usa '10' como padrão
+                "selecionado": request.GET.get('limite', '10')
+            }
+        ]
+
+    elif tipo == "distribuicao_citacoes":
+        # Para um histograma, precisamos do período de tempo e, opcionalmente, 
+        # como o usuário quer fatiar/colorir essas barras (ex: por Acesso Aberto)
+        lista_de_filtros = [
+            f"{PATH_FILTROS_ATOMICOS}_filtro_ano_inicial.html",
+            f"{PATH_FILTROS_ATOMICOS}_filtro_ano_final.html",
+            f"{PATH_FILTROS_ATOMICOS}_filtro_agrupamento.html",
+        ]
+        
+        # Agrupamentos permitidos para o Histograma de Citações
+        # (Isso vai criar as barras empilhadas ou agrupadas dentro de cada "Bin")
+        agrupamentos_disponiveis = {
+            'Acesso Aberto': 'acesso_aberto',
+            'Domínio': 'dominio', 
+        }
 
     ctx['lista_de_filtros'] = lista_de_filtros
     ctx['agrupamentos_disponiveis'] = agrupamentos_disponiveis

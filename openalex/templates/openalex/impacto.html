@@ -17,4 +17,8 @@
     {% render_filtros_producao tipo="citacoes_por_ano" url_grafico="/pesquisa/graficos/citacoes_por_ano/" grafico_id="plot-citacoes" spinner_id="spinner-citacoes" grafico_html=graf_01 plotter_name="openalex" nome_plot="citacoes_por_ano" %}
 </div>
 
+<div class="card-body">
+    {% render_filtros_producao tipo="distribuicao_citacoes" url_grafico="/pesquisa/graficos/distribuicao_citacoes/" grafico_id="plot-distribuicao" spinner_id="spinner-distribuicao" grafico_html=graf_02 plotter_name="openalex" nome_plot="distribuicao_citacoes" %}
+</div>
+
 {% endblock %}

@@ -1,6 +1,7 @@
 from ..models import Work, WorkTopic, Institution
 from django.db.models import Q
 from .traducoes import OPENALEX_TRADUCOES
+import numpy as np
 
 # ==========================================
 # 1. PAINEL DE PRODUÇÃO
@@ -93,7 +94,7 @@ MAPEAMENTOS_IMPACTO = {
         "estrategia_plot": "impacto",  # Aponta para a nossa nova Strategy
         "tipo_grafico_padrao": "linha", 
         "modelo": Work, 
-        "titulo_base": "Evolução do Impacto",
+        "titulo_base": "Evolução do Impacto de artigos",
     
         "eixo_x_campo": "pubyear__year",
         "eixo_x_nome": "Ano de Publicação",
@@ -114,6 +115,11 @@ MAPEAMENTOS_IMPACTO = {
             "metrica": None, # [total_citacoes, media, total_citacoes_acumuladas, hindex]
         },
 
+        "filtros_padrao": {
+            # O ORM traduz isso para: WHERE worktype IN ('article', 'review')
+            "worktype__worktype__in": ["article", "review"],
+        },
+
         "agrupamentos": {
             "dominio": "worktopic__topic__domain_name", 
             "acesso_aberto": "is_oa",
@@ -124,6 +130,44 @@ MAPEAMENTOS_IMPACTO = {
         },
 
         'substituicoes': OPENALEX_TRADUCOES,
+    },
+
+    "distribuicao_citacoes" : {
+        "nome_plot": "distribuicao_citacoes",
+        "estrategia_plot": "distribuicao", # <-- Aponta para a nova Strategy
+        "tipo_grafico_padrao": "barra",    # Um histograma categórico é basicamente um gráfico de barras
+        "modelo": Work, 
+        "titulo_base": "Distribuição de Artigos",
+    
+        "eixo_x_campo": "cited_by_count", # O dado cru que vamos fatiar
+        "eixo_x_nome": "Faixa de Citações",
+    
+        "eixo_y_nome": "Número de Artigos",
+
+        "filtros": {
+            "ano_inicial": "pubyear__year__gte",
+            "ano_final": "pubyear__year__lte",
+        },
+
+
+        "filtros_padrao": {
+            # O ORM traduz isso para: WHERE worktype IN ('article', 'review')
+            "worktype__worktype__in": ["article", "review"],
+        },
+
+        # Podemos permitir que o usuário veja a distribuição colorida por Acesso Aberto, por exemplo
+        "agrupamentos": {
+            "acesso_aberto": "is_oa",
+            "dominio": "worktopic__topic__domain_name"
+        },
+
+        "labels_customizadas": {
+            "dominio": "Domínio",
+        },
+
+        "distribuicao_bins": [-1, 0] + list(range(5, 101, 5)) + [np.inf],
+        "distribuicao_labels": ['0'] + [f"{i-4}-{i}" for i in range(5, 101, 5)] + ['> 100'],
+
     },
 }
 

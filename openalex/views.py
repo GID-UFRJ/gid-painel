@@ -61,6 +61,10 @@ def impacto(request):
             nome_plot='citacoes_por_ano', 
             filtros_selecionados=filtros_iniciais_grafico,
         ),
+        # Gráfico Secundário (distribuicao)
+        'graf_02': p.generate_plot_html(
+            nome_plot="distribuicao_citacoes", 
+            filtros=request.GET),
         'plotter': p, #Usado APENAS para mostrar o sumário dos plots
     }
 
