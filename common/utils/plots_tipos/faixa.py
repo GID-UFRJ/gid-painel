@@ -209,8 +209,8 @@ class RangeAreaStrategy(XYBaseStrategy):
             yaxis=dict(autorange="reversed") if self.mapeamento.get('eixo_y_invertido', False) else {}
         )
 
-        config = {"responsive": True, "displaylogo": False}
-        return fig.to_html(full_html=False, include_plotlyjs="cdn", config=config)
+        #Retorna o objeto fig
+        return fig
 
     def _hex_to_rgba(self, hex_color, alpha):
         """Método utilitário para converter cor Hex para RGBA com transparência."""

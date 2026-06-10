@@ -123,7 +123,7 @@ MAPEAMENTOS_IMPACTO = {
             "dominio": "Domínio",
         },
 
-        'substituicoes': OPENALEX_TRADUCOES
+        'substituicoes': OPENALEX_TRADUCOES,
     },
 }
 

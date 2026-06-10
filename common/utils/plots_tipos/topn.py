@@ -96,6 +96,5 @@ class TopNStrategy(BasePlotStrategy):
             fig.update_yaxes(**yaxes_config)
         # ==========================================================
 
-        # 4. Renderiza o HTML final
-        config = {"responsive": True, "displaylogo": False}
-        return fig.to_html(full_html=False, include_plotlyjs="cdn", config=config)
+        #Retorna o objeto fig
+        return fig

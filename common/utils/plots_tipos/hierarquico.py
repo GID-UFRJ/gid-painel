@@ -127,5 +127,5 @@ class HierarchicalPlotStrategy(BasePlotStrategy):
                     xanchor="center"
                 )
     
-            # Renderiza o HTML final
-            return fig.to_html(full_html=False, include_plotlyjs="cdn", config={"responsive": True})
+            #Retorna o objeto fig
+            return fig

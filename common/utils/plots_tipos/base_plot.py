@@ -127,15 +127,48 @@ class BasePlotStrategy(ABC):
         
         return kwargs
 
-    def generate_plot(self, df: pd.DataFrame, **kwargs):
-            """
-            MÉTODO PÚBLICO: Orquestra a injeção de cores e configurações globais
-            antes de mandar a classe filha renderizar o gráfico.
-            """
-            # kwargs a serem passados para o método interno
-            kwargs = self._inject_color_mapping(df, kwargs)
+    def generate_plot(self, df: pd.DataFrame, **kwargs) -> str:
+        """
+        MÉTODO PÚBLICO: Orquestra a injeção de cores, a construção da figura,
+        a aplicação do tema global e a renderização final em HTML.
+        """
+        # 1. Injeta as cores nos parâmetros
+        kwargs = self._inject_color_mapping(df, kwargs)
 
-            return self._build_figure(df, **kwargs)
+        # 2. Chama a classe filha para construir APENAS o objeto Figure (não mais HTML)
+        fig = self._build_figure(df, **kwargs)
+        
+        # Se a classe filha retornar uma string (ex: mensagem de "Nenhum dado encontrado")
+        if isinstance(fig, str):
+            return fig
+
+        # 3. CENTRALIZADO: Aplica o tamanho de fonte e regras de design universais
+        fig = self._apply_global_layout(fig)
+
+        # 4. CENTRALIZADO: Transforma a figura em HTML em um único lugar do sistema
+        config = {"responsive": True, "displaylogo": False}
+        return fig.to_html(full_html=False, include_plotlyjs="cdn", config=config)
+    
+    def _apply_global_layout(self, fig):
+        """
+        MÉTODO INTERNO: Aplica configurações visuais universais (como tamanho de fonte)
+        a qualquer objeto Figure do Plotly antes da renderização HTML.
+        """
+        # 1. Pega o tamanho da fonte do dicionário. Se não existir, usa 12 como padrão universal.
+        tamanho_fonte = self.mapeamento.get('tamanho_fonte_global', 16)
+
+        # 2. Configurações que você quer aplicar globalmente
+        layout_updates = {
+            "font": dict(size=tamanho_fonte),
+            # No futuro, se quiser adicionar fontes específicas, basta colocar aqui:
+            # "title_font": dict(size=tamanho_fonte + 4), 
+            # "legend": dict(font=dict(size=tamanho_fonte - 1))
+        }
+
+        # 3. Aplica as atualizações ao gráfico
+        fig.update_layout(**layout_updates)
+        
+        return fig
 
     @abstractmethod
     def _build_figure(self, df: pd.DataFrame, **kwargs):
