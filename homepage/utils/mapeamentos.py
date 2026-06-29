@@ -269,7 +269,7 @@ MAPEAMENTOS = {
         "sufixo": "meses", # Adiciona a unidade no card
         "formatacao": "decimal", # Para mostrar ex: 44.5
         "mostrar_periodo": "ano_id",
-        #"filtrar_ultimo_ano": True,
+        "filtrar_ultimo_ano": True,
         "filtros_padrao": {
             "situacao__nm_situacao_discente": "TITULADO",
             "grau_academico__nm_grau_curso": "DOUTORADO"
@@ -289,7 +289,7 @@ MAPEAMENTOS = {
         "sufixo": "meses",
         "formatacao": "decimal",
         "mostrar_periodo": "ano_id",
-        #"filtrar_ultimo_ano": True,
+        "filtrar_ultimo_ano": True,
         "filtros_padrao": {
             "situacao__nm_situacao_discente": "TITULADO",
             "grau_academico__nm_grau_curso": "MESTRADO"
@@ -309,7 +309,7 @@ MAPEAMENTOS = {
         "sufixo": "meses",
         "formatacao": "decimal",
         "mostrar_periodo": "ano_id",
-        #"filtrar_ultimo_ano": True,
+        "filtrar_ultimo_ano": True,
         "filtros_padrao": {
             "situacao__nm_situacao_discente": "TITULADO",
             "grau_academico__nm_grau_curso": "MESTRADO PROFISSIONAL"
@@ -323,14 +323,14 @@ MAPEAMENTOS = {
         "nome_plot": "kpi_titulados_doutorado",
         "estrategia_plot": "kpi",
         "modelo": Discente,
-        "titulo_base": "Egressos Doutorado",
+        "titulo_base": "Titulados Doutorado",
         "icone": "fas fa-user-graduate",
         "cor": cor_doutorado,
         "eixo_y_campo": "pessoa_id",
         "eixo_y_agregacao": "count_distinct",
         "formatacao": "magnitude",
         "mostrar_periodo": "ano_id",
-        "filtrar_ultimo_ano": False, # Queremos o histórico todo
+        "filtrar_ultimo_ano": True,
         "filtros_padrao": {"situacao__nm_situacao_discente": "TITULADO", "grau_academico__nm_grau_curso": "DOUTORADO"},
         "filtros": {},
     },
@@ -339,11 +339,12 @@ MAPEAMENTOS = {
         "nome_plot": "kpi_titulados_mestrado",
         "estrategia_plot": "kpi",
         "modelo": Discente,
-        "titulo_base": "Egressos Mestrado",
+        "titulo_base": "Titulados Mestrado",
         "icone": "fas fa-user-graduate",
         "cor": cor_mestrado,
         "eixo_y_agregacao": "count_distinct",
         "formatacao": "magnitude",
+        "filtrar_ultimo_ano": True,
         "mostrar_periodo": "ano_id",
         "filtros_padrao": {"situacao__nm_situacao_discente": "TITULADO", "grau_academico__nm_grau_curso": "MESTRADO"},
         "filtros": {},
@@ -353,11 +354,12 @@ MAPEAMENTOS = {
         "nome_plot": "kpi_titulados_profissional",
         "estrategia_plot": "kpi",
         "modelo": Discente,
-        "titulo_base": "Egressos Mestrado Profissional",
+        "titulo_base": "Titulados Mestrado Profissional",
         "icone": "fas fa-user-graduate",
         "cor": cor_profissional,
         "eixo_y_agregacao": "count_distinct",
         "formatacao": "magnitude",
+        "filtrar_ultimo_ano": True,
         "mostrar_periodo": "ano_id",
         "filtros_padrao": {"situacao__nm_situacao_discente": "TITULADO", "grau_academico__nm_grau_curso": "MESTRADO PROFISSIONAL"},
         "filtros": {},

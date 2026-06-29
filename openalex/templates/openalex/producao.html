@@ -1,26 +1,21 @@
 {% extends "common/base.html" %}
 
+{% load openalex_tags %}
+
 {% block conteudo %}
         
-<!--
-<div class='divisoria'>
-    <img src = "data:image/png;base64, {{ card_01 }}" alt="" class='imagemsuperior'>
-    <img src = "data:image/png;base64, {{ card_02 }}" alt="" class='imagemsuperior'>
+
+<div class="row">
+    <div class="col-md-12">
+        {% render_filtros_producao tipo="producao_por_ano" url_grafico="/pesquisa/graficos/producao_por_ano/" grafico_id="plot-producao-ano" spinner_id="spinner-producao" grafico_html=graf_01 plotter_name="openalex" nome_plot="producao_por_ano" %}
+    </div>
 </div>
--->
 
-
-{% url 'openalex:grafico_producao_por_ano' as url_producao_ano %}
-
-<!-- Citações por ano -->
-{% include "openalex/partials/producao/_plot_producao_por_ano.html" with url_grafico=url_producao_ano grafico_id="producao-ano" spinner_id="spinner-producao-ano" grafico_html=graf_01 %}
-
-
-<!-- Gráfico - Distribuição temática de documentos UFRJ -->
-<div class="container mt-4">
-  <div class="grafico" style="height: 90vh;">
-      {{ graf_02 | safe }}
-  </div>
+<div class="row">
+    <div class="col-md-12">
+        {% render_filtros_producao tipo="distribuicao_tematica" url_grafico="/pesquisa/graficos/distribuicao_tematica/" grafico_id="meu-sunburst" spinner_id="loading-sunburst" grafico_html=graf_02 plotter_name="openalex" nome_plot="distribuicao_tematica" %}
+    </div>
 </div>
+
 
 {% endblock %} 

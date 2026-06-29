@@ -7,7 +7,7 @@ class AggregatedPlotStrategy(XYBaseStrategy):
     """
     Estratégia para plots agregados.
     """
-    def get_dataframe(self) -> pd.DataFrame:
+    def _get_raw_dataframe(self) -> pd.DataFrame:
         """
         [MÉTODO ATUALIZADO]
         Agora, ao calcular uma média (avg), também calcula a contagem (count)
@@ -51,7 +51,12 @@ class AggregatedPlotStrategy(XYBaseStrategy):
             return pd.DataFrame()
 
         df.rename(columns={eixo_x_campo: eixo_x_nome, alias_coluna_y: eixo_y_nome}, inplace=True)
+
         if campo_grupo:
-            df.rename(columns={campo_grupo: agrupamento.replace('_', ' ').capitalize()}, inplace=True)
+            # 1. Busca a tradução. Se não achar, usa o capitalize() original como plano B
+            labels = self.mapeamento.get('labels_customizadas', {})
+            nome_amigavel = labels.get(agrupamento, agrupamento.replace('_', ' ').capitalize())
+            
+            df.rename(columns={campo_grupo: nome_amigavel}, inplace=True)
 
         return df

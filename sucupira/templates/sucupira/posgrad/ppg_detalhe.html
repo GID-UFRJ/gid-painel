@@ -2,6 +2,10 @@
 
 {% load common_tags %}
 
+{# Diz explicitamente para não renderizar o indice global nesta página #}
+{% block indice_global %}{% endblock %}
+
+
 {% block conteudo %}
     <h1 class="mb-4">Detalhes do Programa: {{ programa.nm_programa_ies|default:"Nome não disponível" }}</h1>
 

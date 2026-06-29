@@ -11,9 +11,18 @@
   <!-- Breadcrumbs -->
   {% include 'common/partials/_breadcrumbs.html' %}
 
-  <!-- Conteúdo principal -->
+  <!-- Indice de gráficos -->
 
+  
+  <!-- Conteúdo principal -->
   <main>
+
+     <!-- Indice de gráficos -->
+    {% block indice_global %}
+      {% include 'common/partials/_indice_graficos.html' %}
+    {% endblock %}
+
+    <!-- Plots e afins -->
     {% block conteudo %}{% endblock  %}
   </main>
 

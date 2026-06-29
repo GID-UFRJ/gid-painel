@@ -18,7 +18,7 @@ class KPIStrategy(BaseKPIStrategy):
     Utiliza 'mostrar_periodo' como fonte para filtragem automática do último ano.
     """
 
-    def get_dataframe(self) -> pd.DataFrame:
+    def _get_raw_dataframe(self) -> pd.DataFrame:
         data = self.get_kpi_data()
         return pd.DataFrame([data])
 
@@ -104,6 +104,6 @@ class KPIStrategy(BaseKPIStrategy):
             "sufixo": mapeamento.get("sufixo", ""),
         }
 
-    def generate_plot(self, df: pd.DataFrame = None, **kwargs) -> str:
+    def _build_figure(self, df: pd.DataFrame = None, **kwargs) -> str:
         context = self.get_kpi_data()
         return render_to_string("common/partials/_card_kpi.html", context)

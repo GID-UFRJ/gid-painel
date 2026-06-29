@@ -19,30 +19,32 @@ class RangeAreaStrategy(XYBaseStrategy):
     - Tooltips individuais limpos.
     """
 
-    def get_dataframe(self) -> pd.DataFrame:
+    def _get_raw_dataframe(self) -> pd.DataFrame:
         """
         Busca os dados considerando dois campos Y (min e max) em vez de um.
         Trata explicitamente o caso de filtro 'None'/'Empty' para buscar campos nulos.
         Aplica filtros padrão do mapeamento para evitar duplicidade de nomes (QS Acadêmico vs QS Sustentabilidade).
         """
-        # --- 1. TRATAMENTO DE FILTROS ESPECIAIS (ODS NULO) ---
+
         filtros_modificados = self.filtros.copy()
 
-        valor_ods = filtros_modificados.get('ods')
-        filtrar_apenas_nulos = False
-
-        if valor_ods == 'None' or valor_ods == '':
-            if 'ods' in filtros_modificados:
-                del filtros_modificados['ods']
-            filtrar_apenas_nulos = True
-
-        # --- 2. MERGE DE DEFAULTS (A CORREÇÃO PARA O SEU PROBLEMA) ---
-        # Garante que filtros como 'tipo_ranking' definidos no mapeamentos.py
-        # sejam aplicados se não estiverem presentes na requisição.
+        # --- 1. MERGE DE DEFAULTS ---
         defaults = self.mapeamento.get("filtros_padrao", {})
         for chave, valor in defaults.items():
             if chave not in filtros_modificados:
                 filtros_modificados[chave] = valor
+
+        # --- 2. BLINDAGEM DO ODS (Totalmente Dinâmica) ---
+        # Acha dinamicamente a chave da URL (ex: 'ods') que mapeia para 'ods__codigo'
+        chave_ods = next((k for k, v in self.mapeamento.get("filtros", {}).items() if v == "ods__codigo"), None)
+
+        valor_ods = None
+        if chave_ods:
+            valor_ods = filtros_modificados.get(chave_ods)
+            # Se for vazio, string vazia, ou "None", nós padronizamos para None
+            if valor_ods in ['None', '', None]:
+                valor_ods = None
+                filtros_modificados.pop(chave_ods, None) # Limpa usando a chave dinâmica
 
         # --- 3. QUERY BASE ---
         queryset, _, _ = self.plotter._get_base_queryset(
@@ -50,11 +52,12 @@ class RangeAreaStrategy(XYBaseStrategy):
             filtros_modificados
         )
 
-        # --- 4. APLICAÇÃO DO FILTRO ISNULL ---
-        if filtrar_apenas_nulos:
+        # --- 4. A CURA DO ZIGUE-ZAGUE ---
+        # Se a estratégia tiver ODS (chave_ods existe) E o usuário não filtrou nada, trava no Geral
+        if chave_ods and not valor_ods:
             queryset = queryset.filter(ods__isnull=True)
 
-        # --- 5. PREPARAÇÃO DOS CAMPOS ---
+        # --- 5. PREPARAÇÃO DOS CAMPOS (O resto continua igual...) ---
         eixo_x = self.mapeamento["eixo_x_campo"]
         y_min = self.mapeamento["eixo_y_min"]
         y_max = self.mapeamento["eixo_y_max"]
@@ -92,7 +95,7 @@ class RangeAreaStrategy(XYBaseStrategy):
         df.rename(columns=rename_map, inplace=True)
         return df
 
-    def generate_plot(self, df: pd.DataFrame, **kwargs) -> str:
+    def _build_figure(self, df: pd.DataFrame, **kwargs) -> str:
         if df.empty:
             return "<p class='text-center text-muted mt-4'>Nenhum dado encontrado.</p>"
 
@@ -206,8 +209,8 @@ class RangeAreaStrategy(XYBaseStrategy):
             yaxis=dict(autorange="reversed") if self.mapeamento.get('eixo_y_invertido', False) else {}
         )
 
-        config = {"responsive": True, "displaylogo": False}
-        return fig.to_html(full_html=False, include_plotlyjs="cdn", config=config)
+        #Retorna o objeto fig
+        return fig
 
     def _hex_to_rgba(self, hex_color, alpha):
         """Método utilitário para converter cor Hex para RGBA com transparência."""

@@ -2,6 +2,9 @@
 
 {% load sucupira_tags %}
 
+{% include "common/partials/_indice_graficos.html" with lista_sumario=plotter.sumario_agrupado.programa %}
+
+
 <div class="d-flex align-items-center mb-3 justify-content-center">
     <h3 class="mb-0 me-2">Evolução do Conceito CAPES</h3>
     <a class="text-secondary" data-bs-toggle="collapse" href="#explicacaoConceito" role="button" aria-expanded="false" aria-controls="explicacaoConceito">
@@ -19,5 +22,6 @@
     </div>
 </div>
 
-{% url 'sucupira:grafico_generico_ppg' programa_id=programa.id nome_plot='conceito_programa_por_ano' as url_conceito_programa_ano %}
+{# UPDATED URL TAG #}
+{% url 'sucupira:htmx_grafico_ppg_detalhe' programa_id=programa.id nome_plot='conceito_programa_por_ano' as url_conceito_programa_ano %}
 {% render_filtros_ppg_detalhe "conceito_programa" url_grafico=url_conceito_programa_ano grafico_id="programa-ano" spinner_id="spinner-programa-ano" grafico_html=conceito_programa_ano_plot plotter_name="ppg_detalhe" nome_plot="conceito_programa_por_ano" programa_id=programa.id %}

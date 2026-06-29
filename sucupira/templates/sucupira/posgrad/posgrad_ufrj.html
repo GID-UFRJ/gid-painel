@@ -2,19 +2,28 @@
 
 {% extends 'common/base.html' %} 
 
-{% load common_tags %}
+{% load sucupira_tags %}
+
 
 {% block conteudo %}
 
-<!--
-<div class='divisoria'>
-{% for card_img in cards %}
-    <img src="data:image/png;base64, {{ card_img }}" alt="KPI Card" class="imagemsuperior"/>
-{% endfor %}
-</div>
--->
 
-{# Adicionando as abas #}
-{% render_abas abas abas_id="posgrad-ufrj-abas" %}
+<div class="container mt-4">
+
+    <div class="mb-4">
+        <h1>PPG's da UFRJ: Geral</h1>
+        <p class="lead">Dados sobre os Programas de Pós-Graduação da UFRJ considerados em conjunto.</p>
+    </div>
+
+    <hr class="my-2">
+
+
+    {# A URL FOI ATUALIZADA AQUI PARA APONTAR PARA A SUPER VIEW #}
+    {% url 'sucupira:htmx_grafico_sucupira' nome_plot='programas_contagem_por_ano' as url_programas_contagem %} 
+
+    {# Chama a templatetag, passando todos os argumentos necessários #}
+    {% render_filtros_posgrad_ufrj "programas_contagem" url_grafico=url_programas_contagem grafico_id="programas-contagem-ano" spinner_id="spinner-programas-contagem-ano" grafico_html=programas_contagem_ano_plot plotter_name="posgrad_ufrj" nome_plot="programas_contagem_por_ano" %}
+
+</div>
 
 {% endblock %}

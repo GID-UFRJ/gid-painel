@@ -1,5 +1,7 @@
 {% extends "common/base.html" %}
 
+{% load openalex_tags %}
+
 {% block conteudo %}
         
 <!--
@@ -9,14 +11,16 @@
 </div>
 -->
 
-{% url 'openalex:grafico_colaboracoes_por_ano' as url_colab_ano %}
-{% url 'openalex:grafico_top_colaboracoes' as url_top_colab %}
-
-
 <!-- Colaborações por ano -->
-{% include "openalex/partials/colaboracao/_plot_colaboracoes_por_ano.html" with url_grafico=url_colab_ano grafico_id="colab-ano" spinner_id="spinner-colab-ano" grafico_html=graf_01 %}
+<div id="container-colab-ano">
+    {% render_filtros_producao tipo="evolucao_colaboracao" url_grafico="/pesquisa/graficos/evolucao_colaboracao/" grafico_id="colab-ano" spinner_id="spinner-colab-ano" grafico_html=graf_01 plotter_name="openalex" nome_plot="evolucao_colaboracao" %}
+</div>
 
 <!-- Top instituições colaboradoras -->
-{% include "openalex/partials/colaboracao/_plot_top_colaboracoes.html" with url_grafico=url_top_colab grafico_id="top-colab" spinner_id="spinner-top-colab" grafico_html=graf_02 %}
+<div id="container-top-colab" class="mt-5">
+    {% render_filtros_producao tipo="top_instituicoes" url_grafico="/pesquisa/graficos/top_instituicoes/" grafico_id="top-colab" spinner_id="spinner-top-colab" grafico_html=graf_02 plotter_name="openalex" nome_plot="top_instituicoes" %}
+</div>
+
+
 
 {% endblock %}

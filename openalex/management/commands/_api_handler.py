@@ -1,9 +1,9 @@
+import time
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from urllib.parse import urlencode
 from ._parser import OpenAlexWorkParser
-#import logging
-#
-#logger = logging.getLogger(__name__)
 
 class OpenAlexAPIHandler:
     """
@@ -11,26 +11,34 @@ class OpenAlexAPIHandler:
     retrieve records, and update the database via Django ORM.
     """
 
-    def __init__(self, email = None):
+    def __init__(self, email=None):
         """
-        Initialize the API handler with the base OpenAlex API URL.
-
-        Args:
-        email (str, optional): Email address for polite API usage (recommended).
+        Initialize the API handler with the base OpenAlex API URL
+        and a resilient HTTP session.
         """
         self.base_url = "https://api.openalex.org/works"
-        self.email = email #Defined in the constructor to allow for multiple api queries without inserting email over and over again
+        self.email = email 
+
+        # ==========================================
+        # CONFIGURAÇÃO DE SESSÃO E RETENTATIVAS
+        # ==========================================
+        self.session = requests.Session()
+        
+        # Configura a estratégia de Retry: Tenta até 5 vezes, 
+        # com um tempo de espera (backoff) progressivo se falhar.
+        retry_strategy = Retry(
+            total=5,  # Número máximo de tentativas
+            backoff_factor=1,  # Tempo de espera: 1s, 2s, 4s...
+            status_forcelist=[429, 500, 502, 503, 504], # Códigos HTTP para insistir
+            allowed_methods=["GET"]
+        )
+        
+        # Aplica a estratégia na nossa sessão
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+        self.session.mount("https://", adapter)
+        self.session.mount("http://", adapter)
 
     def _process_and_update_db(self, results):
-        """
-        Process a list of OpenAlex work records and update the database.
-
-        For each record, it uses the OpenAlexWorkParser to parse
-        and save the record via Django ORM.
-
-        Args:
-            results (list): List of work records (dictionaries) from the API.
-        """
         for record in results:
             try:
                 parser = OpenAlexWorkParser(record)
@@ -38,50 +46,24 @@ class OpenAlexAPIHandler:
             except Exception as e:
                 work_id = record.get('id', '[unknown]')
                 print(f"Error processing record {work_id}: {str(e)}")
-                #logger.error("Error processing record %s: %s", work_id, str(e), exc_info=True)
-
 
     def _build_filter_string(self, filters: dict) -> str:
-        """
-        Construct the OpenAlex API filter query string from a dictionary.
-
-        Args:
-            filters (dict): Dictionary of filter keys and values.
-
-        Returns:
-            str: Comma-separated filter string suitable for the API.
-        """
         return ",".join(f"{k}:{v}" for k, v in filters.items() if v is not None)
 
     def _build_select_string(self, fields: list) -> str:
-        """
-        Construct the OpenAlex API select query string from a list of fields.
-
-        Args:
-            fields (list): List of field names to select.
-
-        Returns:
-            str: Comma-separated select string suitable for the API.
-        """
         return ",".join(fields)
     
     def _get_total_record_count(self, filters=None) -> int:
-        """
-        Fetch the total number of records that match the given filters,
-        without downloading all data.
-
-        Args:
-            filters (dict, optional): Dictionary of filter conditions.
-
-        Returns:
-            int: Total number of matching records.
-        """
         query_params = {"per-page": 1, "cursor": "*"}
         if filters:
             query_params["filter"] = self._build_filter_string(filters)
+        if self.email:
+            query_params["mailto"] = self.email
 
         url = self.base_url + "?" + urlencode(query_params)
-        response = requests.get(url)
+        
+        # Usa a SESSÃO em vez de requests.get
+        response = self.session.get(url, timeout=15)
 
         if response.status_code != 200:
             raise Exception(f"Failed to fetch metadata: {response.status_code} - {response.text}")
@@ -90,31 +72,15 @@ class OpenAlexAPIHandler:
         return meta.get("count", 0)
 
     def update_db_from_api(self, filters=None, select=None, per_page=200, max_pages=None):
-        """
-        Retrieve works from the OpenAlex API using optional filters and select fields,
-        then parse and insert them into the database using Django ORM.
-
-        Args:
-            filters (dict, optional): Dictionary of filter conditions for API.
-            select (list, optional): List of fields to retrieve per record.
-            per_page (int, optional): Number of records per page (max 200).
-            max_pages (int, optional): Maximum number of pages to retrieve.
-
-        Raises:
-            ValueError: If per_page is greater than 200.
-            Exception: For HTTP request failures.
-        """
         if per_page > 200:
             raise ValueError("The per_page parameter cannot be greater than 200.")
 
-        # Get total number of records that match the filters (for progress tracking)
         total_records = self._get_total_record_count(filters)
         print(f"Total records to be retrieved: {total_records}")
 
-        # Prepare initial query parameters
         query_params = {
             "per-page": per_page,
-            "cursor": "*"  # OpenAlex uses cursor-based pagination starting with "*"
+            "cursor": "*" 
         }
 
         if filters:
@@ -126,10 +92,9 @@ class OpenAlexAPIHandler:
 
         base_url = self.base_url
         cursor = query_params["cursor"]
-        count = 0  # Page counter
-        count_records = 0  # Total records processed so far
+        count = 0 
+        count_records = 0 
 
-        # Loop through pages until no more data or max_pages reached
         while cursor:
             if max_pages is not None and count >= max_pages:
                 break
@@ -138,22 +103,32 @@ class OpenAlexAPIHandler:
             url = base_url + "?" + urlencode(query_params)
             print(f"\nFetching data from: {url}")
 
-            response = requests.get(url)
-            if response.status_code != 200:
-                raise Exception(f"Failed to fetch data: {response.status_code} - {response.text}")
+            try:
+                # Usa a SESSÃO com timeout de 15 segundos para evitar travamentos
+                response = self.session.get(url, timeout=15)
+                
+                if response.status_code != 200:
+                    raise Exception(f"Failed to fetch data: {response.status_code} - {response.text}")
 
-            page_data = response.json()
-            results = page_data.get("results", [])
-            count_records += len(results)
+                page_data = response.json()
+                results = page_data.get("results", [])
+                count_records += len(results)
 
-            # Print progress if total is known
-            if total_records > 0:
-                percent = (count_records / total_records) * 100
-                print(f"Retrieved {count_records} of {total_records} records ({percent:.2f}%)")
+                if total_records > 0:
+                    percent = (count_records / total_records) * 100
+                    print(f"Retrieved {count_records} of {total_records} records ({percent:.2f}%)")
 
-            print("Updating database...")
-            self._process_and_update_db(results)
+                print("Updating database...")
+                self._process_and_update_db(results)
 
-            # Update cursor for next page
-            cursor = page_data.get("meta", {}).get("next_cursor")
-            count += 1
+                cursor = page_data.get("meta", {}).get("next_cursor")
+                count += 1
+                
+                # Opcional: Uma pausa microscópica por cortesia à API
+                time.sleep(0.1) 
+
+            # Captura especificamente a quebra de conexão, aguarda e continua
+            except requests.exceptions.ConnectionError as e:
+                print(f"\nConnection broken. Waiting 5 seconds before retrying... Error: {e}")
+                time.sleep(5)
+                continue # Volta para o início do while tentando o mesmo cursor

@@ -1,5 +1,8 @@
 {% extends "common/base.html" %}
 
+{# Diz explicitamente para não renderizar o indice global nesta página #}
+{% block indice_global %}{% endblock %}
+
 {% block conteudo %}
         
 <div class="container p-4">
@@ -47,7 +50,7 @@
 
                 <ul>
                     <li class="list-group-item mb-3">
-                        <strong>Coordenação Geral</strong>
+                        <strong>Coordenação geral</strong>
                         <ul class="mt-1">
                             <li>Prof. Jacqueline Leta (<a href="http://lattes.cnpq.br/4133191475294218">Lattes</a>)</li>
                         </ul>
@@ -60,7 +63,13 @@
                         </ul>
                     </li>
                     <li class="list-group-item mb-3">
-                        <strong>Levantamento de Dados</strong>
+                        <strong>Consultoria - apresentação visual e usabilidade</strong>
+                        <ul class="mt-1">
+                            <li>Prof. Doris Kosminsky (<a href="http://lattes.cnpq.br/4801768397535572">Lattes</a>)</li>
+                        </ul>
+                    </li>
+                    <li class="list-group-item mb-3">
+                        <strong>Levantamento de dados</strong>
                         <ul class="mt-1">
                             <li>Felipe Silva Izidoro da Fonseca (<a href="http://lattes.cnpq.br/3033849341307886">Lattes</a>)</li>
                             <li>Raquel de Souza Leal (<a href="http://lattes.cnpq.br/4136609790390562">Lattes</a>)</li>

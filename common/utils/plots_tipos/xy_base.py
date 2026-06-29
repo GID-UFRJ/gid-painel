@@ -16,11 +16,11 @@ class XYBaseStrategy(BasePlotStrategy):
     é o que diferencia as estratégias filhas (agregada vs. direta).
     """
     @abstractmethod
-    def get_dataframe(self) -> pd.DataFrame:
+    def _get_raw_dataframe(self) -> pd.DataFrame:
         """As classes filhas devem implementar sua própria forma de buscar dados."""
         raise NotImplementedError
 
-    def generate_plot(self, df: pd.DataFrame, tipo_grafico: str, **kwargs) -> str:
+    def _build_figure(self, df: pd.DataFrame, tipo_grafico: str, **kwargs) -> str:
             """
             [VERSÃO FINAL E CORRIGIDA]
             Prepara TODOS os parâmetros, gera o gráfico base e, em seguida, aplica
@@ -34,15 +34,17 @@ class XYBaseStrategy(BasePlotStrategy):
             agrupamentos_validos = self.mapeamento.get("agrupamentos", {})
             grupo_plotly = None
             if agrupamento and agrupamento in agrupamentos_validos:
-                grupo_plotly = agrupamento.replace('_', ' ').capitalize()
+                # 1. Faz exatamente a mesma busca que fizemos no agregado.py
+                labels = self.mapeamento.get('labels_customizadas', {})
+                grupo_plotly = labels.get(agrupamento, agrupamento.replace('_', ' ').capitalize())
 
             eixo_x_nome = self.mapeamento["eixo_x_nome"]
-            eixo_y_nome = self.mapeamento.get("eixo_y_nome", "Total")
+            eixo_y_nome = kwargs.get("eixo_y_override", self.mapeamento.get("eixo_y_nome", "Total"))
 
             titulo_base = kwargs.get('titulo_override') or self.mapeamento['titulo_base']
             titulo_final = f"{titulo_base} por {eixo_x_nome}"
             if grupo_plotly:
-                 titulo_final = f"{titulo_base} por {grupo_plotly}"
+                 titulo_final = f"{titulo_base} - {grupo_plotly}"
 
             category_orders_config = {}
             if grupo_plotly:
@@ -85,8 +87,6 @@ class XYBaseStrategy(BasePlotStrategy):
             if yaxes_config:
                 fig.update_yaxes(**yaxes_config)
         
-            # ==========================================================
 
-            # Renderiza o HTML final
-            config = {"responsive": True, "displaylogo": False}
-            return fig.to_html(full_html=False, include_plotlyjs="cdn", config=config)
+            #Retorna o objeto fig
+            return fig

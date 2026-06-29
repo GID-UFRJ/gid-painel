@@ -1,9 +1,8 @@
 # rankings/utils/mapeamentos.py
 from rankings.models import RankingEntrada
-
 import datetime
 
-# Define o ano atual dinamicamente (ex: 2025)
+# Define o ano atual dinamicamente
 ano_atual = datetime.date.today().year + 1
 
 # --- Configuração Base (DRY: Don't Repeat Yourself) ---
@@ -22,7 +21,6 @@ _config_faixa_base = {
     "eixo_y_nome": "Posição",
     "eixo_y_invertido": True, # Inverte o eixo Y (1º lugar no topo)
 
-    # Filtros disponíveis para a URL
     "filtros": {
         "ranking_nome": "ranking__nome",
         "escopo": "escopo_geografico__nome",
@@ -32,7 +30,6 @@ _config_faixa_base = {
         "ods": "ods__codigo",
     },
     
-    # Agrupamentos disponíveis (caso venha a agrupar algo no futuro)
     "agrupamentos": {
         "ranking": "ranking__nome",
         "escopo": "escopo_geografico__nome",
@@ -42,34 +39,51 @@ _config_faixa_base = {
 
 # --- Variação 1: Acadêmico ---
 ranking_academico_faixa = _config_faixa_base.copy()
-
-ranking_academico_faixa["nome_plot"] = "academico_faixa"
-
-ranking_academico_faixa["filtros_padrao"] = {
-    "tipo_ranking": "ACADÊMICO",
-    "ano_inicial": 2018,
-    "ano_final":ano_atual,
-    "escopo": "MUNDO",
-    # No acadêmico, o agrupamento padrão é por Ranking
-}
+ranking_academico_faixa.update({
+    "nome_plot": "academico_faixa",
+    "filtros_padrao": {
+        "tipo_ranking": "ACADÊMICO",
+        "ranking_nome": "THE",
+        "ano_inicial": 2018,
+        "ano_final": ano_atual,
+        "escopo": "MUNDO",
+    }
+})
 
 # --- Variação 2: Sustentabilidade ---
 ranking_sustentabilidade_faixa = _config_faixa_base.copy()
+ranking_sustentabilidade_faixa.update({
+    "nome_plot": "sustentabilidade_faixa",
+    "filtros_padrao": {
+        "tipo_ranking": "SUSTENTABILIDADE",
+        "ranking_nome": "THE IMPACT", 
+        #"ods__isnull": True,
+        "ano_inicial": 2019,
+        "ano_final": ano_atual,
+        "escopo": "MUNDO",
+    }
+})
 
-ranking_sustentabilidade_faixa["nome_plot"] = "sustentabilidade_faixa"
 
-ranking_sustentabilidade_faixa["filtros_padrao"] = {
-    "tipo_ranking": "SUSTENTABILIDADE",
-    "ranking_nome": "THE IMPACT", # Default seguro para ODS
-    "ano_inicial": 2019,
-    "ano_final":ano_atual,
-    "escopo": "MUNDO",
+# =========================================================
+# DICIONÁRIOS POR PÁGINA (Para uso nas Views de cada página)
+# =========================================================
 
-    # Na sustentabilidade, geralmente queremos comparar ODSs, mas o padrão aqui pode ser ranking
+MAPEAMENTOS_RANKINGS_ACADEMICOS = {
+    "academico_faixa": ranking_academico_faixa,
 }
 
-MAPEAMENTOS = {
-    # Nomes internos que usaremos no PlotsRankings
-    "academico_faixa": ranking_academico_faixa,
+MAPEAMENTOS_RANKINGS_SUSTENTABILIDADE = {
     "sustentabilidade_faixa": ranking_sustentabilidade_faixa,
+}
+
+
+# =========================================================
+# DICIONÁRIO MESTRE (Para o motor de CSV e Dispatcher Global)
+# =========================================================
+
+# O operador ** extrai tudo dos dicionários menores e combina num só
+MAPEAMENTOS_TODOS = {
+    **MAPEAMENTOS_RANKINGS_ACADEMICOS,
+    **MAPEAMENTOS_RANKINGS_SUSTENTABILIDADE,
 }

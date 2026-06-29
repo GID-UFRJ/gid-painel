@@ -23,6 +23,6 @@ class RankingKPIStrategy(BaseKPIStrategy):
         
         return self.get_base_context(valor_final, ano)
 
-    def generate_plot(self, **kwargs):
+    def _build_figure(self, **kwargs):
         context = self.get_kpi_data()
         return render_to_string("common/partials/_card_kpi.html", context)

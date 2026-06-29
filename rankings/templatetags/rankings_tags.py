@@ -8,8 +8,16 @@ PATH_FILTROS = "common/partials/filtros/"
 
 
 @register.inclusion_tag("common/partials/_layout_de_filtros_dinamico.html", takes_context=True)
-def render_filtros_rankings(context, tipo, url_grafico, grafico_id, spinner_id, grafico_html):
-    ctx = { "url_grafico": url_grafico, "grafico_id": grafico_id, "spinner_id": spinner_id, "grafico_html": grafico_html }
+def render_filtros_rankings(context, tipo, url_grafico, grafico_id, spinner_id, grafico_html, plotter_name="rankings", nome_plot=None): 
+    ctx = { 
+        "url_grafico": url_grafico, 
+        "grafico_id": grafico_id, 
+        "spinner_id": spinner_id, 
+        "grafico_html": grafico_html,
+        "plotter_name": plotter_name,
+        "nome_plot": nome_plot
+    }
+
     lista = []
 
     # Filtros comuns de data e agrupamento

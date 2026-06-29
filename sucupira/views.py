@@ -1,16 +1,23 @@
 # sucupira/views.py
 
-
 from collections import defaultdict
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404
 from django.db.models import OuterRef, Subquery
 
-# Importe os modelos, as classes de plotagem (que agora estão simplificadas) e o decorador
+# Importes padrão da sua aplicação
 from .models import Programa, AnoPrograma, Curso
-from .utils.plots import PlotsPessoal, PlotsPpgDetalhe, PlotsPpgUfrj
 from common.utils.cache import cache_context_data
 
+# O NOVO MOTOR: O Dispatcher e os Dicionários de Mapeamento
+from common.utils.dispatcher import Dispatcher
+from .utils.mapeamentos import (
+    MAPEAMENTOS_DISCENTES,
+    MAPEAMENTOS_DOCENTES,
+    MAPEAMENTOS_PPG_GERAL,
+    MAPEAMENTOS_PPG_INDIVIDUAL,
+    MAPEAMENTOS_TODOS
+)
 
 # ==============================================================================
 # VIEWS ESTÁTICAS E AUXILIARES
@@ -21,232 +28,72 @@ def index(request):
     namespace = request.resolver_match.namespace
     return render(request, f"sucupira/{namespace}/index.html")
 
-
-
 # ==============================================================================
-# VIEWS PARA A SEÇÃO "PESSOAL PPG" (GERAL)
+# VIEWS PARA A SEÇÃO PESSOAL (DISCENTES E DOCENTES)
 # ==============================================================================
-
-#def pessoal_ppg(request):
-#    """
-#    Renderiza a página principal do dashboard "Pessoal", com cache para performance.
-#    """
-#    @cache_context_data(key_prefix='pessoal_ppg', timeout=3600)
-#    def get_cached_context():
-#        """
-#        Gera e cacheia o contexto completo, usando a nova arquitetura de orquestração
-#        para criar os plots iniciais.
-#        """
-#        p = PlotsPessoal()
-#
-#        abas = [
-#            {
-#                "id": "discentes",
-#                "label": "Discentes",
-#                "icone": "fas fa-user-graduate",
-#                "titulo": "Análise de Discentes",
-#                "template_name": "sucupira/partials/pessoal/_aba_discentes_conteudo.html"
-#            },
-#            {
-#                "id": "docentes",
-#                "label": "Docentes",
-#                "icone": "fas fa-chalkboard-teacher",
-#                "titulo": "Análise de Docentes",
-#                "template_name": "sucupira/partials/pessoal/_aba_docentes_conteudo.html"
-#            },
-#        ]
-#
-#        contexto_cards = {
-#            'n_titulados_cards': p.cards_total_alunos_titulados_por_grau(),
-#            'docentes_card': p.card_total_docentes_ultimo_ano(),
-#        }
-#
-#        contexto_plots = {
-#            'discentes_ano_plot': p.generate_plot_html(nome_plot='discentes_por_ano', filtros_selecionados={}),
-#            'discentes_sunburst_plot': p.generate_plot_html(nome_plot='discentes_por_area_sunburst', filtros_selecionados={}),
-#            'top_paises_discentes_plot': p.generate_plot_html(nome_plot='top_paises_discentes', filtros_selecionados={}),
-#            'docentes_ano_plot': p.generate_plot_html(nome_plot='docentes_por_ano', filtros_selecionados={}),
-#            'docentes_sunburst_plot': p.generate_plot_html(nome_plot='docentes_por_area_sunburst', filtros_selecionados={}),
-#            'top_paises_docentes_plot': p.generate_plot_html(nome_plot='top_paises_docentes', filtros_selecionados={}),
-#        }
-#        
-#        context = {
-#            "abas": abas,
-#            **contexto_cards,
-#            **contexto_plots,
-#        }
-#        return context
-#
-#    context = get_cached_context()
-#    return render(request, r'sucupira/pessoal/pessoal_ppg.html', context)
-
 
 def pessoal_discentes(request):
-    """
-    Renderiza a página de análise de Discentes.
-    """
-    
+    """Renderiza a página de análise de Discentes."""
     @cache_context_data(key_prefix='pessoal_discentes', timeout=3600)
     def get_cached_context():
-        """
-        Gera e cacheia o contexto completo, usando a nova arquitetura de orquestração
-        para criar os plots iniciais.
-        """
-        p = PlotsPessoal()
+        # Instancia o motor apenas com os gráficos de Pessoal
+        p = Dispatcher(mapeamentos=MAPEAMENTOS_DISCENTES)
 
-        contexto_cards = {
-            'n_titulados_cards': p.cards_total_alunos_titulados_por_grau(),
-        }
-
-        contexto_plots = {
+        context = {
             'discentes_ano_plot': p.generate_plot_html(nome_plot='discentes_por_ano', filtros_selecionados={}),
             'discentes_sunburst_plot': p.generate_plot_html(nome_plot='discentes_por_area_sunburst', filtros_selecionados={}),
             'top_paises_discentes_plot': p.generate_plot_html(nome_plot='top_paises_discentes', filtros_selecionados={}),
-        }
-        
-        context = {
-            **contexto_cards,
-            **contexto_plots,
+            'plotter': p, # Injeta para o sumário automático
         }
         return context
 
-    context = get_cached_context()
-    return render(request, r'sucupira/pessoal/pessoal_discentes.html', context)
+    return render(request, r'sucupira/pessoal/pessoal_discentes.html', get_cached_context())
 
 
 def pessoal_docentes(request):
-    """
-    Renderiza a página de análise de Docentes.
-    """
-    
+    """Renderiza a página de análise de Docentes."""
     @cache_context_data(key_prefix='pessoal_docentes', timeout=3600)
     def get_cached_context():
-        """
-        Gera e cacheia o contexto completo, usando a nova arquitetura de orquestração
-        para criar os plots iniciais.
-        """
-        p = PlotsPessoal()
+        p = Dispatcher(mapeamentos=MAPEAMENTOS_DOCENTES)
 
-        contexto_cards = {
-            'docentes_card': p.card_total_docentes_ultimo_ano(),
-        }
-
-        contexto_plots = {
+        context = {
             'docentes_ano_plot': p.generate_plot_html(nome_plot='docentes_por_ano', filtros_selecionados={}),
             'docentes_sunburst_plot': p.generate_plot_html(nome_plot='docentes_por_area_sunburst', filtros_selecionados={}),
             'top_paises_docentes_plot': p.generate_plot_html(nome_plot='top_paises_docentes', filtros_selecionados={}),
-        }
-        
-        context = {
-            **contexto_cards,
-            **contexto_plots,
+            'plotter': p, 
         }
         return context
 
-    context = get_cached_context()
-    return render(request, r'sucupira/pessoal/pessoal_docentes.html', context)
-
-
-def grafico_generico_pessoal(request, nome_plot: str):
-    """
-    View genérica para as atualizações HTMX da seção Pessoal.
-    """
-    plotter = PlotsPessoal()
-    
-    grafico_html = plotter.generate_plot_html(
-        nome_plot=nome_plot,
-        filtros_selecionados=request.GET.dict()
-    )
-    
-    return HttpResponse(grafico_html)
+    return render(request, r'sucupira/pessoal/pessoal_docentes.html', get_cached_context())
 
 # ==============================================================================
-# VIEW PARA A PÓS-GRADUAÇÃO DA UFRJ NO GERAL (POSGRAD_UFRJ)
+# VIEW PARA A PÓS-GRADUAÇÃO DA UFRJ NO GERAL
 # ==============================================================================
 
 def posgrad_ufrj(request):
-    """Placeholder para uma futura página."""
+    """Página geral dos PPGs da UFRJ."""
     @cache_context_data(key_prefix='posgrad_ufrj', timeout=3600)
     def get_cached_context():
-        """
-        Gera e cacheia o contexto completo, usando a nova arquitetura de orquestração
-        para criar os plots iniciais.
-        """
-        p = PlotsPpgUfrj()
+        p = Dispatcher(mapeamentos=MAPEAMENTOS_PPG_GERAL)
 
-        abas = [
-            {
-                "id": "ppgs_ufrj",
-                "label": "PPGs UFRJ",
-                "icone": "fas fa-graduation-cap",
-                "titulo": "Análise dos PPGs da UFRJ",
-                "template_name": "sucupira/partials/posgrad/posgrad_ufrj/_aba_ppgs_ufrj_conteudo.html"
-            }
-        ]
-
-        # Note que 'cards_programas_por_modalidade' retorna uma lista,
-        # então vamos juntá-la com os outros cards.
-        card_total = p.card_total_programas_ultimo_ano()
-        cards_modalidade = p.cards_programas_por_modalidade()
-        card_conceito_max = p.card_total_programas_conceito_maximo()
-
-        # Juntamos todos os cards em uma única lista para o template
-        todos_os_cards = ([card_total] if card_total else []) + \
-                         (cards_modalidade or []) + \
-                         ([card_conceito_max] if card_conceito_max else [])
-
-        contexto_cards = {
-            'cards': todos_os_cards
-        }
-
-        contexto_plots = {
-            'programas_contagem_ano_plot': p.generate_plot_html(nome_plot='programas_contagem_por_ano', filtros_selecionados={}),
-        }
-        
         context = {
-            "abas": abas,
-            **contexto_cards,
-            **contexto_plots,
+            'programas_contagem_ano_plot': p.generate_plot_html(nome_plot='programas_contagem_por_ano', filtros_selecionados={}),
+            'plotter': p,
         }
-
         return context
 
-    context = get_cached_context()
-    return render(request, r'sucupira/posgrad/posgrad_ufrj.html', context)
-
-
-
-def grafico_generico_posgrad_ufrj(request, nome_plot: str):
-    """
-    View genérica para as atualizações HTMX da seção Pessoal.
-    """
-    plotter = PlotsPpgUfrj()
-
-    grafico_html = plotter.generate_plot_html(
-        nome_plot=nome_plot,
-        filtros_selecionados=request.GET.dict()
-    )
-
-    return HttpResponse(grafico_html)
-
+    return render(request, r'sucupira/posgrad/posgrad_ufrj.html', get_cached_context())
 
 # ==============================================================================
-# VIEW PARA A LISTA DE PROGRAMAS (PPGS)
+# VIEWS PARA A LISTA E DETALHE DOS PROGRAMAS (PPGS)
 # ==============================================================================
 
 def ppgs(request):
-    """
-    Lista todos os programas de pós-graduação, usando cache para otimizar a performance.
-    """
+    """Lista todos os programas de pós-graduação."""
     @cache_context_data(key_prefix='ppgs_list', timeout=3600)
     def get_cached_context():
-        """
-        Contém a lógica pesada de buscar e agrupar os programas, que só é
-        executada se o resultado não estiver no cache.
-        """
         ultimo_ano_qs = AnoPrograma.objects.filter(programa=OuterRef('pk')).order_by('-ano__ano_valor')
 
-        # --- ANOTAÇÕES COMPLETAS RESTAURADAS AQUI ---
         programas = Programa.objects.annotate(
             nm_programa_ies=Subquery(ultimo_ano_qs.values('nm_programa_ies__nm_programa_ies')[:1]), 
             grande_area_nome=Subquery(ultimo_ano_qs.values('grande_area__nm_grande_area_conhecimento')[:1]),
@@ -257,55 +104,25 @@ def ppgs(request):
             chave = programa.grande_area_nome or "Sem Grande Área"
             agrupados[chave].append(programa)
 
-        programas_agrupados = dict(sorted(agrupados.items()))
-        
-        return {'programas_agrupados': programas_agrupados}
+        return {'programas_agrupados': dict(sorted(agrupados.items()))}
 
-    context = get_cached_context()
-    return render(request, 'sucupira/posgrad/ppgs.html', context)
+    return render(request, 'sucupira/posgrad/ppgs.html', get_cached_context())
 
-
-# ==============================================================================
-# VIEWS PARA A PÁGINA "DETALHE DO PPG"
-# ==============================================================================
 
 def ppg_detalhe(request, programa_id):
-    """
-    Renderiza a página de detalhes de um programa, com cache dinâmico por programa.
-    """
+    """Renderiza a página de detalhes de um programa específico."""
     @cache_context_data(key_prefix='ppg_detalhe', timeout=3600)
     def get_cached_context(prog_id):
-        """Gera e cacheia o contexto para um programa específico."""
-        p = PlotsPpgDetalhe(programa_id=prog_id)
+        p = Dispatcher(mapeamentos=MAPEAMENTOS_PPG_INDIVIDUAL)
         
-        # --- DEFINIÇÃO DAS ABAS COMPLETA RESTAURADA AQUI ---
         abas = [
-            {
-                "id": "programa", 
-                "label": "Programa", 
-                "icone": "fas fa-graduation-cap", 
-                "titulo": "Análise do Programa",
-                "template_name": "sucupira/partials/posgrad/ppg_detalhe/_aba_programa_conteudo.html"
-            },
-            {
-                "id": "discentes", 
-                "label": "Discentes", 
-                "icone": "fas fa-user-graduate", 
-                "titulo": "Análise de Discentes",
-                "template_name": "sucupira/partials/posgrad/ppg_detalhe/_aba_discentes_conteudo.html"
-            },
-            {
-                "id": "docentes", 
-                "label": "Docentes", 
-                "icone": "fas fa-chalkboard-teacher", 
-                "titulo": "Análise de Docentes",
-                "template_name": "sucupira/partials/posgrad/ppg_detalhe/_aba_docentes_conteudo.html"
-            },
+            {"id": "programa", "label": "Programa", "icone": "fas fa-graduation-cap", "titulo": "Análise do Programa", "template_name": "sucupira/partials/posgrad/ppg_detalhe/_aba_programa_conteudo.html"},
+            {"id": "discentes", "label": "Discentes", "icone": "fas fa-user-graduate", "titulo": "Análise de Discentes", "template_name": "sucupira/partials/posgrad/ppg_detalhe/_aba_discentes_conteudo.html"},
+            {"id": "docentes", "label": "Docentes", "icone": "fas fa-chalkboard-teacher", "titulo": "Análise de Docentes", "template_name": "sucupira/partials/posgrad/ppg_detalhe/_aba_docentes_conteudo.html"},
         ]
         
         ultimo_ano_qs = AnoPrograma.objects.filter(programa_id=OuterRef('pk')).order_by('-ano__ano_valor')
         
-        # --- ANOTAÇÕES COMPLETAS RESTAURADAS AQUI ---
         programa = get_object_or_404(
             Programa.objects.annotate(
                 ultimo_ano=Subquery(ultimo_ano_qs.values('ano__ano_valor')[:1]),
@@ -321,7 +138,9 @@ def ppg_detalhe(request, programa_id):
         )
         cursos = Curso.objects.filter(programa_id=prog_id).select_related("grau_curso").order_by("grau_curso__nm_grau_curso")
         
+        # Injeção do programa_id nos filtros iniciais
         filtros_iniciais = {'programa_id': prog_id}
+        
         contexto_plots = {
             'conceito_programa_ano_plot': p.generate_plot_html(nome_plot='conceito_programa_por_ano', filtros_selecionados=filtros_iniciais),
             'discentes_ano_plot': p.generate_plot_html(nome_plot='discentes_por_ano_ppg', filtros_selecionados=filtros_iniciais),
@@ -334,31 +153,33 @@ def ppg_detalhe(request, programa_id):
             "programa": programa,
             "cursos": cursos,
             **contexto_plots,
+            "plotter": p, # Injeta para o sumário automático
         }
         return context
 
-    context = get_cached_context(prog_id=programa_id)
-    return render(request, "sucupira/posgrad/ppg_detalhe.html", context)
+    return render(request, "sucupira/posgrad/ppg_detalhe.html", get_cached_context(prog_id=programa_id))
 
+# ==============================================================================
+# A "SUPER VIEW" GENÉRICA DO HTMX
+# ==============================================================================
 
-def grafico_generico_ppg(request, **kwargs):
+def grafico_generico_sucupira(request, nome_plot: str, **kwargs):
     """
-    View genérica para as atualizações HTMX da seção Detalhe do PPG.
+    View ÚNICA para todas as requisições HTMX do aplicativo Sucupira.
+    Substitui as antigas 'grafico_generico_pessoal', 'grafico_generico_posgrad_ufrj', etc.
     """
-    # --- INÍCIO DA CORREÇÃO ---
-    # 1. Extraímos o 'nome_plot' dos argumentos da URL.
-    nome_plot = kwargs.pop('nome_plot', None)
-    if not nome_plot:
-        raise Http404("O 'nome_plot' não foi fornecido na URL.")
+    # 1. Valida se o gráfico existe no sistema inteiro da Sucupira
+    if nome_plot not in MAPEAMENTOS_TODOS:
+        raise Http404(f"O gráfico '{nome_plot}' não está mapeado no sistema.")
 
-    # 2. O 'kwargs' restante agora contém apenas o 'programa_id'.
-    plotter = PlotsPpgDetalhe(**kwargs)
-    # --- FIM DA CORREÇÃO ---
+    # 2. Instancia o motor com todos os mapeamentos
+    plotter = Dispatcher(mapeamentos=MAPEAMENTOS_TODOS)
 
-    filtros = request.GET.dict()
-    # Adicionamos o programa_id aos filtros para que a estratégia o receba.
-    filtros['programa_id'] = kwargs.get('programa_id')
+    # 3. Prepara os filtros juntando GET (Dropdowns HTMX) com kwargs da URL (programa_id)
+    filtros = request.GET.dict().copy()
+    filtros.update(kwargs) 
 
+    # 4. Processa a mágica
     grafico_html = plotter.generate_plot_html(
         nome_plot=nome_plot,
         filtros_selecionados=filtros

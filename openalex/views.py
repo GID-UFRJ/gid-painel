@@ -1,5 +1,7 @@
 from django.shortcuts import render
-from .utils.plots import PlotsProducao, PlotsImpacto, PlotsColaboracao
+#from .utils.plots import PlotsProducao, PlotsImpacto, PlotsColaboracao
+from common.utils.dispatcher import Dispatcher
+from .utils.mapeamentos import MAPEAMENTOS_PRODUCAO, MAPEAMENTOS_IMPACTO, MAPEAMENTOS_COLABORACAO, MAPEAMENTOS_TODOS
 
 # Create your views here.
 from django.http import HttpResponse
@@ -11,134 +13,119 @@ def index(request):
 
 # Create your views here.
 def producao(request):
-    p = PlotsProducao()
+    """
+    View responsável por carregar a página de Produção pela PRIMEIRA VEZ.
+    """
+    print("1. Entrei na View Produção")
+    
+    # 1. Instanciamos o Dispatcher com os mapeamentos
+    p = Dispatcher(mapeamentos=MAPEAMENTOS_PRODUCAO)
+    
 
-    return render(request, r'openalex/producao.html', {
-        #'card_01':p.producao_total(),
-        #'card_02':p.producao_total_artigos(),
-        #'card_03':p.producao_artigos_acesso_aberto(),
-        #'card_04':p.producao_total_citacoes(),
-                 
-        'graf_01':p.producao_por_ano(ano_inicial=1990, ano_final=2024),
-        'graf_02': p.distribuicao_tematica_artigos(),
-    }
-)
+    # 2. Geramos os gráficos
+    html_producao_ano = p.generate_plot_html(
+        nome_plot='producao_por_ano', 
+        filtros_selecionados={'ano_inicial': 2013, 'ano_final': 2024}
+    )
+    
+    html_distribuicao = p.generate_plot_html(
+        nome_plot='distribuicao_tematica', 
+        filtros_selecionados={}
+    )
 
-def grafico_producao_por_ano(request):
-    ano_inicial = int(request.GET.get("ano_inicial", 1990))
-    ano_final = int(request.GET.get("ano_final", 2024))
-    tipo_producao = request.GET.get("tipo_producao", "total")
-    tipo_grafico = request.GET.get("tipo_grafico", "barra")
+    print(f"4. Voltei para a View. Tamanho do HTML (Temática): {len(html_distribuicao)}")
 
-
-    p = PlotsProducao()
-    graf = p.producao_por_ano(ano_inicial=ano_inicial, 
-                              ano_final=ano_final, 
-                              tipo_producao=tipo_producao, 
-                              tipo_grafico=tipo_grafico,
-                              )
-
-    return render( request, 
-                  "homepage/partials/_plot_reativo.html", 
-                  {"graf": graf} 
-                  )
-
+    # 3. Mandamos para o template
+    return render(request, 'openalex/producao.html', {
+        'graf_01': html_producao_ano,
+        'graf_02': html_distribuicao,
+        'plotter': p, #Usado APENAS para mostrar o sumário dos plots
+    })
 
 def impacto(request):
-    p = PlotsImpacto()
-    return render(request, r'openalex/impacto.html', {
-        #'card_01':p.producao_total_citacoes(),
-        #'card_02':p.producao_total_hindex(),
+    """
+    View responsável por carregar a página de Impacto pela PRIMEIRA VEZ.
+    """
+    p = Dispatcher(mapeamentos=MAPEAMENTOS_IMPACTO)
 
-        'graf_01':p.citacoes_por_ano(ano_inicial=1990, ano_final=2024),
-        #'graf_02':p.top_instituicoes_colaboradoras(internacional=True),
+    # Definimos os filtros iniciais para quando o usuário abre a página
+    filtros_iniciais_grafico = {
+        'ano_inicial': 2013,
+        'ano_final': 2024,
+        'metrica': 'total_citacoes' # O gráfico já nasce exibindo o total
     }
-)
 
-def grafico_citacoes_por_ano(request):
-    ano_inicial = int(request.GET.get("ano_inicial", 1990))
-    ano_final = int(request.GET.get("ano_final", 2024))
-    tipo_producao = request.GET.get("tipo_producao", "total")
-    metrica = request.GET.get("metrica", "total_citacoes")
-    tipo_grafico = request.GET.get("tipo_grafico", "barra")
+    context = {
+        # Gráfico Principal (Passamos os filtros iniciais)
+        'graf_01': p.generate_plot_html(
+            nome_plot='citacoes_por_ano', 
+            filtros_selecionados=filtros_iniciais_grafico,
+        ),
+        # Gráfico Secundário (distribuicao)
+        'graf_02': p.generate_plot_html(
+            nome_plot="distribuicao_citacoes", 
+            filtros=request.GET),
+        'plotter': p, #Usado APENAS para mostrar o sumário dos plots
+    }
 
-    p = PlotsImpacto()
-    graf = p.citacoes_por_ano(ano_inicial=ano_inicial, 
-                              ano_final=ano_final, 
-                              tipo_producao=tipo_producao, 
-                              metrica=metrica, 
-                              tipo_grafico=tipo_grafico,
-                              )
+    return render(request, 'openalex/impacto.html', context)
 
-    # Renderiza o partial específico para HTMX
-    return render( request, 
-                  "common/partials/_plot_reativo.html", 
-                  {"graf": graf}
-                  )
+
 
 def colaboracao(request):
-    p = PlotsColaboracao()
-
-    return render(request, r'openalex/colaboracao.html', {
-        #'card_01':p.producao_colaboracao_nacional(),
-        #'card_02':p.producao_colaboracao_internacional(),
-
-        'graf_01':p.colaboracoes_por_ano(),
-        'graf_02':p.top_instituicoes_colaboradoras(n_instituicoes=10, tipo_instituicao='nacional'),
-        #'graf_02':p.top_instituicoes_colaboradoras(internacional=True),
-        #'graf_02':p.producao_por_ano_worktype(ano_inicial=1990, ano_final=2024),
-        #'graf_03':p.producao_por_ano_worktype(ano_inicial=1990, 
-        #                                      ano_final=2024,
-        #                                      tipo_plot='barra'),
-        #'graf_04': p.distribuicao_tematica_artigos(),
-    }
-)
-
-def grafico_colaboracoes_por_ano(request):
     """
-    Gera um gráfico da produção científica da UFRJ em colaboração com outras 
-    instituições (nacionais ou internacionais) ao longo do tempo.
-
-    A função é acionada por HTMX e aceita os seguintes parâmetros via GET:
-    - ano_inicial, ano_final: Filtra o período de publicação.
-    - tipo_colaboracao: 'nacional' ou 'internacional'.
-    - agrupamento: Como os dados serão divididos/coloridos no gráfico.
-                   Opções: 'total', 'tipo_documento', 'acesso_aberto', 'dominio'.
-    - tipo_grafico: 'barra' ou 'linha'.
+    View responsável por carregar a página de Colaboração pela PRIMEIRA VEZ.
     """
-    # 1. Obter parâmetros do request com valores padrão
-    ano_inicial = int(request.GET.get('ano_inicial', 2010))
-    ano_final = int(request.GET.get('ano_final', 2023))
-    tipo_colaboracao = request.GET.get('tipo_colaboracao', 'nacional')
-    tipo_producao = request.GET.get('tipo_producao', 'total')
-    tipo_grafico = request.GET.get('tipo_grafico', 'barra')
-
-    p = PlotsColaboracao()
-    graf = p.colaboracoes_por_ano(ano_inicial=ano_inicial, 
-                                            ano_final=ano_final, 
-                                            tipo_colaboracao=tipo_colaboracao, 
-                                            tipo_producao=tipo_producao, 
-                                            tipo_grafico=tipo_grafico
-                                            )
-    # Renderiza o partial específico para HTMX
-    return render( request, 
-                  "common/partials/_plot_reativo.html", 
-                  {"graf": graf}
-                  )
-
-
-def grafico_top_colaboracoes(request):
-    n_instituicoes = int(request.GET.get("n_instituicoes", 10))
-    tipo_instituicao = request.GET.get('tipo_instituicao', 'nacional')
+    print("1. Entrei na View Colaboração")
     
-    p = PlotsColaboracao()
-    graf = p.top_instituicoes_colaboradoras(
-                            n_instituicoes=n_instituicoes,
-                            tipo_instituicao=tipo_instituicao,
-                            )
+    p = Dispatcher(mapeamentos=MAPEAMENTOS_COLABORACAO)
 
-    # Renderiza o partial específico para HTMX
-    return render( request, 
-                  "common/partials/_plot_reativo.html", 
-                  {"graf": graf}
-                  )
+    # Filtros iniciais para os gráficos nascerem preenchidos
+    filtros_evolucao = {
+        'ano_inicial': 2013, 
+        'ano_final': 2024,
+        # Você pode escolher se a página nasce mostrando Nacional ou Internacional
+    }
+    
+    filtros_top = {
+        'tipo_colaboracao': 'nacional', # Nasce mostrando BR
+        'limite': 10 # Nasce como Top 10
+    }
+
+    context = {
+        # 1. Gráfico de Evolução (Atualizado para o novo nome unificado)
+        'graf_01': p.generate_plot_html(
+            nome_plot='evolucao_colaboracao',  # <--- AQUI ESTAVA O NOME ANTIGO
+            filtros_selecionados=filtros_evolucao
+        ),
+        
+        # 2. Gráfico de Top Instituições
+        'graf_02': p.generate_plot_html(
+            nome_plot='top_instituicoes', 
+            filtros_selecionados=filtros_top
+        ),
+        'plotter': p, #Usado APENAS para mostrar o sumário dos plots
+    }
+
+    return render(request, 'openalex/colaboracao.html', context)
+
+
+def grafico_generico_openalex(request, nome_plot):
+    """
+    View acionada pelo HTMX. Recebe requisições via AJAX quando o usuário 
+    muda um dropdown (ex: muda de 'Total' para 'Índice H').
+    """
+
+    p = Dispatcher(mapeamentos=MAPEAMENTOS_TODOS)
+
+    # 1. Pega todos os filtros da URL (ex: ?ano_inicial=2000&metrica=hindex)
+    filtros_selecionados = request.GET.dict()
+
+    # 2. O Dispatcher processa a mágica
+    grafico_html = p.generate_plot_html(
+        nome_plot=nome_plot, 
+        filtros_selecionados=filtros_selecionados
+    )
+
+    # 3. Retorna APENAS o HTML do gráfico (para o HTMX injetar na tela)
+    return HttpResponse(grafico_html)

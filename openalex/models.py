@@ -1,8 +1,100 @@
-from django.db import models
+from django.db import models #Para criar as classes (models.Model)
 from django.core.exceptions import ValidationError
+from django.db.models import Exists, OuterRef, Subquery, Case, When, Value, BooleanField, Count, CharField #Para trabalhar com querysets
+from django.db.models.functions import Coalesce    
 
 #Nota: Django cria AutoFields automaticamente (nome da coluna = 'id') quando uma PK não é definida. Esse padrão é esperado por outras bibliotecas e resolvi aderir.
 #Também foi preferir usar chaves substitutas/artificiais (surrogate) em vez de naturais, para fins de eficiência e tbm pq elas substituem chaves compostas, para as quais o django não tem um suporte muito desenvolvido
+
+
+class WorkQuerySet(models.QuerySet):
+    def autor_correspondente_ufrj(self):
+        from .models import Authorship
+
+        UFRJ_OPENALEX_ID = 'I122140584'
+        
+        corresp_ufrj = Authorship.objects.filter(
+            work=OuterRef('pk'),
+            is_corresponding=True,
+            authorshipinstitution__institution__institution_id=UFRJ_OPENALEX_ID
+        )
+
+        return self.annotate(
+            autor_correspondente_ufrj=Case(
+                When(Exists(corresp_ufrj), then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField()
+            )
+        )
+
+    def com_tipo_documento_agrupado(self):
+        """
+        Calcula os tipos de documento com mais publicações globais. 
+        Mantém o nome original deles, e transforma todos os outros em 'Outros'.
+        """
+        # 1. Pede ao banco para achar os 9 maiores tipos globais
+        top_tipos = (
+            self.values('worktype__worktype')
+            .annotate(total=Count('id'))
+            .order_by('-total')[:6] #altere o numero de categorias aqui
+        )
+        
+        # 2. Extrai apenas os nomes para uma lista (ignorando nulos)
+        lista_top = [
+            item['worktype__worktype'] 
+            for item in top_tipos 
+            if item['worktype__worktype']
+        ]
+
+        # 3. Retorna a query anotando a NOVA coluna limpa
+        return self.annotate(
+            tipo_documento_limpo=Case(
+                When(worktype__worktype__in=lista_top, then='worktype__worktype'),
+                default=Value('others'), #valor dado aos agrupados
+                output_field=CharField()
+            )
+        )
+    
+    def com_topico_principal(self):
+        from .models import WorkTopic
+        
+        # Subquery base ordenada pelo maior score
+        top_topic_qs = WorkTopic.objects.filter(work=OuterRef('pk')).order_by('-score')
+
+        return self.annotate(
+            top_domain=Coalesce(Subquery(top_topic_qs.values('topic__domain_name')[:1]), Value("Unclassified")),
+            top_field=Coalesce(Subquery(top_topic_qs.values('topic__field_name')[:1]), Value("Unclassified")),
+            top_subfield=Coalesce(Subquery(top_topic_qs.values('topic__subfield_name')[:1]), Value("Unclassified")),
+        )
+    
+    def com_status_colaboracao(self):
+        # Importe o modelo localmente como você já faz
+        from .models import AuthorshipInstitution
+        UFRJ_ID = 'I122140584'
+    
+        # Subquery: Existe alguma instituição BR nesse trabalho que não seja a UFRJ?
+        parceiro_br = AuthorshipInstitution.objects.filter(
+            authorship__work=OuterRef('pk'),
+            institution__country_code='BR'
+        ).exclude(
+            institution__institution_id=UFRJ_ID
+        )
+    
+        # Subquery: Existe alguma instituição nesse trabalho que não seja BR?
+        parceiro_int = AuthorshipInstitution.objects.filter(
+            authorship__work=OuterRef('pk'),
+            institution__country_code__isnull=False
+        ).exclude(
+            institution__country_code='BR'
+        )
+    
+        # Anotamos booleanos! Isso é super rápido e não quebra o GROUP BY
+        return self.annotate(
+            tem_colab_nacional=Exists(parceiro_br),
+            tem_colab_internacional=Exists(parceiro_int)
+        )
+        
+
 
 class Year(models.Model):
     year = models.IntegerField(unique=True)
@@ -48,6 +140,10 @@ class Work(models.Model):
     is_oa = models.BooleanField()
     oa_status = models.ForeignKey(OAStatus, on_delete=models.CASCADE)
     referenced_works_count = models.IntegerField()
+    objects = WorkQuerySet.as_manager()
+
+    class Meta:
+            base_manager_name = 'objects'
 
     def __str__(self):
         return self.work_title or self.work_id #Fallback for title

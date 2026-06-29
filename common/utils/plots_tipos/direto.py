@@ -10,7 +10,7 @@ class DirectPlotStrategy(XYBaseStrategy):
     Busca valores diretamente do modelo sem aplicar agregação (Count, Sum, Avg).
     Ideal para séries temporais simples como 'conceito por ano'.
     """
-    def get_dataframe(self) -> pd.DataFrame:
+    def _get_raw_dataframe(self) -> pd.DataFrame:
         """
         Implementação para buscar valores diretos.
         """
