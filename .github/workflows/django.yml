@@ -7,39 +7,55 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 4
-      matrix:
-        python-version: [3.10.12, 3.11, 3.12, 3.13]
+
+    # 1. CRIA UM POSTGRES TEMPORÁRIO PARA OS TESTES
+    services:
+      postgres:
+        image: postgres:17.5
+        env:
+          POSTGRES_USER: user_teste
+          POSTGRES_PASSWORD: pass_teste
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+    
+    # 2. USA APENAS O PYTHON 3.13
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v5
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: '3.13'
+        cache: 'pip' # Acelera a instalação do requirements.txt
+
     - name: Install System Dependencies 
       run: |
         sudo apt-get update
-        sudo apt-get install -y \
-          libpq-dev \
-          libmysqlclient-dev \
-          libjpeg-dev \
-          zlib1g-dev \
-          libfreetype6-dev \
-          libxml2-dev \
-          libxslt1-dev
-          # Add any other dependencies your project might need for compilation
-          # For example, if you use `pycurl`: libcurl4-openssl-dev
-          # If you use `pylibmc`: libmemcached-dev
-          # Add more as per your `requirements.txt` and error logs
+        sudo apt-get install -y libpq-dev # Apenas o necessário para o Postgres
+
     - name: Install Python Dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+
     - name: Run Tests
+      # 3. VARIÁVEIS FALSAS PARA O DJANGO NÃO QUEBRAR NO STARTUP
+      env:
+        DJANGO_SECRET_KEY: 'chave-secreta-insegura-apenas-para-testes'
+        DJANGO_DEBUG: 'True'
+        DJANGO_ALLOWED_HOSTS: '*'
+        POSTGRES_USER: user_teste
+        POSTGRES_PASSWORD: pass_teste
+        POSTGRES_DB: test_db
+        POSTGRES_HOST: localhost
+        POSTGRES_PORT: 5432
       run: |
         python manage.py test

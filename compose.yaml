@@ -136,8 +136,6 @@ services:
         # Liga a limpeza automática
         - WATCHTOWER_CLEANUP=true
 
-
-
 volumes:
   static_volume:
   postgres_data:
