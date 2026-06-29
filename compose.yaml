@@ -21,11 +21,9 @@ services:
       # Certifique-se de que o diretório de arquivos estáticos esteja montado
       # para o Caddy poder servi-los diretamente.
       - static_volume:${DJANGO_STATIC_ROOT} # Agora usa a variável do .env
-      - ./importar:/app/importar
-      - .:/app #acrescentado posteriormente.
       - ./dump:/app/dump #também acrescentei
-    ports: 
-      - 8001:${DJANGO_PORT}
+      # Descomente a linha abaixo se precisar processar dados brutos locais
+      # - ./importar:/app/importar
     depends_on:
       postgres:
         condition: service_healthy # Espera o DB estar saudável
@@ -131,9 +129,11 @@ services:
         - /var/run/docker.sock:/var/run/docker.sock
       environment:
         - TZ=America/Sao_Paulo
-        # Busca atualizacao todo domingo 3 da manhã
-        - WATCHTOWER_SCHEDULE=0 0 3 * * 0 
-        # Liga a faxina automática!
+        # Busca atualizacao a cada 5 minutos
+        - WATCHTOWER_POLL_INTERVAL=300
+        # Busca atualizacao todo dia às 3 da manhã
+        #- WATCHTOWER_SCHEDULE=0 0 3 * * * 
+        # Liga a limpeza automática
         - WATCHTOWER_CLEANUP=true
 
 
