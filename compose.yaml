@@ -15,6 +15,10 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT}
+      # Variáveis para o superusuário
+      - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
+      - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
+      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
       # Dump para atualizacao
       - DUMP_URL=${DUMP_URL}
     volumes:
@@ -60,45 +64,6 @@ services:
       timeout: 5s
       retries: 5
     restart: "unless-stopped"
-
-  init-db:
-      image: gavieira/gid-painel:latest
-      # --- MODIFICAÇÃO AQUI ---
-      # Comando simplificado para apenas tarefas de aplicação
-      command: sh -c "
-        set -e;
-        echo '--- 1. Aplicando migrações (se houver novas)... ---';
-        python manage.py migrate --no-input;
-        
-        echo '--- 2. Coletando arquivos estáticos... ---';
-        python manage.py collectstatic --no-input;
-        
-        echo '--- 3. Garantindo superusuário (ignora erro se já existir)... ---';
-        python manage.py createsuperuser --noinput \
-                         --username $$DJANGO_SUPERUSER_USERNAME \
-                         --email $$DJANGO_SUPERUSER_EMAIL || true;
-                         
-        echo '--- Setup da Aplicação Concluído ---' "
-      # --- MODIFICAÇÃO AQUI ---
-      # Volume de 'importar' não é mais necessário para este comando
-      volumes:
-        - static_volume:${DJANGO_STATIC_ROOT} 
-      environment:
-        - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
-        - DJANGO_DEBUG=${DJANGO_DEBUG}
-        - DJANGO_STATIC_ROOT=${DJANGO_STATIC_ROOT}
-        - POSTGRES_USER=${POSTGRES_USER}
-        - POSTGRES_DB=${POSTGRES_DB}
-        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-        - POSTGRES_HOST=${POSTGRES_HOST}
-        - POSTGRES_PORT=${POSTGRES_PORT}
-        - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
-        - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
-        - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
-      depends_on:
-        postgres:
-          condition: service_healthy
-      profiles: ["setup"]
 
   caddy:
     image: caddy:2.7.6-alpine

@@ -19,8 +19,20 @@ if [ "$#" -gt 0 ]; then
     # Isso é o que init-db precisa para rodar seus comandos de migração
     exec "$@"
 else
-    # Se nenhum argumento foi passado (assume CMD vazio no Dockerfile), executa o comando padrão (Gunicorn)
-    # Isso é o que gid-painel fará por padrão
+    # Se nenhum argumento foi passado, faz o setup automático e inicia o Gunicorn
+    echo "--- 1. Aplicando migrações (se houver novas)... ---"
+    python manage.py migrate --no-input
+
+    echo "--- 2. Coletando arquivos estáticos... ---"
+    python manage.py collectstatic --no-input
+
+    echo "--- 3. Garantindo superusuário (ignora erro se já existir)... ---"
+    python manage.py createsuperuser --noinput \
+                     --username "$DJANGO_SUPERUSER_USERNAME" \
+                     --email "$DJANGO_SUPERUSER_EMAIL" || true
+
+    echo "--- Setup da Aplicação Concluído! ---"
+    
     echo "--- Iniciando Gunicorn (comando padrão) ---"
     echo "Porta: ${DJANGO_PORT}, Workers: ${GUNICORN_WORKERS}"
     exec gunicorn --bind "0.0.0.0:${DJANGO_PORT}" --workers "${GUNICORN_WORKERS}" gid.wsgi:application
