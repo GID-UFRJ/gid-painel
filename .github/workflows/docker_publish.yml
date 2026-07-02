@@ -6,7 +6,7 @@ on:
       - main # Aciona o workflow em pushes para a branch 'main'
 
 env:
-  DOCKER_IMAGE_NAME: gavieira/gid-painel # Define o nome base da imagem Docker como uma variável de ambiente
+  DOCKER_IMAGE_NAME: gidpr2/gid-painel # Define o nome base da imagem Docker como uma variável de ambiente
 
 jobs:
   docker:

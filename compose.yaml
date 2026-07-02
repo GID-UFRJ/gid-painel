@@ -1,6 +1,6 @@
 services:
   gid-painel:
-    image: gavieira/gid-painel:latest
+    image: gidpr2/gid-painel:latest
     environment:
       # Variáveis da Aplicação Django (lidas do .env)
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
