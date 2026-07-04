@@ -119,7 +119,7 @@ if DEBUG:
 else:
     # Em modo de produção (DEBUG=False), usamos a configuração robusta com Redis.
     REDIS_HOST = config('REDIS_HOST', default='localhost')
-    REDIS_PORT = config('REDIS_PORT', default=6379, cast=int)
+    REDIS_PORT = config('REDIS_PORT', default='6379')
     
     CACHES = {
         "default": {
