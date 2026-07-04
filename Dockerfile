@@ -56,6 +56,11 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 # Definindo o ENTRYPOINT como o script copiado
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
+# Recebe o hash do commit do GitHub Actions
+ARG COMMIT_HASH="Desenvolvimento"
+# Salva o hash como variável de ambiente fixa dentro da imagem
+ENV COMMIT_HASH=${COMMIT_HASH}
+
 # Este CMD será executado por padrão se nenhum 'command' for especificado no compose.yaml.
 # Entretanto, entrypoint.sh não precisa de nenhum argumento adicional, logo CMD será vazio aqui.
 CMD []

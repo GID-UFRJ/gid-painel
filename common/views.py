@@ -3,6 +3,9 @@ from django.http import HttpResponse, Http404
 from common.utils.dispatcher import Dispatcher
 from .utils.export_helpers import DICIONARIOS_MAPEAMENTO, get_csv_response
 
+import re
+import requests
+from django.core.cache import cache
 import threading
 import subprocess
 import os
@@ -76,6 +79,12 @@ def tarefa_atualizacao_dados():
         print(f"Iniciando download da fonte final: {link_download}")
         # === FIM DA LÓGICA ===
 
+        # === NOVO: EXTRAÇÃO DA VERSÃO ===
+        # Procura o padrão "records/NUMEROS" no link final do download
+        match_zenodo = re.search(r'records/(\d+)', link_download)
+        zenodo_id = match_zenodo.group(1) if match_zenodo else "Fonte Externa"
+        # ================================
+
         # O curl agora recebe o link_download mastigado e exato!
         subprocess.run(['curl', '-L', '-o', caminho_tmp, link_download], check=True)
 
@@ -90,6 +99,12 @@ def tarefa_atualizacao_dados():
         ]
         subprocess.run(comando_restore, check=True)
         print("Sincronização concluída com sucesso!")
+        
+        # === NOVO: SALVANDO A VERSÃO NO CACHE ===
+        # Registra no Redis para que o Context Processor possa exibir no Admin
+        cache.set('DB_VERSAO_ZENODO', zenodo_id, timeout=None)
+        print(f"Versão do banco ({zenodo_id}) salva no cache com sucesso.")
+        # ========================================
 
     except subprocess.CalledProcessError as e:
         print(f"Erro durante a execução do comando de sistema: {e}")

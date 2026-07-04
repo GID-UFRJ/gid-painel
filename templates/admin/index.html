@@ -14,3 +14,19 @@
 
     {{ block.super }}
 {% endblock %}
+
+{% block footer %}
+    {{ block.super }}
+    <div style="text-align: center; padding: 15px; color: #666; font-size: 13px; border-top: 1px solid #ddd; margin-top: 20px;">
+        <strong>Painel GID-UFRJ</strong> &nbsp;|&nbsp; 
+        Versão do Sistema (Commit): 
+        <a href="https://github.com/GID-UFRJ/gid-painel/commit/{{ APP_VERSAO_COMMIT }}" target="_blank" style="color: #417690;">
+            {{ APP_VERSAO_COMMIT }}
+        </a> 
+        &nbsp;|&nbsp; 
+        Versão do Banco de Dados (Zenodo): 
+        <a href="https://zenodo.org/records/{{ APP_VERSAO_DB }}" target="_blank" style="color: #417690;">
+            {{ APP_VERSAO_DB }}
+        </a>
+    </div>
+{% endblock %}

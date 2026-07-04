@@ -76,6 +76,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'baseGraficos.context_processors.menu_items',
+                'common.context_processors.versoes_sistema', # <- versão do APP e da DB
             ],
         },
     },

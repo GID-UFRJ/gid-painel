@@ -44,3 +44,6 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }} # Usa os labels gerados pelo docker/metadata-action
           cache-from: type=gha # Habilita o cache do build para acelerar futuras execuções
           cache-to: type=gha,mode=max # Salva o cache do build
+          # Injeta o hash do commit dentro da imagem do Docker
+          build-args: |
+            COMMIT_HASH=${{ github.sha }} 
