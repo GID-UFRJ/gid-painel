@@ -17,6 +17,7 @@ services:
       - POSTGRES_PORT=${POSTGRES_PORT}
       # Variáveis para o Redis
       - REDIS_HOST={$REDIS_HOST}
+      - REDIS_PORT={$REDIS_PORT}
       # Variáveis para o superusuário
       - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
       - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
