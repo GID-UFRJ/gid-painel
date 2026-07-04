@@ -32,6 +32,10 @@ else
                      --email "$DJANGO_SUPERUSER_EMAIL" || true
 
     echo "--- Setup da Aplicação Concluído! ---"
+
+    # Limpa o cache do Redis 
+    echo "Limpando o cache antigo do Redis..."
+    python manage.py shell -c "from django.core.cache import cache; cache.clear()"
     
     echo "--- Iniciando Gunicorn (comando padrão) ---"
     echo "Porta: ${DJANGO_PORT}, Workers: ${GUNICORN_WORKERS}"
