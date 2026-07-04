@@ -25,7 +25,7 @@ services:
       # Certifique-se de que o diretório de arquivos estáticos esteja montado
       # para o Caddy poder servi-los diretamente.
       - static_volume:${DJANGO_STATIC_ROOT} # Agora usa a variável do .env
-      - ./dump:/app/dump #também acrescentei
+      #- ./dump:/app/dump #também acrescentei
       # Descomente a linha abaixo se precisar processar dados brutos locais
       # - ./importar:/app/importar
     depends_on:
@@ -45,7 +45,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       # Mapeia o dump para a pasta de inicialização do Postgres
-      - ./dump/init.sql:/docker-entrypoint-initdb.d/init.sql
+      #- ./dump/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s

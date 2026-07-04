@@ -3,6 +3,15 @@ from django.http import HttpResponse, Http404
 from common.utils.dispatcher import Dispatcher
 from .utils.export_helpers import DICIONARIOS_MAPEAMENTO, get_csv_response
 
+import threading
+import subprocess
+import os
+from decouple import config
+from django.contrib import messages
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.contrib.admin.views.decorators import staff_member_required
+
 def download_csv_generic(request, plotter_name: str, **kwargs):
     # 1. Busca o dicionário mestre do app (ex: 'openalex')
     mapeamento_alvo = DICIONARIOS_MAPEAMENTO.get(plotter_name)
@@ -28,15 +37,6 @@ def download_csv_generic(request, plotter_name: str, **kwargs):
 
 
 
-import threading
-import subprocess
-import os
-from decouple import config
-from django.contrib import messages
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-from django.contrib.admin.views.decorators import staff_member_required
-
 def tarefa_atualizacao_dados():
     # 1. Busca a URL genérica definida na infraestrutura
     url_do_dump = config('DUMP_URL')
@@ -54,9 +54,30 @@ def tarefa_atualizacao_dados():
     db_url = f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
 
     try:
-        print(f"Baixando dados da fonte remota...")
-        # O curl baixa o arquivo da URL fornecida, seja ela qual for
-        subprocess.run(['curl', '-L', '-o', caminho_tmp, url_do_dump], check=True)
+        print(f"Processando URL original: {url_do_dump}")
+        
+        # === INÍCIO DA LÓGICA DE DETECÇÃO (ZENODO VS CLOUDFLARE) ===
+        # Se for um link de preservação científica (zenodo), seguimos o redirecionamento
+        if "doi.org" in url_do_dump or "zenodo.org" in url_do_dump:
+            print("Link Zenodo/DOI detectado. Buscando a versão mais recente...")
+            # Pede ao servidor para onde a URL redireciona, pegando o link final
+            resposta = requests.head(url_do_dump, allow_redirects=True)
+            url_base = resposta.url.rstrip('/')
+            
+            # Se a URL não tiver os parâmetros de download anexados, nós montamos
+            if "/files/" not in url_base:
+                link_download = f"{url_base}/files/gid_db.dump?download=1"
+            else:
+                link_download = url_base
+        else:
+            # Se for link direto (como bucket Cloudflare, AWS), usa ele mesmo
+            link_download = url_do_dump
+            
+        print(f"Iniciando download da fonte final: {link_download}")
+        # === FIM DA LÓGICA ===
+
+        # O curl agora recebe o link_download mastigado e exato!
+        subprocess.run(['curl', '-L', '-o', caminho_tmp, link_download], check=True)
 
         print("Restaurando as tabelas científicas no banco...")
         comando_restore = [
@@ -72,6 +93,9 @@ def tarefa_atualizacao_dados():
 
     except subprocess.CalledProcessError as e:
         print(f"Erro durante a execução do comando de sistema: {e}")
+    except Exception as e:
+        # Pega erros de rede do requests (Zenodo fora do ar, por exemplo)
+        print(f"Erro inesperado ao processar atualização: {e}")
         
     finally:
         # Garante que o contêiner não fique com lixo acumulado
