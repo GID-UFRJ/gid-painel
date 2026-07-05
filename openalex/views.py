@@ -3,15 +3,21 @@ from django.shortcuts import render
 from common.utils.dispatcher import Dispatcher
 from .utils.mapeamentos import MAPEAMENTOS_PRODUCAO, MAPEAMENTOS_IMPACTO, MAPEAMENTOS_COLABORACAO, MAPEAMENTOS_TODOS
 
+#Ferramenta de cache
+from django.views.decorators.cache import cache_page
+
 # Create your views here.
 from django.http import HttpResponse
 
+
+# Constante de tempo
+TEMPO_CACHE = 3600
 
 def index(request):
     return render(request, r'openalex/index.html')
 
 
-# Create your views here.
+@cache_page(TEMPO_CACHE)
 def producao(request):
     """
     View responsável por carregar a página de Produção pela PRIMEIRA VEZ.
@@ -42,6 +48,7 @@ def producao(request):
         'plotter': p, #Usado APENAS para mostrar o sumário dos plots
     })
 
+@cache_page(TEMPO_CACHE)
 def impacto(request):
     """
     View responsável por carregar a página de Impacto pela PRIMEIRA VEZ.
@@ -71,7 +78,7 @@ def impacto(request):
     return render(request, 'openalex/impacto.html', context)
 
 
-
+@cache_page(TEMPO_CACHE)
 def colaboracao(request):
     """
     View responsável por carregar a página de Colaboração pela PRIMEIRA VEZ.
@@ -109,7 +116,7 @@ def colaboracao(request):
 
     return render(request, 'openalex/colaboracao.html', context)
 
-
+@cache_page(TEMPO_CACHE)
 def grafico_generico_openalex(request, nome_plot):
     """
     View acionada pelo HTMX. Recebe requisições via AJAX quando o usuário 

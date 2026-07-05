@@ -63,6 +63,7 @@ services:
   redis:
     image: redis:7-alpine  # Usamos uma imagem leve
     hostname: redis        # O nome do host que o Django usará para se conectar
+    command: redis-server --appendonly yes --maxmemory 20mb --maxmemory-policy allkeys-lru #Redis com limite de 20MB
     healthcheck:
       test: ["CMD", "redis-cli", "ping"] # Verifica se o Redis está respondendo
       interval: 5s
