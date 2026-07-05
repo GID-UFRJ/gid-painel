@@ -1,29 +1,30 @@
 services:
   gid-painel:
     image: gidpr2/gid-painel:latest
+
     environment:
       # Variáveis da Aplicação Django (lidas do .env)
-      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
-      - DJANGO_DEBUG=${DJANGO_DEBUG}
-      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
-      - DJANGO_PORT=${DJANGO_PORT}
-      - GUNICORN_WORKERS=${GUNICORN_WORKERS}
-      - DJANGO_STATIC_ROOT=${DJANGO_STATIC_ROOT}
+      - DJANGO_SECRET_KEY
+      - DJANGO_DEBUG
+      - DJANGO_ALLOWED_HOSTS
+      - DJANGO_PORT
+      - GUNICORN_WORKERS
+      - DJANGO_STATIC_ROOT
       # Variáveis do Banco de Dados PostgreSQL (lidas do .env)
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER
+      - POSTGRES_DB
+      - POSTGRES_PASSWORD
+      - POSTGRES_HOST
+      - POSTGRES_PORT
       # Variáveis para o Redis
-      - REDIS_HOST={$REDIS_HOST}
-      - REDIS_PORT={$REDIS_PORT}
+      - REDIS_HOST
+      - REDIS_PORT
       # Variáveis para o superusuário
-      - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
-      - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
-      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+      - DJANGO_SUPERUSER_USERNAME
+      - DJANGO_SUPERUSER_EMAIL
+      - DJANGO_SUPERUSER_PASSWORD
       # Dump para atualizacao
-      - DUMP_URL=${DUMP_URL}
+      - DUMP_URL
     volumes:
       # Certifique-se de que o diretório de arquivos estáticos esteja montado
       # para o Caddy poder servi-los diretamente.
@@ -42,9 +43,9 @@ services:
     image: postgres:17.5
     environment:
       # Credenciais do PostgreSQL (lidas do .env)
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB} # A imagem Postgres usa POSTGRES_DB, que vem de POSTGRES_DB do .env
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB # A imagem Postgres usa POSTGRES_DB, que vem de POSTGRES_DB do .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
       # Mapeia o dump para a pasta de inicialização do Postgres
@@ -81,11 +82,11 @@ services:
       - static_volume:${DJANGO_STATIC_ROOT} # Monta o mesmo volume de arquivos estáticos
     environment:
       # Variáveis do Caddy (lidas do .env)
-      - CADDY_DOMAIN=${CADDY_DOMAIN}
-      - CADDY_EMAIL=${CADDY_EMAIL}
+      - CADDY_DOMAIN
+      - CADDY_EMAIL
       # Referência ao serviço Django (hardcoded, pois é um nome de serviço interno)
       - DJANGO_HOST=gid-painel
-      - DJANGO_PORT=${DJANGO_PORT} # Porta que o Gunicorn está usando dentro do contêiner Django
+      - DJANGO_PORT # Porta que o Gunicorn está usando dentro do contêiner Django
     depends_on:
       gid-painel:
         condition: service_started # Caddy precisa que o Django esteja rodando
