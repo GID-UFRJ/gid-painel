@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main # Aciona o workflow em pushes para a branch 'main'
+      - develop # Pushes para o develop terão sua propria tag
 
 env:
   DOCKER_IMAGE_NAME: gidpr2/gid-painel # Define o nome base da imagem Docker como uma variável de ambiente
