@@ -6,18 +6,20 @@ from .utils.mapeamentos import MAPEAMENTOS_PRODUCAO, MAPEAMENTOS_IMPACTO, MAPEAM
 #Ferramenta de cache
 from django.views.decorators.cache import cache_page
 
+#Settings (para pegar as variáveis de timeout do cache)
+from django.conf import settings 
+
+
 # Create your views here.
 from django.http import HttpResponse
 
 
-# Constante de tempo
-TEMPO_CACHE = 3600
-
+@cache_page(settings.CACHE_TIMEOUT_PAGINAS)
 def index(request):
     return render(request, r'openalex/index.html')
 
 
-@cache_page(TEMPO_CACHE)
+@cache_page(settings.CACHE_TIMEOUT_PAGINAS)
 def producao(request):
     """
     View responsável por carregar a página de Produção pela PRIMEIRA VEZ.
@@ -48,7 +50,7 @@ def producao(request):
         'plotter': p, #Usado APENAS para mostrar o sumário dos plots
     })
 
-@cache_page(TEMPO_CACHE)
+@cache_page(settings.CACHE_TIMEOUT_PAGINAS)
 def impacto(request):
     """
     View responsável por carregar a página de Impacto pela PRIMEIRA VEZ.
@@ -78,7 +80,7 @@ def impacto(request):
     return render(request, 'openalex/impacto.html', context)
 
 
-@cache_page(TEMPO_CACHE)
+@cache_page(settings.CACHE_TIMEOUT_PAGINAS)
 def colaboracao(request):
     """
     View responsável por carregar a página de Colaboração pela PRIMEIRA VEZ.
@@ -116,7 +118,8 @@ def colaboracao(request):
 
     return render(request, 'openalex/colaboracao.html', context)
 
-@cache_page(TEMPO_CACHE)
+
+@cache_page(settings.CACHE_TIMEOUT_HTMX)
 def grafico_generico_openalex(request, nome_plot):
     """
     View acionada pelo HTMX. Recebe requisições via AJAX quando o usuário 

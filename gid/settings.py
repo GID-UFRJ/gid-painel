@@ -133,6 +133,16 @@ else:
 
 # --- FIM DA CONFIGURAÇÃO DE CACHE CONDICIONAL ---
 
+# ==============================================================================
+# CONFIGURAÇÕES DE TIMEOUT DE CACHE
+# ==============================================================================
+
+# Páginas principais (Casca HTML + Gráficos Iniciais) - Ex: 365 dias
+CACHE_TIMEOUT_PAGINAS = 60 * 60 * 24 * 365
+
+# Consultas específicas via HTMX (Variações de filtros) - Ex: 24 horas
+CACHE_TIMEOUT_HTMX = 60 * 60 * 24
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

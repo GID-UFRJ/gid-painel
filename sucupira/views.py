@@ -8,6 +8,9 @@ from django.db.models import OuterRef, Subquery
 # IMPORTAÇÃO NATIVA DO DJANGO PARA O CACHE
 from django.views.decorators.cache import cache_page
 
+#Settings (para pegar as variáveis de timeout do cache)
+from django.conf import settings 
+
 # Importes padrão 
 from .models import Programa, AnoPrograma, Curso
 
@@ -21,14 +24,11 @@ from .utils.mapeamentos import (
     MAPEAMENTOS_TODOS
 )
 
-# Constante de tempo de cache (3600 segundos = 1 hora)
-TEMPO_CACHE = 3600
-
 # ==============================================================================
 # VIEWS ESTÁTICAS E AUXILIARES
 # ==============================================================================
 
-@cache_page(TEMPO_CACHE)
+@cache_page(settings.CACHE_TIMEOUT_PAGINAS)
 def index(request):
     """Renderiza o índice do app, determinando o namespace a partir da URL."""
     namespace = request.resolver_match.namespace
@@ -38,7 +38,7 @@ def index(request):
 # VIEWS PARA A SEÇÃO PESSOAL (DISCENTES E DOCENTES)
 # ==============================================================================
 
-@cache_page(TEMPO_CACHE)
+@cache_page(settings.CACHE_TIMEOUT_PAGINAS)
 def pessoal_discentes(request):
     """Renderiza a página de análise de Discentes."""
     # Instancia o motor apenas com os gráficos de Pessoal
@@ -54,7 +54,7 @@ def pessoal_discentes(request):
     return render(request, r'sucupira/pessoal/pessoal_discentes.html', context)
 
 
-@cache_page(TEMPO_CACHE)
+@cache_page(settings.CACHE_TIMEOUT_PAGINAS)
 def pessoal_docentes(request):
     """Renderiza a página de análise de Docentes."""
     p = Dispatcher(mapeamentos=MAPEAMENTOS_DOCENTES)
@@ -72,7 +72,7 @@ def pessoal_docentes(request):
 # VIEW PARA A PÓS-GRADUAÇÃO DA UFRJ NO GERAL
 # ==============================================================================
 
-@cache_page(TEMPO_CACHE)
+@cache_page(settings.CACHE_TIMEOUT_PAGINAS)
 def posgrad_ufrj(request):
     """Página geral dos PPGs da UFRJ."""
     p = Dispatcher(mapeamentos=MAPEAMENTOS_PPG_GERAL)
@@ -88,7 +88,7 @@ def posgrad_ufrj(request):
 # VIEWS PARA A LISTA E DETALHE DOS PROGRAMAS (PPGS)
 # ==============================================================================
 
-@cache_page(TEMPO_CACHE)
+@cache_page(settings.CACHE_TIMEOUT_PAGINAS)
 def ppgs(request):
     """Lista todos os programas de pós-graduação."""
     ultimo_ano_qs = AnoPrograma.objects.filter(programa=OuterRef('pk')).order_by('-ano__ano_valor')
@@ -106,7 +106,7 @@ def ppgs(request):
     return render(request, 'sucupira/posgrad/ppgs.html', {'programas_agrupados': dict(sorted(agrupados.items()))})
 
 
-@cache_page(TEMPO_CACHE)
+@cache_page(settings.CACHE_TIMEOUT_PAGINAS)
 def ppg_detalhe(request, programa_id):
     """Renderiza a página de detalhes de um programa específico."""
     p = Dispatcher(mapeamentos=MAPEAMENTOS_PPG_INDIVIDUAL)
@@ -154,7 +154,7 @@ def ppg_detalhe(request, programa_id):
 # A "SUPER VIEW" GENÉRICA DO HTMX
 # ==============================================================================
 
-@cache_page(TEMPO_CACHE)
+@cache_page(settings.CACHE_TIMEOUT_HTMX)
 def grafico_generico_sucupira(request, nome_plot: str, **kwargs):
     """
     View ÚNICA para todas as requisições HTMX do aplicativo Sucupira.

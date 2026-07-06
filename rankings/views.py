@@ -5,6 +5,9 @@ from django.http import HttpResponse, Http404
 # Importação nativa do cache do Django
 from django.views.decorators.cache import cache_page
 
+#Settings (para pegar as variáveis de timeout do cache)
+from django.conf import settings 
+
 # Substituímos a classe antiga pelo novo motor universal
 from common.utils.dispatcher import Dispatcher
 
@@ -15,16 +18,13 @@ from .utils.mapeamentos import (
     MAPEAMENTOS_TODOS
 )
 
-# Constante de tempo de cache (3600 segundos = 1 hora)
-TEMPO_CACHE = 3600
 
-
-@cache_page(TEMPO_CACHE)
+@cache_page(settings.CACHE_TIMEOUT_PAGINAS)
 def index(request):
     return render(request, r'rankings/index.html')
 
 
-@cache_page(TEMPO_CACHE)
+@cache_page(settings.CACHE_TIMEOUT_PAGINAS)
 def academicos(request):
     """Página exclusiva para Rankings Acadêmicos."""
     # 1. Instancia o motor usando APENAS o dicionário desta página
@@ -46,7 +46,7 @@ def academicos(request):
     return render(request, "rankings/academicos.html", context)
 
 
-@cache_page(TEMPO_CACHE)
+@cache_page(settings.CACHE_TIMEOUT_PAGINAS)
 def sustentabilidade(request):
     """Página exclusiva para Rankings de Sustentabilidade."""
     # 1. Instancia o motor com o dicionário de sustentabilidade
@@ -65,7 +65,7 @@ def sustentabilidade(request):
     return render(request, "rankings/sustentabilidade.html", context)
 
 
-@cache_page(TEMPO_CACHE)
+@cache_page(settings.CACHE_TIMEOUT_HTMX)
 def grafico_generico_rankings(request, nome_plot):
     """View HTMX que serve os gráficos para ambas as páginas."""
     
