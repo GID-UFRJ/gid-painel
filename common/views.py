@@ -11,6 +11,8 @@ from django.contrib.admin.views.decorators import staff_member_required
 from common.utils.dispatcher import Dispatcher
 from .utils.export_helpers import DICIONARIOS_MAPEAMENTO, get_csv_response
 
+from django.core.cache import cache
+
 
 def download_csv_generic(request, plotter_name: str, **kwargs):
     mapeamento_alvo = DICIONARIOS_MAPEAMENTO.get(plotter_name)
@@ -71,7 +73,12 @@ def tarefa_atualizacao_dados():
             '--dbname', db_url, caminho_tmp
         ], check=True)
         
-        print("Sincronização concluída com sucesso!")
+        print("Sincronização do banco concluída com sucesso!")
+
+        # 4. Limpeza do cache
+        print("Limpando os gráficos antigos do Redis...")
+        cache.clear()
+        print("Cache limpo! O painel já está exibindo os dados mais recentes.")
 
     except requests.exceptions.RequestException as e:
         print(f"Erro de rede ao baixar o banco de dados: {e}")
@@ -80,10 +87,9 @@ def tarefa_atualizacao_dados():
     except Exception as e:
         print(f"Erro inesperado: {e}")
     finally:
-        # 4. Limpa a sujeira
+        # 5. Limpa a sujeira
         if os.path.exists(caminho_tmp):
             os.remove(caminho_tmp)
-
 
 @staff_member_required
 def sincronizar_view(request):
