@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from ._api_handler import OpenAlexAPIHandler 
+from django.conf import settings
 
 
 class Command(BaseCommand):
@@ -7,12 +8,12 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         handler = OpenAlexAPIHandler(
-            email='gabrieldeusdeth@gmail.com' # Optional, but recommended for API calls
+            email=settings.DJANGO_SUPERUSER_EMAIL # Optional, but recommended for API calls
             )
 
         # Set your default query parameters here
         filters = {
-            "institutions.ror": "03490as77"
+            "authorships.institutions.lineage": "I122140584" #Recupera toda a 'linhagem' (UFRJ, HU, por aí vai...)
             # Add more filters if needed
         }
 

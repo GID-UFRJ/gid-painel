@@ -80,6 +80,19 @@ class OpenAlexWorkParser:
         for auth in self.json_data.get("authorships", []):
             author_id = self._clean_id(auth.get("author", {}).get("id"))
 
+
+
+            # ========================================================================
+            # DECISÃO ARQUITETURAL: Descarte de Autores sem ID
+            # ------------------------------------------------------------------------
+            # Como este é um painel gerencial (e não apenas um catálogo),
+            # a rastreabilidade da entidade é estritamente necessária. 
+            # A OpenAlex, apesar de ter muitas vantagens, peca na qualidade de parte 
+            # dos metadados. Um exemplo disso são os autores sem ID.
+            # Aceita-se a perda destas autorias específicas em troca de garantir 
+            # 100% de confiabilidade, integridade referencial e performance no banco.
+            # ========================================================================
+
             # Se a OpenAlex mandou um autor sem ID, ignoramos
             if not author_id:
                 raw_name = auth.get("raw_author_name", "Desconhecido")

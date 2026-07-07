@@ -35,6 +35,11 @@ ALLOWED_HOSTS_STR = config('DJANGO_ALLOWED_HOSTS', default='127.0.0.1,localhost'
 # Converte a string separada por vírgulas em uma lista
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',')]
 
+
+#Email do admin (usado para o polite pool da openalex api)
+DJANGO_SUPERUSER_EMAIL = config('DJANGO_SUPERUSER_EMAIL')
+
+
 # Application definition
 
 INSTALLED_APPS = [
