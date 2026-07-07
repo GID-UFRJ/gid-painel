@@ -125,7 +125,7 @@ class OpenAlexAPIHandler:
                 count += 1
                 
                 # Opcional: Uma pausa microscópica por cortesia à API
-                time.sleep(0.1) 
+                time.sleep(0.3) 
 
             # Captura especificamente a quebra de conexão, aguarda e continua
             except requests.exceptions.ConnectionError as e:

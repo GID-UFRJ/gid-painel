@@ -96,12 +96,12 @@ class OpenAlexWorkParser:
             # Se a OpenAlex mandou um autor sem ID, ignoramos
             if not author_id:
                 raw_name = auth.get("raw_author_name", "Desconhecido")
-                #print(f"⚠️ Aviso: Autor sem ID ignorado no trabalho {self.work_obj.work_id} (Nome bruto: {raw_name})") #Polui bastante a saída
+                print(f"⚠️ Aviso: Autor sem ID ignorado no trabalho {self.work_obj.work_id} (Nome bruto: {raw_name})") #Polui bastante a saída
                 continue
                 
             # Se a OpenAlex mandou o mesmo autor duplicado, ignoramos a duplicata
             if author_id in seen_authors:
-                #print(f"🔁 Aviso: Autor {author_id} duplicado no trabalho {self.work_obj.work_id}. Ignorando duplicata.") #Polui bastante a saída
+                print(f"🔁 Aviso: Autor {author_id} duplicado no trabalho {self.work_obj.work_id}. Ignorando duplicata.") #Polui bastante a saída
                 continue
             
             seen_authors.add(author_id)
