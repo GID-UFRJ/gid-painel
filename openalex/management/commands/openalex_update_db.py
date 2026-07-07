@@ -28,7 +28,8 @@ class Command(BaseCommand):
             "counts_by_year",
             "topics",
             "referenced_works_count",
-            "cited_by_count"
+            "cited_by_count",
+            "fwci"
         ]
 
         try:

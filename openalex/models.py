@@ -114,6 +114,12 @@ class OAStatus(models.Model):
     def __str__(self):
         return self.oa_status
 
+class AuthorPosition(models.Model):
+    position = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.position
+
 class PrimarySource(models.Model):
     # source_id can sometimes be None if there's no primary location/source data
     source_id = models.CharField(max_length=100, unique=True, null=True, blank=True)
@@ -140,6 +146,7 @@ class Work(models.Model):
     is_oa = models.BooleanField()
     oa_status = models.ForeignKey(OAStatus, on_delete=models.CASCADE)
     referenced_works_count = models.IntegerField()
+    fwci = models.FloatField(null=True, blank=True)
     objects = WorkQuerySet.as_manager()
 
     class Meta:
@@ -183,6 +190,7 @@ class Authorship(models.Model):
     work = models.ForeignKey(Work, on_delete=models.CASCADE)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     is_corresponding = models.BooleanField()
+    author_position = models.ForeignKey(AuthorPosition, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         constraints = [
