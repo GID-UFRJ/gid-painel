@@ -37,7 +37,7 @@ class Command(BaseCommand):
             handler.update_db_from_api(
                 filters=filters,
                 select=select,
-                per_page=100, #Recommended to be 100 (max value allowed by OpenAlex)
+                per_page=200, #Recommended to be 200 (max value allowed by OpenAlex)
                 max_pages=None  # Optional limit
             )
         except Exception as e:
