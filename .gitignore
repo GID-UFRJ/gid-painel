@@ -25,3 +25,6 @@ mediafiles/
 .idea/
 .DS_Store
 Thumbs.db
+
+
+*.dump

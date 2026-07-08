@@ -13,6 +13,9 @@ from .utils.export_helpers import DICIONARIOS_MAPEAMENTO, get_csv_response
 
 from django.core.cache import cache
 
+#Permite rodar comandos do manage.py por dentro do código
+from django.core.management import call_command
+
 
 def download_csv_generic(request, plotter_name: str, **kwargs):
     mapeamento_alvo = DICIONARIOS_MAPEAMENTO.get(plotter_name)
@@ -31,7 +34,6 @@ def download_csv_generic(request, plotter_name: str, **kwargs):
         return HttpResponse("Nenhum dado encontrado para os filtros informados.", status=404)
 
     return get_csv_response(df, f"{plotter_name}_{nome_plot}")
-
 
 def tarefa_atualizacao_dados():
     url_do_dump = config('DUMP_URL')
@@ -57,7 +59,7 @@ def tarefa_atualizacao_dados():
             
         print(f"Baixando arquivo final de: {link_download}")
         
-        # 2. Faz o download nativo em Python (seguro, sem dependência do curl)
+        # 2. Faz o download nativo em Python
         resposta_arquivo = requests.get(link_download, stream=True)
         resposta_arquivo.raise_for_status()
         
@@ -65,17 +67,25 @@ def tarefa_atualizacao_dados():
             for chunk in resposta_arquivo.iter_content(chunk_size=8192):
                 f.write(chunk)
                 
-        print("Download concluído. Iniciando restauração do banco...")
+        print("Download concluído. Iniciando restauração do banco (substituindo schema e dados)...")
 
         # 3. Restaura o banco de dados
+        # A flag --clean apaga as tabelas antigas antes de restaurar o backup
         subprocess.run([
             'pg_restore', '--clean', '--if-exists', '--no-owner', 
             '--dbname', db_url, caminho_tmp
         ], check=True)
         
-        print("Sincronização do banco concluída com sucesso!")
+        print("Restauração física concluída! Sincronizando o código com o banco...")
 
-        # 4. Limpeza do cache
+        # 4. A MÁGICA DA AUTOCURA: Roda o migrate
+        # Ele lê a tabela django_migrations (que acabou de ser restaurada do PC)
+        # e cria qualquer coluna nova que o código da UFRJ tenha, mas que faltava no backup.
+        call_command('migrate', interactive=False)
+        
+        print("Sincronização de migrações concluída com sucesso!")
+
+        # 5. Limpeza do cache
         print("Limpando os gráficos antigos do Redis...")
         cache.clear()
         print("Cache limpo! O painel já está exibindo os dados mais recentes.")
@@ -87,9 +97,10 @@ def tarefa_atualizacao_dados():
     except Exception as e:
         print(f"Erro inesperado: {e}")
     finally:
-        # 5. Limpa a sujeira
+        # 6. Limpa a sujeira
         if os.path.exists(caminho_tmp):
             os.remove(caminho_tmp)
+
 
 @staff_member_required
 def sincronizar_view(request):

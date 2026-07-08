@@ -125,11 +125,12 @@ else:
     # Em modo de produção (DEBUG=False), usamos a configuração robusta com Redis.
     REDIS_HOST = config('REDIS_HOST', default='localhost')
     REDIS_PORT = config('REDIS_PORT', default=6379, cast=int)
+    REDIS_DB = config('REDIS_DB', default=1, cast=int)
     
     CACHES = {
         "default": {
             "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/1",
+            "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}",
             "OPTIONS": {
                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
             }
