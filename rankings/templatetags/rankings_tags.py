@@ -26,11 +26,13 @@ def render_filtros_rankings(context, tipo, url_grafico, grafico_id, spinner_id, 
         f"{PATH_FILTROS}_filtro_ano_final.html",
     ]
 
-    if tipo == "academico":
-        max_ano_db = RankingEntrada.objects.filter(
+    #Valor máximo de ano para a tabela dos rankings
+    max_ano_db = RankingEntrada.objects.filter(
         ranking__tipo__nome__in=["ACADÊMICO", "SUSTENTABILIDADE"]
         ).aggregate(Max('ano'))['ano__max']
 
+
+    if tipo == "academico":
         lista = base_filters + [
             f"{PATH_FILTROS}_filtro_ranking_nome.html",
             f"{PATH_FILTROS}_filtro_ranking_escopo.html",
@@ -41,10 +43,6 @@ def render_filtros_rankings(context, tipo, url_grafico, grafico_id, spinner_id, 
         ctx["ano_final_padrao"] = max_ano_db
 
     elif tipo == "sustentabilidade":
-        max_ano_db = RankingEntrada.objects.filter(
-        ranking__tipo__nome__in=["ACADÊMICO", "SUSTENTABILIDADE"]
-        ).aggregate(Max('ano'))['ano__max']
-
 
         lista = base_filters + [
             f"{PATH_FILTROS}_filtro_ranking_nome.html",
