@@ -51,6 +51,19 @@ class EscopoGeografico(UpperCaseMixin):
     def __str__(self):
         return self.nome
 
+#class ODS(UpperCaseMixin):
+#    """
+#    Objetivos de Desenvolvimento Sustentável.
+#    Ex: ODS_3, ODS_4.
+#    """
+#    codigo = models.CharField(max_length=20, unique=True, help_text="Ex: ODS_3")
+#    descricao = models.CharField(max_length=255, blank=True, null=True, help_text="Ex: Saúde e Bem-Estar")
+#
+#    def __str__(self):
+#        if self.descricao:
+#            return f"{self.codigo} - {self.descricao}"
+#        return self.codigo
+
 class ODS(UpperCaseMixin):
     """
     Objetivos de Desenvolvimento Sustentável.
@@ -58,11 +71,31 @@ class ODS(UpperCaseMixin):
     """
     codigo = models.CharField(max_length=20, unique=True, help_text="Ex: ODS_3")
     descricao = models.CharField(max_length=255, blank=True, null=True, help_text="Ex: Saúde e Bem-Estar")
+    
+    # Campo invisível apenas para forçar a ordenação correta (1, 2, 3... 17)
+    numero = models.IntegerField(blank=True, null=True, editable=False)
+
+    class Meta:
+        ordering = ['numero'] # Garante a ordem numérica em todo o painel
+        verbose_name = "ODS"
+        verbose_name_plural = "ODSs"
+
+    def save(self, *args, **kwargs):
+        # Tenta extrair o número do código automaticamente (ex: 'ODS_3' -> 3)
+        if self.codigo and not self.numero:
+            try:
+                numero_str = self.codigo.split('_')[1]
+                self.numero = int(numero_str)
+            except (IndexError, ValueError):
+                pass
+                
+        super().save(*args, **kwargs)
 
     def __str__(self):
         if self.descricao:
             return f"{self.codigo} - {self.descricao}"
         return self.codigo
+
 
 class RankingEntrada(UpperCaseMixin):
     ranking = models.ForeignKey(Ranking, on_delete=models.CASCADE)
