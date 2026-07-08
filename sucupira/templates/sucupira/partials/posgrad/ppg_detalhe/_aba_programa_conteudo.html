@@ -7,21 +7,51 @@
 
 <div class="d-flex align-items-center mb-3 justify-content-center">
     <h3 class="mb-0 me-2">Evolução do Conceito CAPES</h3>
-    <a class="text-secondary" data-bs-toggle="collapse" href="#explicacaoConceito" role="button" aria-expanded="false" aria-controls="explicacaoConceito">
-        <i class="fa-solid fa-circle-question"></i>
+    <a data-bs-toggle="collapse" href="#collapseConceitosCapes" role="button" aria-expanded="false" aria-controls="collapseConceitosCapes" style="color: #003366; text-decoration: none; margin-left: 10px; font-weight: 500;">
+        <i class="fas fa-info-circle"></i> 
     </a>
+</div>
+
+<!-- O conteúdo do Collapse (escondido por padrão) -->
+<div class="collapse mt-2" id="collapseConceitosCapes">
+    <div class="card card-body" style="font-size: 0.85em; color: #555; background-color: #f8f9fa; border-left: 3px solid #003366;">
+        Os conceitos variam de 1 a 7, conforme a escala oficial da 
+        <a href="https://www.gov.br/capes/pt-br/acesso-a-informacao/acoes-e-programas/avaliacao" target="_blank" rel="noopener noreferrer" style="color: #003366; text-decoration: underline;">
+            Avaliação da CAPES
+        </a>:
+        <ul style="margin-top: 5px; margin-bottom: 0; padding-left: 20px;">
+            <li><b>1 e 2:</b> Desempenho insuficiente (implica descredenciamento).</li>
+            <li><b>3 a 5:</b> Desempenho de Regular a Muito Bom.</li>
+            <li><b>6 e 7:</b> Excelência e inserção internacional (exige nível de Doutorado).</li>
+        </ul>
+    </div>
 </div>
 
 <div class="collapse mb-4" id="explicacaoConceito">
     <div class="card card-body bg-light border-0">
-        <p class="mb-0 small text-muted">
-            Este gráfico de linha mostra a evolução da nota (conceito) atribuída pela CAPES a este programa de pós-graduação ao longo das diferentes avaliações anuais. O eixo Y representa a nota, que varia de 1 a 7. 
-            Gaps na linha indicam anos em que não houve avaliação ou dados disponíveis.
-            O conceito 0 (zero) significa a ausência de conceito, comum em programas recentes que ainda não passaram por uma avaliação da CAPES.
-        </p>
+        <div class="texto-explicativo-grafico" style="font-size: 0.9em; color: #555; margin-top: 15px;">
+            Este gráfico mostra a evolução do conceito atribuído pela CAPES a este programa ao longo das avaliações. 
+            Eventuais gaps (espaços vazios) na linha indicam anos em que não houve avaliação ou dados disponíveis.<br><br>
+                
+            Os conceitos variam de 1 a 7, conforme a escala oficial da 
+            <a href="https://www.gov.br/capes/pt-br/acesso-a-informacao/acoes-e-programas/avaliacao" target="_blank" rel="noopener noreferrer" style="color: #003366; text-decoration: underline;">
+                Avaliação da CAPES
+            </a>:
+            <ul style="margin-top: 5px; margin-bottom: 5px; padding-left: 20px;">
+                <li><b>1 e 2:</b> Desempenho insuficiente (implica descredenciamento).</li>
+                <li><b>3 a 5:</b> Desempenho de Regular a Muito Bom.</li>
+                <li><b>6 e 7:</b> Excelência e inserção internacional (exige nível de Doutorado).</li>
+            </ul>
+            
+            O conceito <b>A</b> significa ausência de conceito consolidado, comum em programas recém-criados.
+        </div>
     </div>
 </div>
 
 {# UPDATED URL TAG #}
 {% url 'sucupira:htmx_grafico_ppg_detalhe' programa_id=programa.id nome_plot='conceito_programa_por_ano' as url_conceito_programa_ano %}
 {% render_filtros_ppg_detalhe "conceito_programa" url_grafico=url_conceito_programa_ano grafico_id="programa-ano" spinner_id="spinner-programa-ano" grafico_html=conceito_programa_ano_plot plotter_name="ppg_detalhe" nome_plot="conceito_programa_por_ano" programa_id=programa.id %}
+
+<div class="texto-explicativo-grafico text-center" style="font-size: 0.85em; color: #6c757d; margin-top: 10px; margin-bottom: 1px;">
+    <b>NOTA:</b> O conceito A indica ausência de nota consolidada pela CAPES no momento da coleta dos dados.
+</div>

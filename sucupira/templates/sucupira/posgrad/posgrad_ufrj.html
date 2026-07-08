@@ -4,6 +4,7 @@
 
 {% load sucupira_tags %}
 
+{% load static %}
 
 {% block conteudo %}
 
@@ -17,12 +18,24 @@
 
     <hr class="my-2">
 
-
     {# A URL FOI ATUALIZADA AQUI PARA APONTAR PARA A SUPER VIEW #}
     {% url 'sucupira:htmx_grafico_sucupira' nome_plot='programas_contagem_por_ano' as url_programas_contagem %} 
 
     {# Chama a templatetag, passando todos os argumentos necessários #}
     {% render_filtros_posgrad_ufrj "programas_contagem" url_grafico=url_programas_contagem grafico_id="programas-contagem-ano" spinner_id="spinner-programas-contagem-ano" grafico_html=programas_contagem_ano_plot plotter_name="posgrad_ufrj" nome_plot="programas_contagem_por_ano" %}
+
+
+    <div id="nota-conceito-a" class="texto-explicativo-grafico text-center" style="display: none; font-size: 0.85em; color: #6c757d; margin-top: 10px; margin-bottom: 0px;">
+        <b>NOTA:</b> O conceito A indica ausência de nota consolidada pela CAPES no momento da coleta dos dados.
+    </div>
+
+    {#Importacao do script para exibir a nota apenas quando o agrupamento adequado estiver selecionado #}
+    <script src="{% static 'common/js/exibicao_condicional.js' %}"></script>
+
+    <script>
+        // Chama a função passando: (1) Seletor do input, (2) ID da nota, (3) Valor que ativa a nota
+        configurarExibicaoCondicional('select[name="agrupamento"]', 'nota-conceito-a', 'conceito');
+    </script>
 
 </div>
 

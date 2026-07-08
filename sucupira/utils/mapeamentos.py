@@ -249,9 +249,35 @@ MAPEAMENTOS_PPG_INDIVIDUAL = {
         },
     },
 
+    #"conceito_programa_por_ano" : {
+    #    "nome_plot": "conceito_programa_por_ano", # <-- ADICIONADO
+    #    "estrategia_plot": "direct",      # <-- ADICIONADO
+    #    "grupo_plot": "programa",
+    #    "tipo_grafico_padrao": "linha",
+    #    "modelo": AnoPrograma,
+    #    "titulo_base": "Evolução do Conceito CAPES do Programa",
+    #    "eixo_x_campo": "ano__ano_valor",
+    #    "eixo_x_nome": "Ano da Avaliação",
+    #    "eixo_x_tipo": "numerico_continuo",
+    #    "eixo_y_campo": "cd_conceito_programa__cd_conceito_programa",
+    #    "eixo_y_nome": "Conceito CAPES",
+    #    "filtros": {
+    #        "programa_id": "programa_id",
+    #        "ano_inicial": "ano__ano_valor__gte",
+    #        "ano_final": "ano__ano_valor__lte",
+    #    },
+    #    "filtros_padrao": {"ano_inicial": 2013},
+    #    "yaxes_config": {
+    #        "range": [-0.5, 7.5],      # Define o intervalo do eixo Y de -0.5 a 7.5
+    #        "tickmode": 'linear',   # Garante que os "ticks" (marcações) sejam lineares
+    #        "tick0": 0,             # Começa a primeira marcação no 0
+    #        "dtick": 1              # O intervalo entre cada marcação é 1 (0, 1, 2, ...)
+    #    }
+    #},
+
     "conceito_programa_por_ano" : {
-        "nome_plot": "conceito_programa_por_ano", # <-- ADICIONADO
-        "estrategia_plot": "direct",      # <-- ADICIONADO
+        "nome_plot": "conceito_programa_por_ano",
+        "estrategia_plot": "direct",
         "grupo_plot": "programa",
         "tipo_grafico_padrao": "linha",
         "modelo": AnoPrograma,
@@ -268,10 +294,19 @@ MAPEAMENTOS_PPG_INDIVIDUAL = {
         },
         "filtros_padrao": {"ano_inicial": 2013},
         "yaxes_config": {
-            "range": [0, 7.5],      # Define o intervalo do eixo Y de 0 a 7.5
-            "tickmode": 'linear',   # Garante que os "ticks" (marcações) sejam lineares
-            "tick0": 0,             # Começa a primeira marcação no 0
-            "dtick": 1              # O intervalo entre cada marcação é 1 (0, 1, 2, ...)
+            "range": [-0.5, 7.5],    # Dei um pequeno respiro negativo para o texto do 0 não cortar na base
+            "tickmode": 'array',     # Muda de linear para array para customizar os textos
+            "tickvals": [0, 1, 2, 3, 4, 5, 6, 7], # Os valores reais no banco de dados
+            "ticktext": [            # Os textos que vão aparecer no eixo Y na mesma ordem
+                "A",
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+            ]
         }
     },
 
