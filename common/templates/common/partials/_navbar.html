@@ -127,11 +127,33 @@
                 </div>
             </div>
 
-            {% for item in menu_items %}
-              <a href="{% url 'url_grafico_painel' item %}" class="list-group-item list-group-item-action">
-                {{ item.nome }}
-              </a>
-            {% endfor %}
+            <!-- Paineis criados pelo framework 'baseGraficos' do Leo são adicionados aqui... -->
+            {% if menu_items %}
+                <div class="nav-item-group">
+                    <div class="list-group-item custom-menu-links-parent d-flex justify-content-between align-items-center">
+                        <!-- Substitua o "#" caso exista uma página índice (index) geral para esses itens -->
+                        <a href="#" class="list-group-item-link">
+                            Painéis Dinâmicos <!-- Coloque o título do grupo aqui -->
+                        </a>
+                        <button class="btn btn-sm p-0 custom-toggle-btn" 
+                                type="button" 
+                                data-bs-toggle="collapse" 
+                                data-bs-target="#collapseDinamico" 
+                                aria-expanded="false" 
+                                aria-controls="collapseDinamico">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                    <div class="collapse" id="collapseDinamico">
+                        {% for item in menu_items %}
+                            <!-- Note a adição da classe 'sub-item' para seguir o padrão de recuo/estilo -->
+                            <a href="{% url 'url_grafico_painel' item %}" class="list-group-item list-group-item-action sub-item">
+                                {{ item.nome }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
             
         </div>
 
