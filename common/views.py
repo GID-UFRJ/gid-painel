@@ -36,6 +36,9 @@ def download_csv_generic(request, plotter_name: str, **kwargs):
     return get_csv_response(df, f"{plotter_name}_{nome_plot}")
 
 def tarefa_atualizacao_dados():
+    # Ativa o bloqueio do painel para os usuários comuns
+    cache.set('modo_manutencao', True, timeout=None)
+
     url_do_dump = config('DUMP_URL')
     caminho_tmp = '/tmp/novo_banco.dump'
     
@@ -47,6 +50,7 @@ def tarefa_atualizacao_dados():
     db_url = f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
 
     try:
+        print("Modo de manutenção ativado. Iniciando processo...")
         print(f"Processando URL: {url_do_dump}")
         
         # 1. Resolve redirecionamentos do Zenodo ou usa links diretos
@@ -98,8 +102,10 @@ def tarefa_atualizacao_dados():
         print(f"Erro inesperado: {e}")
     finally:
         # 6. Limpa a sujeira
+        cache.set('modo_manutencao', False) # Desliga o modo de manutencao
         if os.path.exists(caminho_tmp):
             os.remove(caminho_tmp)
+        print("Modo de manutenção desativado. Sistema liberado.")
 
 
 @staff_member_required

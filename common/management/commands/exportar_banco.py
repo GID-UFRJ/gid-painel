@@ -39,7 +39,7 @@ class Command(BaseCommand):
             '-p', db_port,
             '-d', db_name,
             '-Fc',                   # Formato custom/comprimido
-            '--no-privileges'        # Remove os privilégios (GRANT/REVOKE)
+            '--no-privileges',        # Remove os privilégios (GRANT/REVOKE)
             '-T', 'auth_*',          # Exclui usuários e senhas
             '-T', 'django_session',  # Exclui sessões ativas
             '-T', 'django_admin_log',# Exclui histórico de auditoria do admin
