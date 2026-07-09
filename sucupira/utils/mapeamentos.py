@@ -180,7 +180,7 @@ MAPEAMENTOS_PPG_GERAL = {
 
         # Agrupamento que o usuário poderá escolher
         "agrupamentos": {
-            "conceito": "cd_conceito_programa__cd_conceito_programa",
+            "conceito": "cd_conceito_programa__cd_conceito_programa_original",
             "in_rede": "in_rede",
         },
 
@@ -188,6 +188,10 @@ MAPEAMENTOS_PPG_GERAL = {
             "in_rede": "PPGs em Rede", 
             "conceito": "Conceito CAPES",
         },
+
+        "ordem_categorias": {
+            "conceito": ["A", "1", "2", "3", "4", "5", "6", "7"]
+        }
     }
 
 }
@@ -249,9 +253,10 @@ MAPEAMENTOS_PPG_INDIVIDUAL = {
         },
     },
 
+
     #"conceito_programa_por_ano" : {
-    #    "nome_plot": "conceito_programa_por_ano", # <-- ADICIONADO
-    #    "estrategia_plot": "direct",      # <-- ADICIONADO
+    #    "nome_plot": "conceito_programa_por_ano",
+    #    "estrategia_plot": "direct",
     #    "grupo_plot": "programa",
     #    "tipo_grafico_padrao": "linha",
     #    "modelo": AnoPrograma,
@@ -268,47 +273,48 @@ MAPEAMENTOS_PPG_INDIVIDUAL = {
     #    },
     #    "filtros_padrao": {"ano_inicial": 2013},
     #    "yaxes_config": {
-    #        "range": [-0.5, 7.5],      # Define o intervalo do eixo Y de -0.5 a 7.5
-    #        "tickmode": 'linear',   # Garante que os "ticks" (marcações) sejam lineares
-    #        "tick0": 0,             # Começa a primeira marcação no 0
-    #        "dtick": 1              # O intervalo entre cada marcação é 1 (0, 1, 2, ...)
+    #        "range": [-0.5, 7.5],    # Dei um pequeno respiro negativo para o texto do 0 não cortar na base
+    #        "tickmode": 'array',     # Muda de linear para array para customizar os textos
+    #        "tickvals": [0, 1, 2, 3, 4, 5, 6, 7], # Os valores reais no banco de dados
+    #        "ticktext": [            # Os textos que vão aparecer no eixo Y na mesma ordem
+    #            "A",
+    #            "1",
+    #            "2",
+    #            "3",
+    #            "4",
+    #            "5",
+    #            "6",
+    #            "7",
+    #        ]
     #    }
     #},
 
     "conceito_programa_por_ano" : {
-        "nome_plot": "conceito_programa_por_ano",
-        "estrategia_plot": "direct",
-        "grupo_plot": "programa",
-        "tipo_grafico_padrao": "linha",
-        "modelo": AnoPrograma,
-        "titulo_base": "Evolução do Conceito CAPES do Programa",
-        "eixo_x_campo": "ano__ano_valor",
-        "eixo_x_nome": "Ano da Avaliação",
-        "eixo_x_tipo": "numerico_continuo",
-        "eixo_y_campo": "cd_conceito_programa__cd_conceito_programa",
-        "eixo_y_nome": "Conceito CAPES",
-        "filtros": {
-            "programa_id": "programa_id",
-            "ano_inicial": "ano__ano_valor__gte",
-            "ano_final": "ano__ano_valor__lte",
+            "nome_plot": "conceito_programa_por_ano",
+            "estrategia_plot": "aggregated",  # ALTERADO para usar a classe que já sabe agrupar
+            "grupo_plot": "programa",
+            "tipo_grafico_padrao": "linha",
+            "modelo": AnoPrograma,
+            "__tipo_entidade__": "programa", # Ajuste conforme o padrão que seu plotter espera no _get_base_queryset
+            "titulo_base": "Evolução do Conceito CAPES do Programa por Quadriênio",
+            "eixo_x_campo": "ano__quadrienio__ds_quadrienio",
+            "eixo_x_nome": "Quadriênio",
+            "eixo_x_tipo": "categorico",
+            "eixo_y_campo": "cd_conceito_programa__cd_conceito_programa",
+            "eixo_y_nome": "Conceito CAPES",
+            "eixo_y_agregacao": "max",        # NOVO: Diz para a estratégia usar o máximo valor para aquele quadriênio (programas podem passar de A para 3, por exemplo...)
+            "filtros": {
+                "programa_id": "programa_id",
+            },
+            "filtros_padrao": {},
+            "yaxes_config": {
+                "range": [-0.5, 7.5],
+                "tickmode": 'array',
+                "tickvals": [0, 1, 2, 3, 4, 5, 6, 7],
+                "ticktext": ["A", "1", "2", "3", "4", "5", "6", "7"]
+            },
+            "ordering": ["ano__quadrienio__ordem"]
         },
-        "filtros_padrao": {"ano_inicial": 2013},
-        "yaxes_config": {
-            "range": [-0.5, 7.5],    # Dei um pequeno respiro negativo para o texto do 0 não cortar na base
-            "tickmode": 'array',     # Muda de linear para array para customizar os textos
-            "tickvals": [0, 1, 2, 3, 4, 5, 6, 7], # Os valores reais no banco de dados
-            "ticktext": [            # Os textos que vão aparecer no eixo Y na mesma ordem
-                "A",
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6",
-                "7",
-            ]
-        }
-    },
 
     "media_titulacao_por_ano" : {
         "nome_plot": "media_titulacao_por_ano",  # <-- ADICIONADO

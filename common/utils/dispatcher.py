@@ -43,7 +43,7 @@ class Dispatcher:
             '35 A 39 ANOS', '40 A 44 ANOS', '45 A 49 ANOS', '50 A 54 ANOS',
             '55 A 59 ANOS', '60 A 64 ANOS', '65 OU MAIS'
         ],
-        'conceito': ['0', '1', '2', '3', '4', '5', '6', '7']
+        'conceito': ['A', '1', '2', '3', '4', '5', '6', '7']
     }
 
 

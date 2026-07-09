@@ -196,9 +196,10 @@ def render_filtros_ppg_detalhe(context, tipo, url_grafico, grafico_id, spinner_i
 
     
     elif tipo == "conceito_programa":
-        lista_de_filtros = [
-            f"{PATH_FILTROS_ATOMicos}_filtro_ano_inicial.html", f"{PATH_FILTROS_ATOMicos}_filtro_ano_final.html",
-        ]
+        lista_de_filtros = []
+        #lista_de_filtros = [
+        #    f"{PATH_FILTROS_ATOMicos}_filtro_ano_inicial.html", f"{PATH_FILTROS_ATOMicos}_filtro_ano_final.html",
+        #]
 
     else:
         raise ValueError(f"Tipo de filtro inválido para 'ppg_detalhe': {tipo}")

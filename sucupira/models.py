@@ -2,8 +2,19 @@ from django.db import models
 
 # Tabelas de "Lookup" (dimensões simples)
 
+class Quadrienio(models.Model):
+    ds_quadrienio = models.CharField(max_length=20, unique=True, primary_key=True) # Ex: "2017-2020"
+    ordem = models.IntegerField(unique=True) # Índice sequencial (0, 1, 2, 3...) para garantir a ordenação correta
+
+    class Meta:
+        ordering = ['ordem'] # Ordena automaticamente do mais antigo para o mais recente
+
+    def __str__(self):
+        return self.ds_quadrienio
+
 class Ano(models.Model):
     ano_valor = models.IntegerField(unique=True, primary_key=True)
+    quadrienio = models.ForeignKey(Quadrienio, on_delete=models.PROTECT, related_name='anos', null=True, blank=True)
 
     def __str__(self):
         return str(self.ano_valor)
@@ -59,7 +70,12 @@ class ProgramaAreaAvaliacao(models.Model):
 
 class ProgramaConceito(models.Model):
     cd_conceito_programa = models.IntegerField(unique=True)
+    cd_conceito_programa_original = models.CharField(max_length=5, default='-')
     ds_conceito = models.CharField(max_length=100, null=True, blank=True) #Descrição do conceito
+
+    class Meta:
+        # Força o Django a ordenar sempre pelo valor numérico por padrão
+        ordering = ['cd_conceito_programa']
 
     def __str__(self):
         return f"{self.cd_conceito_programa} - {self.ds_conceito}"

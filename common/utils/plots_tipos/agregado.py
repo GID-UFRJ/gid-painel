@@ -1,6 +1,6 @@
 # em common/utils/plots_tipos/agregado.py
 import pandas as pd
-from django.db.models import Count, Sum, Avg
+from django.db.models import Count, Sum, Avg, Max
 from .xy_base import XYBaseStrategy
 
 class AggregatedPlotStrategy(XYBaseStrategy):
@@ -41,7 +41,12 @@ class AggregatedPlotStrategy(XYBaseStrategy):
         else:
             # Para outros casos (count, sum), a lógica permanece a mesma.
             distinct = 'distinct' in agregacao_str.lower()
-            agg_map = {"count": Count(eixo_y_campo, distinct=distinct), "sum": Sum(eixo_y_campo)}
+            agg_map = {
+                "count": Count(eixo_y_campo, distinct=distinct), 
+                "sum": Sum(eixo_y_campo),
+                "max": Max(eixo_y_campo)
+                }
+
             agg_func = agg_map.get(agregacao_base.lower())
             dados = queryset.values(*valores_a_buscar).annotate(**{alias_coluna_y: agg_func}).order_by(eixo_x_campo)
         
