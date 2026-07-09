@@ -86,7 +86,8 @@ class XYBaseStrategy(BasePlotStrategy):
             yaxes_config = self.mapeamento.get("yaxes_config")
             if yaxes_config:
                 fig.update_yaxes(**yaxes_config)
-        
+
+            fig.update_xaxes(categoryorder='category ascending')
 
             #Retorna o objeto fig
             return fig
