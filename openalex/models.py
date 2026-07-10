@@ -81,14 +81,21 @@ class WorkQuerySet(models.QuerySet):
     def com_status_colaboracao(self):
         # Importe o modelo localmente como você já faz
         from .models import AuthorshipInstitution
-        UFRJ_ID = 'I122140584'
+
+        instituicoes_ufrj = {
+            'MATRIZ': 'I122140584',
+            'VALONGO': 'I4210089367',
+            'CIENCIAS_COGNICAO': 'I4210126836',
+            'BIOFISICA': 'I4387153105'
+        }
+
     
         # Subquery: Existe alguma instituição BR nesse trabalho que não seja a UFRJ?
         parceiro_br = AuthorshipInstitution.objects.filter(
             authorship__work=OuterRef('pk'),
             institution__country_code='BR'
         ).exclude(
-            institution__institution_id=UFRJ_ID
+            institution__institution_id__in=instituicoes_ufrj.values()
         )
     
         # Subquery: Existe alguma instituição nesse trabalho que não seja BR?
