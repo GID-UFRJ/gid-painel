@@ -7,7 +7,18 @@ from django.db.models.functions import Coalesce
 #Também foi preferir usar chaves substitutas/artificiais (surrogate) em vez de naturais, para fins de eficiência e tbm pq elas substituem chaves compostas, para as quais o django não tem um suporte muito desenvolvido
 
 
+
 class WorkQuerySet(models.QuerySet):
+    # A Openalex tem sérios problemas com a identificacao de autores.
+    # Ex: https://api.openalex.org/works/w3097763105
+    # Nenhum dos 5 autores apresenta um ID que o ligue às outras tabelas
+    # Essa ausência de identificacao é bem comum, e pode  levar à subestimacao significativa
+    # do número de autores da ufrj que são correspondente/primeiro/ultimo.
+    # Logo, esse queryset de autor correspondente não vai ser incluído do painel 
+    # Se no futuro os metadados da OpenAlex para esse campo melhorarem em termos de qualidade 
+    # ou se acharmos que vale a pena reestruturarmos o banco de dados para obter esse dado específico 
+    # (salvando autores sem ID e tendo que lidar com questões de homônimos e afins), 
+    # poderemos usar essa e outras análises (último e primeiro autor, por exemplo)
     def autor_correspondente_ufrj(self):
         from .models import Authorship
 
@@ -147,6 +158,14 @@ class Work(models.Model):
     oa_status = models.ForeignKey(OAStatus, on_delete=models.CASCADE)
     referenced_works_count = models.IntegerField()
     fwci = models.FloatField(null=True, blank=True)
+
+    ## IDÉIA PARA O FUTURO: calcular esses campos desnormalizados
+    #top_topic_domain = models.CharField(max_length=255, null=True, blank=True)
+    #has_international_collab = models.BooleanField(default=False)
+    #has_national_collab = models.BooleanField(default=False)
+    #is_ufrj_corresponding = models.BooleanField(default=False)
+
+    ## Se os campos desnormalizados acima passarem a fazer parte desta tabela, boa parte dos WorkQuerySets não serão mais necessários
     objects = WorkQuerySet.as_manager()
 
     class Meta:

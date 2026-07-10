@@ -1,5 +1,7 @@
 {% extends "common/base.html" %}
 
+{% load static %}
+
 {% load openalex_tags %}
 
 {% block conteudo %}
@@ -16,9 +18,27 @@
 <div class="card-body">
     {% render_filtros_producao tipo="citacoes_por_ano" url_grafico="/pesquisa/graficos/citacoes_por_ano/" grafico_id="plot-citacoes" spinner_id="spinner-citacoes" grafico_html=graf_01 plotter_name="openalex" nome_plot="citacoes_por_ano" %}
 </div>
+    
+<!-- NOTA FWCI -->
+<div id="nota-fwci" class="texto-explicativo-grafico text-center" style="display: none; font-size: 0.85em; color: #6c757d; margin-top: 10px; margin-bottom: 0px;">
+    <b>NOTA:</b> Um FWCI > 1.0 indica que o artigo recebeu mais citações do que a média mundial esperada para o seu ano e área de publicação. Artigos sem FWCI calculado pela OpenAlex não foram contabilizados no cálculo deste percentual.
+</div>
 
 <div class="card-body">
     {% render_filtros_producao tipo="distribuicao_citacoes" url_grafico="/pesquisa/graficos/distribuicao_citacoes/" grafico_id="plot-distribuicao" spinner_id="spinner-distribuicao" grafico_html=graf_02 plotter_name="openalex" nome_plot="distribuicao_citacoes" %}
 </div>
+
+
+    <!-- IMPORTAÇÃO DO SCRIPT DE NOTAS (Se já não estiver no base.html) -->
+    <script src="{% static 'common/js/exibicao_condicional.js' %}"></script>
+
+    <!-- CONFIGURAÇÃO DA CONDIÇÃO -->
+    <script>
+        // (1) Seletor: O select que controla as métricas
+        // (2) ID da nota: 'nota-fwci'
+        // (3) Valor gatilho: 'fwci_acima_1' (o mesmo que está no dicionário do Python)
+        configurarExibicaoCondicional('select[name="metrica"]', 'nota-fwci', 'fwci_acima_1');
+    </script>
+
 
 {% endblock %}

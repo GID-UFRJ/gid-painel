@@ -27,7 +27,6 @@ MAPEAMENTOS_PRODUCAO = {
             #"tipo_documento": "worktype__worktype",
             "tipo_documento": "tipo_documento_limpo",
             "dominio": "worktopic__topic__domain_name",
-            "autor_correspondente": "autor_correspondente_ufrj",
         },
         "filtros": {
             "ano_inicial": "pubyear__year__gte",
@@ -40,7 +39,6 @@ MAPEAMENTOS_PRODUCAO = {
         },
         "queries_condicionais": {
             "tipo_documento": "com_tipo_documento_agrupado",
-            "autor_correspondente": "autor_correspondente_ufrj"
         },
 
         'substituicoes': OPENALEX_TRADUCOES
@@ -107,12 +105,17 @@ MAPEAMENTOS_IMPACTO = {
             "media": "Média de Citações",
             "total_citacoes_acumuladas": "Citações Acumuladas",
             "hindex": "Índice H",
+            "fwci_acima_1": "% Artigos com FWCI > 1"
+        },
+
+        "colunas_metricas_adicionais": {
+            "fwci_acima_1": "fwci"
         },
     
         "filtros": {
             "ano_inicial": "pubyear__year__gte",
             "ano_final": "pubyear__year__lte",
-            "metrica": None, # [total_citacoes, media, total_citacoes_acumuladas, hindex]
+            "metrica": None, # [total_citacoes, media, total_citacoes_acumuladas, hindex, média fwci]
         },
 
         "filtros_padrao": {

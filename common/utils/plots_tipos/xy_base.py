@@ -87,7 +87,22 @@ class XYBaseStrategy(BasePlotStrategy):
             if yaxes_config:
                 fig.update_yaxes(**yaxes_config)
 
-            fig.update_xaxes(categoryorder='category ascending')
+            # 3. APLICA AS CONFIGURAÇÕES DO EIXO X (automaticamente)
+            xaxes_config = self.mapeamento.get("xaxes_config", {}).copy()
+
+            # Se o desenvolvedor não forçou uma ordem manual no config...
+            if "categoryorder" not in xaxes_config:
+                # Inspecionamos a coluna do dataframe gerado pelas filhas (como o DistribuicaoStrategy)
+                if isinstance(df[eixo_x_nome].dtype, pd.CategoricalDtype):
+                    # O Pandas já sabe a ordem (graças ao pd.cut). Extraímos direto dele!
+                    xaxes_config["categoryorder"] = "array"
+                    xaxes_config["categoryarray"] = list(df[eixo_x_nome].cat.categories)
+                else:
+                    # Para anos e textos normais, ordem crescente
+                    xaxes_config["categoryorder"] = "category ascending"
+
+            if xaxes_config:
+                fig.update_xaxes(**xaxes_config)
 
             #Retorna o objeto fig
             return fig

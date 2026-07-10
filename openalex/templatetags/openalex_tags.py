@@ -45,7 +45,6 @@ def render_filtros_producao(context, tipo, url_grafico, grafico_id, spinner_id, 
             'Acesso Aberto': 'acesso_aberto',
             'Tipo de Documento': 'tipo_documento',
             'Domínio': 'dominio',
-            'Autor Correspondente': 'autor_correspondente',
         }
 
     elif tipo == "distribuicao_tematica":
@@ -71,6 +70,7 @@ def render_filtros_producao(context, tipo, url_grafico, grafico_id, spinner_id, 
             'Mediana de Citações': 'mediana',
             'Citações Acumuladas': 'total_citacoes_acumuladas',
             'Índice H': 'hindex',
+            '% Artigos com FWCI > 1': 'fwci_acima_1'
         }
         
         # Agrupamentos permitidos para esse gráfico específico

@@ -79,6 +79,13 @@
                 a produção e a citação, e permite observar a produção-impacto sem a contribuição dos <i>outliers</i>. 
                 <a href='https://wp.ufpel.edu.br/labserg/um-texto-util-para-entender-o-h-index/'>Este texto</a> explica em detalhes as origens do índice H e como calculá-lo.
             </p>
+
+            <p>
+                Para uma comparação justa entre diferentes disciplinas, utiliza-se o <strong>FWCI</strong> (<i>Field-Weighted Citation Impact</i>). 
+                Esta métrica normaliza as citações, comparando o artigo com a média mundial esperada para publicações do mesmo ano, 
+                tipo de documento e área de conhecimento. Um valor superior a 1,0 indica que o artigo ou conjunto analisado 
+                possui um impacto acima da média global. <a href='https://docs.openalex.org/api-entities/works/work-object#fwci' target='_blank'>Saiba mais sobre a metodologia da métrica</a>.
+            </p>
         {% endblocktrans %}    
 
         {% include "common/partials/_info_adicional.html" with texto=impacto_nota %}
@@ -86,8 +93,8 @@
     </h5>
 
     <p>
-        Inclui os totais de citação recebidos pela produção científica da UFRJ segundo o ano, 
-        a área do periódico, o tipo de acesso e a autoria correspondente. Inclui também o Índice H da UFRJ segundo estas mesmas variáveis.
+        Inclui os diversas métricas de citação recebidos pela produção científica da UFRJ segundo o ano, 
+        a área do periódico e o tipo de acesso. Inclui também o Índice H da UFRJ segundo estas mesmas variáveis.
     </p>
 
 

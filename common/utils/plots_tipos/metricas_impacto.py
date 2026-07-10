@@ -13,19 +13,27 @@ class MetricasImpactoStrategy(XYBaseStrategy):
 
             # --- 1. SETUP DE VARIÁVEIS ---
             eixo_x = self.mapeamento["eixo_x_campo"]
-            campo_valor = self.mapeamento["campo_valor"] 
+            campo_valor = self.mapeamento["campo_valor"] # O padrão (cited_by_count)
             agrupamento = self.filtros.get("agrupamento")
             campo_grupo = self.mapeamento.get("agrupamentos", {}).get(agrupamento)
 
-            # Monta a lista de colunas sem IFs usando concatenação de listas
+            metrica = self.filtros.get('metrica', 'total_citacoes')
+
+            # NOVIDADE: Verifica se essa métrica exige uma coluna específica (ex: fwci)
+            # Se não existir no dicionário, fallback para o campo_valor padrão
+            coluna_alvo = self.mapeamento.get("colunas_metricas_adicionais", {}).get(metrica, campo_valor)
+
+            # Monta a lista e garante que a coluna alvo seja buscada no banco
             campos_busca = [eixo_x, campo_valor] + ([campo_grupo] if campo_grupo else [])
+            if coluna_alvo not in campos_busca:
+                campos_busca.append(coluna_alvo)
+
             df = pd.DataFrame(list(queryset.values(*campos_busca)))
 
             if df.empty:
                 return pd.DataFrame()
 
             grupo_cols = [eixo_x] + ([campo_grupo] if campo_grupo else [])
-            metrica = self.filtros.get('metrica', 'total_citacoes')
 
             # ==========================================================
             # 2. CÁLCULOS
@@ -38,7 +46,10 @@ class MetricasImpactoStrategy(XYBaseStrategy):
                 'media': lambda: df.groupby(grupo_cols)[campo_valor].mean().round(2),
                 'mediana': lambda: df.groupby(grupo_cols)[campo_valor].median().round(2),
                 'hindex': lambda: df.groupby(grupo_cols)[campo_valor].apply(calculate_h_index),
-                'total_citacoes_acumuladas': lambda: df.groupby(grupo_cols)[campo_valor].sum().groupby(level=campo_grupo).cumsum() if campo_grupo else df.groupby(grupo_cols)[campo_valor].sum().cumsum()
+                'total_citacoes_acumuladas': lambda: df.groupby(grupo_cols)[campo_valor].sum().groupby(level=campo_grupo).cumsum() if campo_grupo else df.groupby(grupo_cols)[campo_valor].sum().cumsum(),
+                'fwci_acima_1': lambda: df.dropna(subset=['fwci']).assign(
+                    **{campo_valor: lambda x: (x['fwci'] > 1.0).astype(int) * 100}
+                ).groupby(grupo_cols)[campo_valor].mean().round(1)
             }
 
             # Aciona a função escolhida (ou a soma por padrão) e limpa o índice
