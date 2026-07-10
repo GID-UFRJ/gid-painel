@@ -37,7 +37,7 @@ ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',')]
 
 
 #Email do admin (usado para o polite pool da openalex api)
-DJANGO_SUPERUSER_EMAIL = config('DJANGO_SUPERUSER_EMAIL')
+DJANGO_SUPERUSER_EMAIL = config('DJANGO_SUPERUSER_EMAIL', default='exemplo@gmail.com')
 
 
 # Application definition
