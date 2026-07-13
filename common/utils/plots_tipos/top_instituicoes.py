@@ -44,11 +44,17 @@ class TopInstituicoesStrategy(TopNStrategy):
         nome_coluna_original = self.mapeamento.get("ranking_campo_categoria", "institution_name")
         coluna_alvo = coluna_eixo_y if coluna_eixo_y in df.columns else nome_coluna_original
 
-        # -> NOVO: Salva o nome original em uma coluna extra antes de sobrescrever!
-        df["Nome Completo"] = df[coluna_alvo]
+        # ACESSA O DICIONÁRIO PELO MAPEAMENTO (Sem precisar importar!)
+        traducoes = self.mapeamento.get("substituicoes", {})
+        trad_dict_nomes = traducoes.get("Nome Completo", {})
 
-        # Passo A: Transforma os nomes longos em siglas usando sua função
-        df[coluna_eixo_y] = df[coluna_alvo].apply(gerar_sigla)
+        # APLICA A TRADUÇÃO IGNORANDO MAIÚSCULAS/MINÚSCULAS ANTES DA SIGLA
+        df["Nome Completo"] = df[coluna_alvo].apply(
+            lambda nome: trad_dict_nomes.get(str(nome).upper(), nome)
+        )
+
+        # Passo A: Transforma os nomes já traduzidos em siglas
+        df[coluna_eixo_y] = df["Nome Completo"].apply(gerar_sigla)
 
         # Passo B: Desambigua siglas repetidas
         df[coluna_eixo_y] = renomear_siglas_duplicadas(df[coluna_eixo_y])

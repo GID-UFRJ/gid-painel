@@ -1,5 +1,7 @@
 {# sucupira/templates/sucupira/partials/pessoal/_aba_docentes_conteudo.html #}
 
+{% load static %}
+
 {% load sucupira_tags %}
 
 {# Gráfico 1: Docentes por Ano #}
@@ -11,6 +13,14 @@
 {# Gráfico 2: Docentes por Área (Sunburst) #}
 {% url 'sucupira:htmx_grafico_sucupira' nome_plot='docentes_por_area_sunburst' as url_docentes_sunburst %}
 {% render_filtros_pessoal "sunburst" url_grafico=url_docentes_sunburst grafico_id="docentes-sunburst" spinner_id="spinner-docentes-sunburst" grafico_html=docentes_sunburst_plot plotter_name="pessoal" nome_plot="docentes_por_area_sunburst" %}
+
+{# NOVO: Nota explicativa do Sunburst #}
+<div class="text-center mt-2">
+    <small class="text-muted text-gray-500">
+        <b>Nota:</b> Docentes são contabilizados uma única vez por área. Caso atuem em áreas distintas, serão contados em cada uma delas.
+    </small>
+</div>
+
 
 <hr class="my-5">
 

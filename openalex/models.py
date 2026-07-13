@@ -5,7 +5,7 @@ from django.db.models.functions import Coalesce
 
 #Nota: Django cria AutoFields automaticamente (nome da coluna = 'id') quando uma PK não é definida. Esse padrão é esperado por outras bibliotecas e resolvi aderir.
 #Também foi preferir usar chaves substitutas/artificiais (surrogate) em vez de naturais, para fins de eficiência e tbm pq elas substituem chaves compostas, para as quais o django não tem um suporte muito desenvolvido
-
+from openalex.utils.config import UFRJ_IDS_LIST
 
 
 class WorkQuerySet(models.QuerySet):
@@ -81,21 +81,13 @@ class WorkQuerySet(models.QuerySet):
     def com_status_colaboracao(self):
         # Importe o modelo localmente como você já faz
         from .models import AuthorshipInstitution
-
-        instituicoes_ufrj = {
-            'MATRIZ': 'I122140584',
-            'VALONGO': 'I4210089367',
-            'CIENCIAS_COGNICAO': 'I4210126836',
-            'BIOFISICA': 'I4387153105'
-        }
-
     
         # Subquery: Existe alguma instituição BR nesse trabalho que não seja a UFRJ?
         parceiro_br = AuthorshipInstitution.objects.filter(
             authorship__work=OuterRef('pk'),
             institution__country_code='BR'
         ).exclude(
-            institution__institution_id__in=instituicoes_ufrj.values()
+            institution__institution_id__in=UFRJ_IDS_LIST
         )
     
         # Subquery: Existe alguma instituição nesse trabalho que não seja BR?

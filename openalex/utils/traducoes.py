@@ -299,5 +299,22 @@ OPENALEX_TRADUCOES = {
         'Virology': 'Virologia',
         'Visual Arts and Performing Arts': 'Artes Visuais e Cênicas',
         'Water Science and Technology': 'Ciência e Tecnologia da Água'
+    },
+
+    'Nome Completo': {
+        "NUCLEAR ENGINEERING INSTITUTE": "Instituto de Engenharia Nuclear",
+        "VALONGO OBSERVATORY": "Observatório do Valongo",
+        "NATIONAL COUNCIL FOR SCIENTIFIC AND TECHNOLOGICAL DEVELOPMENT": "Conselho Nacional de Desenvolvimento Científico e Tecnológico",
+        "MILITARY INSTITUTE OF ENGINEERING": "Instituto Militar de Engenharia",
+        "ESTÁCIO (BRAZIL)": "Universidade Estácio de Sá",
+        "STATE UNIVERSITY OF NORTE FLUMINENSE": "Universidade Estadual do Norte Fluminense",
+        "NATIONAL INSTITUTE OF SCIENCE AND TECHNOLOGY FOR STRUCTURAL BIOLOGY AND BIOIMAGING": "Instituto Nacional de Ciência e Tecnologia de Biologia Estrutural e Bioimagem",
+        "FEDERAL CENTER FOR TECHNOLOGICAL EDUCATION CELSO SUCKOW DA FONSECA": "Centro Federal de Educação Tecnológica Celso Suckow da Fonseca",
+        "BRAZILIAN AGRICULTURAL RESEARCH CORPORATION": "Empresa Brasileira de Pesquisa Agropecuária",
+        "D’OR INSTITUTE FOR RESEARCH AND EDUCATION": "Instituto D'Or de Pesquisa e Ensino",
+        "RIO DE JANEIRO FEDERAL INSTITUTE OF EDUCATION, SCIENCE AND TECHNOLOGY": "Instituto Federal de Educação, Ciência e Tecnologia do Rio de Janeiro",
+        "PETROBRAS (BRAZIL)": "Petrobras",
+        "PONTIFICAL CATHOLIC UNIVERSITY OF RIO DE JANEIRO": "Pontifícia Universidade Católica do Rio de Janeiro",
+        "NATIONAL OBSERVATORY": "Observatório Nacional"
     }
 }
