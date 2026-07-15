@@ -41,12 +41,14 @@ def tarefa_atualizacao_dados():
 
     url_do_dump = settings.DUMP_URL
     caminho_tmp = '/tmp/novo_banco.dump'
-    
-    db_user = config('POSTGRES_USER')
-    db_pass = config('POSTGRES_PASSWORD')
-    db_host = config('POSTGRES_HOST')
-    db_port = config('POSTGRES_PORT', default='5432')
-    db_name = config('POSTGRES_DB')
+
+    db_settings = settings.DATABASES['default']
+    db_user = db_settings['USER']
+    db_pass = db_settings['PASSWORD']
+    db_host = db_settings['HOST']
+    db_port = db_settings.get('PORT', '5432')
+    db_name = db_settings['NAME']
+
     db_url = f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
 
     try:
