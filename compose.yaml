@@ -58,8 +58,6 @@ services:
       timeout: 10s
       retries: 5
       start_period: 30s
-    ports: 
-      - 5433:5432
     restart: "on-failure"
 
   redis:
