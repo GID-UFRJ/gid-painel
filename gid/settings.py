@@ -39,6 +39,11 @@ ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',')]
 #Email do admin (usado para o polite pool da openalex api)
 DJANGO_SUPERUSER_EMAIL = config('DJANGO_SUPERUSER_EMAIL', default='exemplo@gmail.com')
 
+# URL de atualização do banco de dados
+DUMP_URL = config(
+    'DUMP_URL', 
+    default='https://doi.org/10.5281/zenodo.20563334',
+)
 
 # Application definition
 

@@ -2,7 +2,7 @@ import threading
 import subprocess
 import os
 import requests
-from decouple import config
+from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.urls import reverse
@@ -39,7 +39,7 @@ def tarefa_atualizacao_dados():
     # Ativa o bloqueio do painel para os usuários comuns
     cache.set('modo_manutencao', True, timeout=None)
 
-    url_do_dump = config('DUMP_URL')
+    url_do_dump = settings.DUMP_URL
     caminho_tmp = '/tmp/novo_banco.dump'
     
     db_user = config('POSTGRES_USER')
