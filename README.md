@@ -86,7 +86,7 @@ Todo o processo de importação e atualização do banco de dados é realizado d
 
 Exemplo de configuração básica:
 
-env
+```env
 # Django
 DJANGO_SECRET_KEY=sua_chave_secreta_aqui
 DJANGO_DEBUG=False
@@ -117,13 +117,14 @@ CADDY_DOMAIN=localhost
 CADDY_EMAIL=dev@example.com
 
 # Dump Database URL (Para atualizações)
-DUMP_URL=http://exemplo.com/dump.sql
+DUMP_URL=https://doi.org/10.5281/zenodo.20563334
+```
 
 
 > **Nota:** Para gerar uma chave segura do Django, use:
-> bash
+> ``bash
 > python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-> 
+> ```
 
 ---
 
