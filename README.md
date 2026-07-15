@@ -122,7 +122,7 @@ DUMP_URL=https://doi.org/10.5281/zenodo.20563334
 
 
 > **Nota:** Para gerar uma chave segura do Django, use:
-> ``bash
+> ```bash
 > python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
 > ```
 
