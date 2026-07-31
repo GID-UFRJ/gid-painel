@@ -296,7 +296,7 @@ MAPEAMENTOS_PPG_INDIVIDUAL = {
             "tipo_grafico_padrao": "linha",
             "modelo": AnoPrograma,
             "__tipo_entidade__": "programa", # Ajuste conforme o padrão que seu plotter espera no _get_base_queryset
-            "titulo_base": "Evolução do Conceito CAPES do Programa por Quadriênio",
+            "titulo_base": "Evolução do Conceito CAPES do Programa",
             "eixo_x_campo": "ano__quadrienio__ds_quadrienio",
             "eixo_x_nome": "Quadriênio",
             "eixo_x_tipo": "categorico",
