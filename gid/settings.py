@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-from decouple import config
+from decouple import config, Csv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -36,6 +36,17 @@ ALLOWED_HOSTS_STR = config('DJANGO_ALLOWED_HOSTS', default='127.0.0.1,localhost'
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',')]
 
 
+# --- INÍCIO DA CONFIGURAÇÃO CSRF ---
+
+# 1. Define as origens seguras que podem enviar formulários (lendo do .env)
+CSRF_TRUSTED_ORIGINS = config('DJANGO_CSRF_TRUSTED_ORIGINS', cast=Csv(), default='')
+
+# 2. Informa ao Django para confiar no HTTPS repassado pelo proxy ou Caddy
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# --- FIM DA CONFIGURAÇÃO CSRF ---
+
+
 #Email do admin (usado para o polite pool da openalex api)
 DJANGO_SUPERUSER_EMAIL = config('DJANGO_SUPERUSER_EMAIL', default='exemplo@gmail.com')
 
@@ -44,6 +55,8 @@ DUMP_URL = config(
     'DUMP_URL', 
     default='https://doi.org/10.5281/zenodo.20563334',
 )
+
+
 
 # Application definition
 
