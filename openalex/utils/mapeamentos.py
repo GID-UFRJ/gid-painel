@@ -15,7 +15,7 @@ MAPEAMENTOS_PRODUCAO = {
         "nome_plot": "producao_por_ano",
         "estrategia_plot": "aggregated",
         "modelo": Work,
-        "titulo_base": "Total de publicações por ano",
+        "titulo_base": "Total de publicações",
         "eixo_x_campo": "pubyear__year",
         "eixo_x_nome": "Ano",
         "eixo_y_campo": "id",

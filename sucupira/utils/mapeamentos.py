@@ -137,7 +137,7 @@ MAPEAMENTOS_DOCENTES = {
         "titulo_base": "Top 10 Países de Procedência - Docentes",
         "ranking_campo_categoria": "pessoa__pais_nacionalidade__pais",
         "ranking_campo_valor": "pessoa_id",
-        "eixo_x_nome": "Total de discentes",
+        "eixo_x_nome": "Total de docentes",
         "eixo_y_nome": "País",
         "ranking_agregacao": "count_distinct",
         "ranking_limite_padrao": 10,
