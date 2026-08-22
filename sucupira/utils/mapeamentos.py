@@ -317,8 +317,8 @@ MAPEAMENTOS_PPG_INDIVIDUAL = {
         },
 
     "media_titulacao_por_ano" : {
-        "nome_plot": "media_titulacao_por_ano",  # <-- ADICIONADO
-        "estrategia_plot": "aggregated",      # <-- ADICIONADO
+        "nome_plot": "media_titulacao_por_ano", 
+        "estrategia_plot": "aggregated",
         "grupo_plot": "discentes",
         "modelo": Discente,
         "titulo_base": "Tempo Médio para Titulação por Ano",
