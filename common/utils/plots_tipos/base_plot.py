@@ -165,7 +165,15 @@ class BasePlotStrategy(ABC):
             # "legend": dict(font=dict(size=tamanho_fonte - 1))
         }
 
-        # 3. Aplica as atualizações ao gráfico
+        # 3. CONTROLE DO TÍTULO: 
+        # Se a flag 'omitir_sufixo_titulo' estiver ativada no dicionário, 
+        # nós sobrescrevemos o título gerado pela classe filha e usamos apenas o titulo_base puro.
+        if self.mapeamento.get('omitir_sufixo_titulo'):
+            titulo_base = self.mapeamento.get('titulo_base')
+            if titulo_base:
+                layout_updates['title_text'] = titulo_base
+
+        # 4. Aplica as atualizações ao gráfico
         fig.update_layout(**layout_updates)
         
         return fig

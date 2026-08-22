@@ -321,7 +321,8 @@ MAPEAMENTOS_PPG_INDIVIDUAL = {
         "estrategia_plot": "aggregated",      # <-- ADICIONADO
         "grupo_plot": "discentes",
         "modelo": Discente,
-        "titulo_base": "Tempo Médio para Titulação",
+        "titulo_base": "Tempo Médio para Titulação por Ano",
+        "omitir_sufixo_titulo": True, 
         "eixo_x_campo": "ano__ano_valor",
         "eixo_x_nome": "Ano de Titulação",
         "eixo_x_tipo": "numerico_continuo",
