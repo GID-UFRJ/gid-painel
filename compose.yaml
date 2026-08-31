@@ -12,6 +12,7 @@ services:
       - DJANGO_PORT
       - GUNICORN_WORKERS
       - DJANGO_STATIC_ROOT
+      - DJANGO_CSRF_TRUSTED_ORIGINS
       # Variáveis do Banco de Dados PostgreSQL (lidas do .env)
       - POSTGRES_USER
       - POSTGRES_DB
