@@ -155,4 +155,4 @@ docker compose down -v
 
 ## 📝 Licença
 
-Este projeto é mantido pelo Escritório de Gestão de Indicadores Institucionais da UFRJ ([GID](https://pr2.ufrj.br/gid)). Licenciamento e termos de uso podem ser definidos conforme sua organização.
+Este projeto está licenciado sob a **GNU General Public License v3.0** (GPLv3) - veja o arquivo [LICENSE](LICENSE) para detalhes.
