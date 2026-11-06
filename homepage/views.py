@@ -18,3 +18,7 @@ def indicadores(request): #Página de indicadores
 @cache_page(settings.CACHE_TIMEOUT_PAGINAS)
 def creditos(request):
     return render(request, r'homepage/creditos.html')
+
+@cache_page(settings.CACHE_TIMEOUT_PAGINAS)
+def cartilhas(request): #Página sobre o GID e suas cartilhas
+    return render(request, r'homepage/cartilhas.html')
